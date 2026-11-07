@@ -2,6 +2,8 @@
 
 The first tool in the **Motif** suite. You sketch a system context diagram, turn it into a ports-and-adapters sketch, and export both as SVG pictures, plus a Markdown solution plan a coding agent can build stubs from. It's a Blazor WebAssembly app for GitHub Pages: no server and no accounts. Your work stays in your own files and browser.
 
+**Try it: [johnrpage.github.io/Motif.Sketch](https://johnrpage.github.io/Motif.Sketch/)**. File → Open example shows Motif Sketch's own design.
+
 It combines and replaces two desktop tools: [Context Sketch](https://github.com/johnrpage/context-tool) and [HexaSketch](https://github.com/johnrpage/HexaSketch).
 
 ## Design
@@ -22,14 +24,13 @@ These pictures are rendered from the two diagram files below, by Context Sketch'
 
 ### Still to do
 
-1. **Turn on GitHub Pages** for the repository (Settings → Pages → Source: GitHub Actions). Until then the workflow's deploy job fails; its test and publish jobs still run.
-2. **Run [docs/manual-checks.md](docs/manual-checks.md)** in Chrome or Edge and in Firefox, then tick off SPEC §8's acceptance checklist. The build was checked in an embedded Chromium only. These haven't been tried yet:
+1. **Run [docs/manual-checks.md](docs/manual-checks.md)** on the live site in Chrome or Edge and in Firefox, then tick off SPEC §8's acceptance checklist. The build was checked in an embedded Chromium only. These haven't been tried yet:
    - the File System Access save and open dialogs, save-in-place after a reload, and real SVG and plan files on disk
    - Firefox's upload and download fallback
    - touch: dragging, pinch-to-zoom and tap-and-hold
    - phone widths (read-only)
    - copying to the clipboard (the embedded browser refused it; the manual-copy fallback worked)
-3. **Answer the open questions** at the end of [decisions.md](decisions.md#still-open).
+2. **Answer the open questions** at the end of [decisions.md](decisions.md#still-open).
 
 Later ideas (not v1) are listed at the end of [decisions.md](decisions.md#later-not-v1).
 
