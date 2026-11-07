@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "title": "Motif Sketch - Context Diagram",
+  "elements": [
+    {
+      "id": "c5a10a01",
+      "type": "system",
+      "name": "Motif Sketch",
+      "description": "Sketch a context diagram, turn it into a ports-and-adapters sketch, then export the diagrams and a solution plan",
+      "technology": "Blazor WebAssembly (GitHub Pages)",
+      "x": 0,
+      "y": 0,
+      "pinned": false
+    },
+    {
+      "id": "c5a10a02",
+      "type": "primaryActor",
+      "name": "Architect",
+      "description": "Sketches the context diagram, then the ports and adapters; exports diagrams and plan, and shares links",
+      "technology": "Web browser",
+      "x": -385,
+      "y": -65,
+      "pinned": false
+    },
+    {
+      "id": "c5a10a08",
+      "type": "primaryActor",
+      "name": "Viewer",
+      "description": "Opens a diagram someone shared, read-only",
+      "technology": "Web browser (snapshot link)",
+      "x": -385,
+      "y": 65,
+      "pinned": false
+    },
+    {
+      "id": "c5a10a0a",
+      "type": "externalSystem",
+      "name": "Clipboard",
+      "description": "Where Copy link puts a snapshot link, ready to paste",
+      "technology": "Browser Clipboard API",
+      "x": 345,
+      "y": -260,
+      "pinned": false
+    },
+    {
+      "id": "c5a10a05",
+      "type": "storage",
+      "name": "Project Files",
+      "description": "Saved projects: one file per system holding the context diagram and, once started, its ports-and-adapters sketch",
+      "technology": "Local files (.motifsketch.json, saved in place or downloaded)",
+      "x": 345,
+      "y": -130,
+      "pinned": false
+    },
+    {
+      "id": "c5a10a06",
+      "type": "storage",
+      "name": "Browser Storage",
+      "description": "Autosaved work in progress and its file handle, so a refresh or closed tab loses nothing and Save still goes to the same file",
+      "technology": "IndexedDB",
+      "x": 345,
+      "y": 0,
+      "pinned": false
+    },
+    {
+      "id": "c5a10a07",
+      "type": "storage",
+      "name": "Diagram Exports",
+      "description": "The context diagram and the ports-and-adapters sketch as pictures",
+      "technology": "Local files (SVG, saved or downloaded)",
+      "x": 345,
+      "y": 130,
+      "pinned": false
+    },
+    {
+      "id": "c5a10a09",
+      "type": "storage",
+      "name": "Solution Plans",
+      "description": "The solution stub plan a coding agent builds from",
+      "technology": "Local files (Markdown, saved or downloaded)",
+      "x": 345,
+      "y": 260,
+      "pinned": false
+    }
+  ],
+  "relationships": [
+    {
+      "id": "c5a10b01",
+      "from": "c5a10a02",
+      "to": "c5a10a01",
+      "label": "Sketches, exports and shares diagrams",
+      "direction": "oneWay"
+    },
+    {
+      "id": "c5a10b07",
+      "from": "c5a10a08",
+      "to": "c5a10a01",
+      "label": "Views shared diagrams",
+      "direction": "oneWay"
+    },
+    {
+      "id": "c5a10b04",
+      "from": "c5a10a01",
+      "to": "c5a10a05",
+      "label": "Opens and saves projects",
+      "direction": "oneWay"
+    },
+    {
+      "id": "c5a10b05",
+      "from": "c5a10a01",
+      "to": "c5a10a06",
+      "label": "Autosaves and restores work",
+      "direction": "oneWay"
+    },
+    {
+      "id": "c5a10b06",
+      "from": "c5a10a01",
+      "to": "c5a10a07",
+      "label": "Writes diagram pictures",
+      "direction": "oneWay"
+    },
+    {
+      "id": "c5a10b08",
+      "from": "c5a10a01",
+      "to": "c5a10a09",
+      "label": "Writes solution plan",
+      "direction": "oneWay"
+    },
+    {
+      "id": "c5a10b09",
+      "from": "c5a10a01",
+      "to": "c5a10a0a",
+      "label": "Copies share links",
+      "direction": "oneWay"
+    }
+  ]
+}
