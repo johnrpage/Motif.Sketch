@@ -18,11 +18,11 @@ These pictures are rendered from the two diagram files below, by Context Sketch'
 
 ## Status
 
-**Designing, not built yet.** The context diagram, the ports-and-adapters sketch and the spec are done.
+**Designing, not built yet.** The context diagram, the ports-and-adapters sketch, the spec and the look-and-feel pass are done.
 
 ### Next steps
 
-1. **Look-and-feel design pass** (SPEC §9), with mockups before any UI code: the app layout and chrome, how the two views relate, Motif's visual identity (light/dark), touch and narrow screens, the Checks adapter's look, first-run and empty states, and Viewer mode.
+1. ~~**Look-and-feel design pass**~~ (SPEC §9): done. See decisions 26–39 and the mockups in [docs/mockups](docs/mockups).
 2. **Plan the build** from SPEC.md, resolving the planner decisions in §10.
 3. **Build**, deploying to GitHub Pages from the first phase.
 4. Once `.motifsketch.json` exists, make the bundled example project from this folder's two diagram files.

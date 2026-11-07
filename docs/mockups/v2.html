@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en" data-theme-pref="system">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motif Sketch Look</title>
+<!-- Mockup only: the app self-hosts IBM Plex (decision 34). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --chrome: #F1F5F9;  --bar: #FFFFFF;    --strip: #F8FAFC;  --canvas: #FFFFFF;
+    --ink: #0F172A;     --text: #334155;   --muted: #64748B;  --line: #E2E8F0;  --line-strong: #CBD5E1;
+    --hover: #EEF2F6;   --pressed: #E2E8F0;
+    --accent: #EA580C;  --accent-ink: #FFFFFF; --accent-soft: #FFF1E6;
+    --card: #FFFFFF;    --shadow: 0 8px 24px rgba(15,23,42,.10), 0 1px 2px rgba(15,23,42,.06);
+    --banner: #FEF3C7;  --banner-ink: #78350F;
+    /* diagram palette (light = export palette, so no overrides) */
+  }
+  :root[data-theme="dark"] {
+    --chrome: #0B1120;  --bar: #111827;    --strip: #0F172A;  --canvas: #141C2B;
+    --ink: #F1F5F9;     --text: #CBD5E1;   --muted: #94A3B8;  --line: #1F2A3C;  --line-strong: #334155;
+    --hover: #1C2638;   --pressed: #263248;
+    --accent: #FB923C;  --accent-ink: #1A0E05; --accent-soft: #2A1A10;
+    --card: #182235;    --shadow: 0 8px 24px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4);
+    --banner: #2A2110;  --banner-ink: #FCD34D;
+    /* dark diagram twin */
+    --d-surface: #1B2638; --d-real: #4D5D73; --d-real-edge: #7C8BA1; --d-light-box: #2B3A50;
+    --d-line: #8796AD;  --d-ink: #E2E8F0;  --d-muted: #94A3B8; --d-hex: #19243A;
+    --d-user: #3A1F22;  --d-user-edge: #F0857A; --d-checks: #2B3A50; --d-divider: #2E3B52;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font: 13px/1.45 "IBM Plex Sans", "Segoe UI", Arial, sans-serif; color: var(--text);
+    background: var(--chrome); display: flex; flex-direction: column;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; white-space: nowrap; }
+  svg.i { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* Mockup-only banner */
+  .mock { background: var(--banner); color: var(--banner-ink); padding: 5px 12px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; font-size: 12px; }
+  .mock b { font-weight: 600; }
+  .mock .seg button { padding: 1px 8px; border: 1px solid currentColor; opacity: .7; }
+  .mock .seg button:first-child { border-radius: 4px 0 0 4px; } .mock .seg button:last-child { border-radius: 0 4px 4px 0; }
+  .mock .seg button + button { border-left: 0; }
+  .mock .seg button[aria-pressed="true"] { opacity: 1; background: var(--banner-ink); color: var(--banner); }
+
+  /* App bar */
+  .appbar { height: 48px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 10px; background: var(--bar); border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 8px; padding-right: 12px; color: var(--ink); font-size: 15px; letter-spacing: -.01em; }
+  .brand .mark { width: 24px; height: 24px; }
+  .brand .motif { font-weight: 400; color: var(--muted); }
+  .brand .tool { font-weight: 600; margin-left: -4px; }
+  .title { display: flex; align-items: center; gap: 6px; padding: 4px 10px; margin-right: 6px; border-radius: 6px; color: var(--ink); font-weight: 500; }
+  .title:hover { background: var(--hover); }
+  .title .dirty { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .cmd { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border-radius: 6px; color: var(--text); }
+  .cmd:hover { background: var(--hover); color: var(--ink); }
+  .cmd:active { background: var(--pressed); }
+  .cmd.icon { padding: 0 8px; }
+  .cmd .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-left: -2px; }
+  .vsep { width: 1px; height: 20px; background: var(--line); margin: 0 6px; }
+  .spacer { flex: 1; }
+  .primary { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 14px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .primary:hover { filter: brightness(1.06); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 13px; background: var(--hover); color: var(--text); font-size: 12px; }
+
+  .menu { position: relative; }
+  .menu-list { display: none; position: absolute; top: calc(100% + 4px); right: 0; z-index: 30; min-width: 220px; background: var(--card); border: 1px solid var(--line-strong); border-radius: 8px; box-shadow: var(--shadow); padding: 4px; }
+  .menu.left .menu-list { left: 0; right: auto; }
+  .menu.open .menu-list { display: block; }
+  .menu-list button { display: flex; width: 100%; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 5px; text-align: left; color: var(--text); }
+  .menu-list button:hover { background: var(--hover); color: var(--ink); }
+  .menu-list button[aria-checked="true"]::after { content: "✓"; margin-left: auto; color: var(--accent); }
+  .menu-list .note { padding: 6px 10px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); margin-top: 4px; }
+  .menu-list .note b { color: var(--accent); font-weight: 500; }
+
+  .switch { display: inline-flex; padding: 2px; gap: 2px; border-radius: 8px; background: var(--hover); margin: 0 4px; }
+  .switch button { display: flex; align-items: center; height: 28px; padding: 0 8px; border-radius: 6px; color: var(--muted); }
+  .switch button:hover { color: var(--ink); }
+  .switch button[aria-pressed="true"] { background: var(--bar); color: var(--ink); box-shadow: 0 1px 2px rgba(15,23,42,.15); }
+  .switch svg { width: 22px; height: 14px; }
+
+  /* Workspace */
+  .work { flex: 1; display: flex; min-height: 0; --left: 50%; }
+  .pane { position: relative; display: flex; flex-direction: column; min-width: 0; background: var(--canvas); }
+  .divider { width: 1px; flex: none; background: var(--line-strong); cursor: col-resize; display: none; position: relative; }
+  .divider::after { content: ""; position: absolute; inset: 0 -4px; }
+  .divider:hover { background: var(--accent); }
+  .s-split .pane.context { flex: 0 0 var(--left); } .s-split .pane.sketch { flex: 1; } .s-split .divider { display: block; }
+  .s-context .pane.context, .s-sketch .pane.sketch { flex: 1; }
+  .s-context .pane.sketch, .s-sketch .pane.context { flex: 0 0 136px; }
+  .s-context .pane.sketch { border-left: 1px solid var(--line-strong); } .s-sketch .pane.context { border-right: 1px solid var(--line-strong); }
+
+  .tools { height: 40px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 8px; border-bottom: 1px solid var(--line); background: var(--strip); overflow: hidden; }
+  .tools .name { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 0 10px 0 4px; }
+  .tool { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 9px; border-radius: 6px; color: var(--text); }
+  .tool:hover { background: var(--hover); color: var(--ink); }
+  .tool .glyph { width: 16px; height: 12px; }
+  .canvas { flex: 1; position: relative; min-height: 0; overflow: hidden; cursor: default; }
+  .diagram { position: absolute; inset: 20px; display: flex; }
+  .diagram svg { width: 100%; height: 100%; }
+  .diagram svg text { font-family: "IBM Plex Sans", "Segoe UI", Arial, sans-serif; pointer-events: none; }
+  .diagram .hit { cursor: pointer; }
+
+  /* Selection: orange, on screen only */
+  .diagram .sel { stroke: var(--accent) !important; stroke-width: 3 !important; stroke-dasharray: none !important; }
+
+  /* Collapsed pane: thumbnail strip */
+  .thumb { display: none; }
+  .collapsed .tools, .collapsed .canvas { display: none; }
+  .collapsed .thumb { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 10px; height: 100%; background: var(--strip); cursor: pointer; }
+  .collapsed .thumb:hover .mini { border-color: var(--accent); }
+  .thumb .label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .thumb .mini { width: 114px; height: 100px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--canvas); padding: 4px; display: flex; transition: border-color .15s; }
+  .thumb .mini svg { width: 100%; height: 100%; }
+  .thumb .hint { font-size: 11px; color: var(--muted); text-align: center; }
+  .start-btn { width: 114px; padding: 12px 8px; border-radius: 8px; border: 1px dashed var(--line-strong); background: var(--canvas); color: var(--ink); text-align: center; white-space: normal; font-weight: 500; }
+  .start-btn:hover { border-color: var(--accent); }
+  .start-btn small { display: block; color: var(--muted); font-size: 11px; font-weight: 400; margin-top: 4px; }
+
+  /* Floating cards */
+  .card { position: absolute; top: 12px; z-index: 5; background: var(--card); border: 1px solid var(--line-strong); border-radius: 10px; box-shadow: var(--shadow); }
+  .card header { display: flex; align-items: center; gap: 8px; padding: 10px 6px 10px 14px; }
+  .card header .t { flex: 1; min-width: 0; }
+  .card header b { display: block; color: var(--ink); font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .card header span { color: var(--muted); font-size: 12px; }
+  .card .x { width: 26px; height: 26px; border-radius: 6px; display: grid; place-items: center; color: var(--muted); }
+  .card .x:hover { background: var(--hover); color: var(--ink); }
+  .card .body { padding: 2px 14px 14px; }
+  .props { right: 12px; width: 260px; }
+  .field { margin-bottom: 10px; }
+  .field label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); margin-bottom: 3px; }
+  .field input, .field textarea, .field select { width: 100%; font: inherit; color: var(--ink); background: var(--canvas); border: 1px solid var(--line-strong); border-radius: 6px; padding: 5px 8px; }
+  .field input:focus, .field textarea:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+  .field textarea { resize: none; height: 52px; }
+  .ro .field input, .ro .field textarea, .ro .field select { border-color: transparent; background: none; padding-left: 0; pointer-events: none; appearance: none; }
+  .code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 12px; color: var(--muted); }
+  .unplaced { left: 12px; width: 232px; }
+  .unplaced header span.count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); font-weight: 600; font-size: 11px; padding: 0 6px; }
+  .help { font-size: 12px; color: var(--muted); margin: 0 0 8px; }
+  .item { display: flex; gap: 8px; align-items: center; border: 1px solid var(--line-strong); border-radius: 8px; padding: 7px 9px; cursor: grab; background: var(--strip); }
+  .item:hover { border-color: var(--accent); }
+  .item b { display: block; color: var(--ink); font-weight: 500; }
+  .item span { font-size: 11px; color: var(--muted); }
+  .badge { position: absolute; top: 12px; left: 12px; z-index: 5; display: none; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 15px; background: var(--card); border: 1px solid var(--line-strong); box-shadow: var(--shadow); color: var(--ink); font-weight: 500; }
+  .badge i { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  .unplaced-min .unplaced { display: none; } .unplaced-min .badge { display: inline-flex; }
+
+  .welcome { left: 20px; top: auto; bottom: 20px; width: 340px; }
+  .welcome .body p { margin: 0 0 10px; }
+  .welcome .tip { display: flex; gap: 8px; padding: 8px 10px; border-radius: 8px; background: var(--strip); font-size: 12px; margin-bottom: 12px; }
+  .welcome .tip svg { margin-top: 2px; color: var(--accent); }
+  .welcome .row { display: flex; gap: 8px; }
+  .ghost { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--line-strong); color: var(--ink); font-weight: 500; }
+  .ghost:hover { background: var(--hover); }
+
+  /* Modes */
+  .only-first, .only-viewer { display: none !important; }
+  body.mode-first .only-first { display: block !important; }
+  body.mode-viewer .only-viewer { display: inline-flex !important; }
+  body.mode-viewer .edit-only, body.mode-viewer .tools, body.mode-first .not-first { display: none !important; }
+  body.mode-first .sketch .thumb .mini, body.mode-first .sketch .thumb .hint { display: none; }
+  .sketch .thumb .start { display: none; } body.mode-first .sketch .thumb .start { display: block; }
+
+  /* Dark diagram twin: remaps the export palette on screen only */
+  [data-theme="dark"] .dg svg > rect:first-of-type,
+  [data-theme="dark"] .dg .relationship rect { fill: var(--canvas); }
+  [data-theme="dark"] .dg :is(rect, circle, ellipse, path, polygon):is([fill="#FFFFFF" i]) { fill: var(--d-surface); }
+  [data-theme="dark"] .dg :is(rect, ellipse, path, polygon):is([fill="#64748B" i], [fill="#52606D" i], [fill="#334155" i]) { fill: var(--d-real); }
+  [data-theme="dark"] .dg :is(rect, ellipse, path):is([fill="#CBD5E1" i], [fill="#E2E8F0" i]) { fill: var(--d-light-box); }
+  [data-theme="dark"] .dg polygon[fill="#F8FAFC" i] { fill: var(--d-hex); }
+  [data-theme="dark"] .dg polygon[fill="#fdecea" i] { fill: var(--d-user); }
+  [data-theme="dark"] .dg [stroke="#b03a2e" i] { stroke: var(--d-user-edge); }
+  [data-theme="dark"] .dg text[fill="#b03a2e" i] { fill: var(--d-user-edge); }
+  [data-theme="dark"] .dg :is([stroke="#475569" i], [stroke="#52606D" i], [stroke="#64748B" i], [stroke="#334155" i]) { stroke: var(--d-line); }
+  [data-theme="dark"] .dg [stroke="#0F172A" i] { stroke: var(--d-ink); }
+  [data-theme="dark"] .dg [stroke="#94A3B8" i] { stroke: var(--d-divider); }
+  [data-theme="dark"] .dg text:is([fill="#0F172A" i], [fill="#1E293B" i], [fill="#334155" i]) { fill: var(--d-ink); }
+  [data-theme="dark"] .dg text:is([fill="#64748B" i], [fill="#475569" i]) { fill: var(--d-muted); }
+  [data-theme="dark"] .dg marker path { fill: var(--d-line); }
+
+  /* Phones: view only (decision 30), so the bar must fit */
+  .title, .pill { white-space: nowrap; }
+  @media (max-width: 599px) {
+    .brand .motif, .pill .long, .primary .long, .switch { display: none !important; }
+    .appbar { gap: 0; padding: 0 6px; }
+    .appbar > * { flex-shrink: 0; } .appbar > .title { flex-shrink: 1; }
+    .title { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  }
+
+  @media (max-width: 899px) {
+    .switch button[data-s="split"], .wide { display: none !important; }
+    .s-context .pane.sketch, .s-sketch .pane.context { flex-basis: 100px; }
+    .thumb .mini, .start-btn { width: 80px; } .thumb .mini { height: 74px; }
+    .props { width: 220px; } .welcome { width: 280px; }
+  }
+</style>
+</head>
+<body class="mode-edit">
+
+<div class="mock">
+  <b>Mockup v2</b>
+  <span>State</span>
+  <span class="seg" id="modeSeg"><button data-m="edit" aria-pressed="true">Editing</button><button data-m="first">First run</button><button data-m="viewer">Viewer</button></span>
+  <span>Mark</span>
+  <span class="seg" id="markSeg"><button data-k="a" aria-pressed="true">A</button><button data-k="b">B</button><button data-k="c">C</button></span>
+  <span>Click shapes to select; click open space or press Esc to clear. Theme is in the app bar (sun icon).</span>
+</div>
+
+<header class="appbar">
+  <div class="brand"><span id="markSlot"></span><span class="motif">Motif</span> <span class="tool">Sketch</span></div>
+  <button class="title edit-only" title="Rename project"><span id="projTitle">Motif Sketch</span><span class="dirty" title="Unsaved changes"></span></button>
+  <span class="title only-viewer" style="padding-left:4px">Motif Sketch</span>
+  <span class="pill only-viewer"><svg class="i" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="long">Shared snapshot · </span>read-only</span>
+
+  <div class="edit-only" style="display:flex;align-items:center;gap:2px">
+    <div class="vsep"></div>
+    <div class="menu left" id="fileMenu">
+      <button class="cmd" data-menu>File<svg class="i" viewBox="0 0 24 24" style="width:12px"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="menu-list">
+        <button>New</button><button>Open…</button><button>Save<span class="code" style="margin-left:auto">Ctrl+S</span></button><button>Save as…</button>
+        <button>Open example</button>
+      </div>
+    </div>
+    <button class="cmd icon" title="Save (Ctrl+S)"><svg class="i" viewBox="0 0 24 24"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg></button>
+    <div class="vsep"></div>
+    <button class="cmd icon" title="Undo (Ctrl+Z)"><svg class="i" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg></button>
+    <button class="cmd icon" title="Redo (Ctrl+Y)"><svg class="i" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H10a6 6 0 000 12h3"/></svg></button>
+  </div>
+
+  <div class="spacer"></div>
+
+  <div class="switch" role="group" aria-label="Layout">
+    <button data-s="context" title="Context diagram (Alt+1)"><svg viewBox="0 0 22 14"><rect x=".5" y=".5" width="16" height="13" rx="2" fill="currentColor"/><rect x="18" y="1" width="3.5" height="12" rx="1" fill="none" stroke="currentColor"/></svg></button>
+    <button data-s="split" title="Side by side (Alt+2)"><svg viewBox="0 0 22 14"><rect x=".5" y=".5" width="10" height="13" rx="2" fill="currentColor"/><rect x="11.5" y=".5" width="10" height="13" rx="2" fill="currentColor"/></svg></button>
+    <button data-s="sketch" title="Ports and adapters (Alt+3)"><svg viewBox="0 0 22 14"><rect x=".5" y="1" width="3.5" height="12" rx="1" fill="none" stroke="currentColor"/><rect x="5.5" y=".5" width="16" height="13" rx="2" fill="currentColor"/></svg></button>
+  </div>
+
+  <div class="menu" id="exportMenu">
+    <button class="cmd" data-menu><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg><span class="wide">Export</span><span class="dot not-first edit-only" title="1 item not placed"></span></button>
+    <div class="menu-list">
+      <button>Context diagram <span class="code" style="margin-left:auto">SVG</span></button>
+      <button class="not-first">Ports and adapters <span class="code" style="margin-left:auto">SVG</span></button>
+      <button class="not-first">Solution plan <span class="code" style="margin-left:auto">MD</span></button>
+      <div class="note not-first"><b>1 item not placed.</b> It's listed under "Not placed" in the plan.</div>
+      <div class="note">Exports always use the light palette.</div>
+    </div>
+  </div>
+  <button class="cmd edit-only" title="Copy a read-only link"><svg class="i" viewBox="0 0 24 24"><path d="M10 14a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"/><path d="M14 10a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/></svg><span class="wide">Copy link</span></button>
+  <button class="primary only-viewer"><svg class="i" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M4 16V5a2 2 0 012-2h11"/></svg>Make a copy<span class="long">&nbsp;to edit</span></button>
+
+  <div class="menu" id="themeMenu">
+    <button class="cmd icon" data-menu title="Theme"><svg class="i" viewBox="0 0 24 24" id="themeIcon"></svg></button>
+    <div class="menu-list" style="min-width:160px">
+      <button role="menuitemradio" data-t="system">System</button>
+      <button role="menuitemradio" data-t="light">Light</button>
+      <button role="menuitemradio" data-t="dark">Dark</button>
+    </div>
+  </div>
+  <button class="cmd icon" title="Help"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 015 0c0 1.7-2.5 2-2.5 4M12 17h.01"/></svg></button>
+</header>
+
+<main class="work s-split" id="work">
+  <section class="pane context" data-pane="context">
+    <div class="tools">
+      <span class="name">Context</span>
+      <button class="tool"><svg class="glyph" viewBox="0 0 16 12"><rect x="1" y="1" width="14" height="10" rx="2.5" fill="#64748B"/></svg>Primary actor</button>
+      <button class="tool"><svg class="glyph" viewBox="0 0 16 12"><rect x="1" y="1" width="14" height="10" rx="2.5" fill="#CBD5E1" stroke="#64748B"/></svg>Secondary actor</button>
+      <button class="tool"><svg class="glyph" viewBox="0 0 16 12"><rect x="1" y="1" width="14" height="10" fill="#E2E8F0" stroke="#64748B"/></svg>External system</button>
+      <button class="tool"><svg class="glyph" viewBox="0 0 16 12"><path d="M2 3v6c0 1.1 2.7 2 6 2s6-.9 6-2V3" fill="#CBD5E1" stroke="#64748B"/><ellipse cx="8" cy="3" rx="6" ry="2" fill="#CBD5E1" stroke="#64748B"/></svg>Storage</button>
+      <div class="vsep"></div>
+      <button class="tool" title="Auto-layout (unpinned)"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Auto-layout</button>
+      <div class="spacer"></div>
+      <button class="tool" title="Fit"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      <button class="tool" data-go="context" title="Context diagram only"><svg class="i" viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
+    </div>
+    <div class="canvas" data-canvas="context">
+      <div class="diagram dg not-first" id="ctxDiagram"></div>
+      <div class="diagram dg only-first" id="firstDiagram"></div>
+      <div class="card welcome only-first" id="welcome">
+        <header><div class="t"><b>Sketch your system's context</b></div><button class="x" data-close title="Dismiss">✕</button></header>
+        <div class="body">
+          <p>Name your system, then add the people and systems around it. When it looks right, start the ports-and-adapters sketch.</p>
+          <div class="tip"><svg class="i" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span>An arrow points from whoever starts the interaction.</span></div>
+          <div class="row"><button class="ghost">Open example</button><button class="ghost">Open file…</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="thumb" data-go="split" title="Show side by side">
+      <span class="label">Context</span>
+      <div class="mini dg" data-thumb="context"></div>
+      <span class="hint">Click to show side by side</span>
+    </div>
+  </section>
+
+  <div class="divider" id="divider" title="Drag to resize"></div>
+
+  <section class="pane sketch" data-pane="sketch">
+    <div class="tools">
+      <span class="name">Ports and adapters</span>
+      <button class="tool"><svg class="glyph" viewBox="0 0 16 12"><circle cx="8" cy="6" r="4.5" fill="none" stroke="#64748B" stroke-width="1.5"/></svg>Driving port</button>
+      <button class="tool"><svg class="glyph" viewBox="0 0 16 12"><circle cx="8" cy="6" r="4.5" fill="none" stroke="#64748B" stroke-width="1.5"/></svg>Driven port</button>
+      <button class="tool"><svg class="glyph" viewBox="0 0 16 12"><rect x="1" y="2" width="14" height="8" rx="1.5" fill="#64748B"/></svg>Adapter</button>
+      <div class="spacer"></div>
+      <button class="tool" title="Fit"><svg class="i" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      <button class="tool" data-go="sketch" title="Ports and adapters only"><svg class="i" viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
+    </div>
+    <div class="canvas" data-canvas="sketch">
+      <div class="diagram dg" id="hexDiagram"></div>
+      <div class="card unplaced edit-only">
+        <header><div class="t"><b>Not placed</b></div><span class="count">1</span><button class="x" id="minUnplaced" title="Minimise">–</button></header>
+        <div class="body">
+          <p class="help">Drag onto a port, an adapter or the hexagon.</p>
+          <div class="item"><svg class="glyph" viewBox="0 0 16 12" style="width:16px"><rect x="1" y="1" width="14" height="10" rx="2.5" fill="#64748B"/></svg><div><b>Viewer</b><span>Primary actor · Web browser</span></div></div>
+        </div>
+      </div>
+      <button class="badge edit-only" id="badge"><i></i>1 not placed</button>
+    </div>
+    <div class="thumb" data-go="split" title="Show side by side">
+      <span class="label">Sketch</span>
+      <div class="mini dg" data-thumb="sketch"></div>
+      <span class="hint">Click to show side by side</span>
+      <div class="start"><button class="start-btn" id="startSketch">Start sketch<small>Turn the context into ports and adapters</small></button></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const CONTEXT_SVG_B64 = "PHN2ZyB2aWV3Qm94PSItNTEwIC0zNDUgOTgwIDY5MCIgd2lkdGg9Ijk4MCIgaGVpZ2h0PSI2OTAiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgQXJpYWwsIHNhbnMtc2VyaWYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxkZWZzPg0KICAgIDxtYXJrZXIgaWQ9ImFycm93IiB2aWV3Qm94PSIwIDAgMTIgMTAiIG1hcmtlcldpZHRoPSIxMiIgbWFya2VySGVpZ2h0PSIxMCIgcmVmWD0iMTIiIHJlZlk9IjUiIG9yaWVudD0iYXV0by1zdGFydC1yZXZlcnNlIiBtYXJrZXJVbml0cz0idXNlclNwYWNlT25Vc2UiPg0KICAgICAgPHBhdGggZD0iTTAsMCBMMTIsNSBMMCwxMCBaIiBmaWxsPSIjNTI2MDZEIiAvPg0KICAgIDwvbWFya2VyPg0KICA8L2RlZnM+DQogIDx0aXRsZT5Nb3RpZiBTa2V0Y2ggLSBDb250ZXh0IERpYWdyYW08L3RpdGxlPg0KICA8cmVjdCB4PSItNTEwIiB5PSItMzQ1IiB3aWR0aD0iOTgwIiBoZWlnaHQ9IjY5MCIgZmlsbD0iI0ZGRkZGRiIgLz4NCiAgPGcgY2xhc3M9InJlbGF0aW9uc2hpcCIgZGF0YS1pZD0iYzVhMTBiMDEiPg0KICAgIDxsaW5lIHgxPSItMzAwIiB5MT0iLTUwLjY1IiB4Mj0iLTEyMCIgeTI9Ii0yMC4yNiIgc3Ryb2tlPSIjNTI2MDZEIiBzdHJva2Utd2lkdGg9IjEuNSIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiIC8+DQogICAgPHJlY3QgeD0iLTI0My43IiB5PSItNTcuOTUiIHdpZHRoPSI2Ny40IiBoZWlnaHQ9IjE1IiBmaWxsPSIjRkZGRkZGIiAvPg0KICAgIDx0ZXh0IHg9Ii0yMTAiIHk9Ii01MC40NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjE3MkEiPlNrZXRjaGVzLDwvdGV4dD4NCiAgICA8cmVjdCB4PSItMjUwLjMiIHk9Ii00Mi45NSIgd2lkdGg9IjgwLjYiIGhlaWdodD0iMTUiIGZpbGw9IiNGRkZGRkYiIC8+DQogICAgPHRleHQgeD0iLTIxMCIgeT0iLTM1LjQ1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzBGMTcyQSI+ZXhwb3J0cyBhbmQ8L3RleHQ+DQogICAgPHJlY3QgeD0iLTI2My41IiB5PSItMjcuOTUiIHdpZHRoPSIxMDciIGhlaWdodD0iMTUiIGZpbGw9IiNGRkZGRkYiIC8+DQogICAgPHRleHQgeD0iLTIxMCIgeT0iLTIwLjQ1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzBGMTcyQSI+c2hhcmVzIGRpYWdyYW1zPC90ZXh0Pg0KICA8L2c+DQogIDxnIGNsYXNzPSJyZWxhdGlvbnNoaXAiIGRhdGEtaWQ9ImM1YTEwYjA3Ij4NCiAgICA8bGluZSB4MT0iLTMwMCIgeTE9IjUwLjY1IiB4Mj0iLTEyMCIgeTI9IjIwLjI2IiBzdHJva2U9IiM1MjYwNkQiIHN0cm9rZS13aWR0aD0iMS41IiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4NCiAgICA8cmVjdCB4PSItMjUzLjYiIHk9IjIwLjQ1IiB3aWR0aD0iODcuMiIgaGVpZ2h0PSIxNSIgZmlsbD0iI0ZGRkZGRiIgLz4NCiAgICA8dGV4dCB4PSItMjEwIiB5PSIyNy45NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjE3MkEiPlZpZXdzIHNoYXJlZDwvdGV4dD4NCiAgICA8cmVjdCB4PSItMjQwLjQiIHk9IjM1LjQ1IiB3aWR0aD0iNjAuOCIgaGVpZ2h0PSIxNSIgZmlsbD0iI0ZGRkZGRiIgLz4NCiAgICA8dGV4dCB4PSItMjEwIiB5PSI0Mi45NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjE3MkEiPmRpYWdyYW1zPC90ZXh0Pg0KICA8L2c+DQogIDxnIGNsYXNzPSJyZWxhdGlvbnNoaXAiIGRhdGEtaWQ9ImM1YTEwYjA0Ij4NCiAgICA8bGluZSB4MT0iMTIwIiB5MT0iLTQ1LjIyIiB4Mj0iMjYwIiB5Mj0iLTk3Ljk3IiBzdHJva2U9IiM1MjYwNkQiIHN0cm9rZS13aWR0aD0iMS41IiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4NCiAgICA8cmVjdCB4PSIxNTYuMyIgeT0iLTk0LjA5IiB3aWR0aD0iNjcuNCIgaGVpZ2h0PSIxNSIgZmlsbD0iI0ZGRkZGRiIgLz4NCiAgICA8dGV4dCB4PSIxOTAiIHk9Ii04Ni41OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjE3MkEiPk9wZW5zIGFuZDwvdGV4dD4NCiAgICA8cmVjdCB4PSIxNjkuNSIgeT0iLTc5LjA5IiB3aWR0aD0iNDEiIGhlaWdodD0iMTUiIGZpbGw9IiNGRkZGRkYiIC8+DQogICAgPHRleHQgeD0iMTkwIiB5PSItNzEuNTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMEYxNzJBIj5zYXZlczwvdGV4dD4NCiAgICA8cmVjdCB4PSIxNTkuNiIgeT0iLTY0LjA5IiB3aWR0aD0iNjAuOCIgaGVpZ2h0PSIxNSIgZmlsbD0iI0ZGRkZGRiIgLz4NCiAgICA8dGV4dCB4PSIxOTAiIHk9Ii01Ni41OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjE3MkEiPnByb2plY3RzPC90ZXh0Pg0KICA8L2c+DQogIDxnIGNsYXNzPSJyZWxhdGlvbnNoaXAiIGRhdGEtaWQ9ImM1YTEwYjA1Ij4NCiAgICA8bGluZSB4MT0iMTIwIiB5MT0iMCIgeDI9IjI2MCIgeTI9IjAiIHN0cm9rZT0iIzUyNjA2RCIgc3Ryb2tlLXdpZHRoPSIxLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPg0KICAgIDxyZWN0IHg9IjE1Ni4zIiB5PSItMjIuNSIgd2lkdGg9IjY3LjQiIGhlaWdodD0iMTUiIGZpbGw9IiNGRkZGRkYiIC8+DQogICAgPHRleHQgeD0iMTkwIiB5PSItMTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMEYxNzJBIj5BdXRvc2F2ZXM8L3RleHQ+DQogICAgPHJlY3QgeD0iMTQ2LjQiIHk9Ii03LjUiIHdpZHRoPSI4Ny4yIiBoZWlnaHQ9IjE1IiBmaWxsPSIjRkZGRkZGIiAvPg0KICAgIDx0ZXh0IHg9IjE5MCIgeT0iMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjE3MkEiPmFuZCByZXN0b3JlczwvdGV4dD4NCiAgICA8cmVjdCB4PSIxNzIuOCIgeT0iNy41IiB3aWR0aD0iMzQuNCIgaGVpZ2h0PSIxNSIgZmlsbD0iI0ZGRkZGRiIgLz4NCiAgICA8dGV4dCB4PSIxOTAiIHk9IjE1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxMiIgZmlsbD0iIzBGMTcyQSI+d29yazwvdGV4dD4NCiAgPC9nPg0KICA8ZyBjbGFzcz0icmVsYXRpb25zaGlwIiBkYXRhLWlkPSJjNWExMGIwNiI+DQogICAgPGxpbmUgeDE9IjEyMCIgeTE9IjQ1LjIyIiB4Mj0iMjYwIiB5Mj0iOTcuOTciIHN0cm9rZT0iIzUyNjA2RCIgc3Ryb2tlLXdpZHRoPSIxLjUiIG1hcmtlci1lbmQ9InVybCgjYXJyb3cpIiAvPg0KICAgIDxyZWN0IHg9IjE2Ni4yIiB5PSI0OS4wOSIgd2lkdGg9IjQ3LjYiIGhlaWdodD0iMTUiIGZpbGw9IiNGRkZGRkYiIC8+DQogICAgPHRleHQgeD0iMTkwIiB5PSI1Ni41OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjE3MkEiPldyaXRlczwvdGV4dD4NCiAgICA8cmVjdCB4PSIxNjIuOSIgeT0iNjQuMDkiIHdpZHRoPSI1NC4yIiBoZWlnaHQ9IjE1IiBmaWxsPSIjRkZGRkZGIiAvPg0KICAgIDx0ZXh0IHg9IjE5MCIgeT0iNzEuNTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXNpemU9IjEyIiBmaWxsPSIjMEYxNzJBIj5kaWFncmFtPC90ZXh0Pg0KICAgIDxyZWN0IHg9IjE1OS42IiB5PSI3OS4wOSIgd2lkdGg9IjYwLjgiIGhlaWdodD0iMTUiIGZpbGw9IiNGRkZGRkYiIC8+DQogICAgPHRleHQgeD0iMTkwIiB5PSI4Ni41OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjE3MkEiPnBpY3R1cmVzPC90ZXh0Pg0KICA8L2c+DQogIDxnIGNsYXNzPSJyZWxhdGlvbnNoaXAiIGRhdGEtaWQ9ImM1YTEwYjA4Ij4NCiAgICA8bGluZSB4MT0iODYuMjUiIHkxPSI2NSIgeDI9IjI4NS4yOSIgeTI9IjIxNSIgc3Ryb2tlPSIjNTI2MDZEIiBzdHJva2Utd2lkdGg9IjEuNSIgbWFya2VyLWVuZD0idXJsKCNhcnJvdykiIC8+DQogICAgPHJlY3QgeD0iMTE1Ljc3IiB5PSIxMzIuNSIgd2lkdGg9IjE0MCIgaGVpZ2h0PSIxNSIgZmlsbD0iI0ZGRkZGRiIgLz4NCiAgICA8dGV4dCB4PSIxODUuNzciIHk9IjE0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjE3MkEiPldyaXRlcyBzb2x1dGlvbiBwbGFuPC90ZXh0Pg0KICA8L2c+DQogIDxnIGNsYXNzPSJyZWxhdGlvbnNoaXAiIGRhdGEtaWQ9ImM1YTEwYjA5Ij4NCiAgICA8bGluZSB4MT0iODYuMjUiIHkxPSItNjUiIHgyPSIyODUuMjkiIHkyPSItMjE1IiBzdHJva2U9IiM1MjYwNkQiIHN0cm9rZS13aWR0aD0iMS41IiBtYXJrZXItZW5kPSJ1cmwoI2Fycm93KSIgLz4NCiAgICA8cmVjdCB4PSIxMjIuMzciIHk9Ii0xNDcuNSIgd2lkdGg9IjEyNi44IiBoZWlnaHQ9IjE1IiBmaWxsPSIjRkZGRkZGIiAvPg0KICAgIDx0ZXh0IHg9IjE4NS43NyIgeT0iLTE0MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTIiIGZpbGw9IiMwRjE3MkEiPkNvcGllcyBzaGFyZSBsaW5rczwvdGV4dD4NCiAgPC9nPg0KICA8ZyBjbGFzcz0iZWxlbWVudCIgZGF0YS1pZD0iYzVhMTBhMDEiIGRhdGEtdHlwZT0ic3lzdGVtIj4NCiAgICA8cmVjdCB4PSItMTIwIiB5PSItNjUiIHdpZHRoPSIyNDAiIGhlaWdodD0iMTMwIiByeD0iNiIgcnk9IjYiIGZpbGw9IiNGRkZGRkYiIHN0cm9rZT0iIzBGMTcyQSIgc3Ryb2tlLXdpZHRoPSIzIiAvPg0KICAgIDx0ZXh0IHg9IjAiIHk9Ii0yMi42MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiMwRjE3MkEiIGZvbnQtd2VpZ2h0PSI2MDAiPk1vdGlmIFNrZXRjaDwvdGV4dD4NCiAgICA8dGV4dCB4PSIwIiB5PSItMS43NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiMwRjE3MkEiPlNrZXRjaCBhIGNvbnRleHQgZGlhZ3JhbSwgdHVybiBpdDwvdGV4dD4NCiAgICA8dGV4dCB4PSIwIiB5PSIxMiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiMwRjE3MkEiPmludG8gYSBwb3J0cy1hbmQtYWRhcHRlcnMgc2tldGNoLDwvdGV4dD4NCiAgICA8dGV4dCB4PSIwIiB5PSIyNS43NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiMwRjE3MkEiPnRoZW4gZXhwb3J0IHRoZSBkaWFncmFtcyBhbmQgYeKApjwvdGV4dD4NCiAgPC9nPg0KICA8ZyBjbGFzcz0iZWxlbWVudCIgZGF0YS1pZD0iYzVhMTBhMDIiIGRhdGEtdHlwZT0icHJpbWFyeUFjdG9yIj4NCiAgICA8cmVjdCB4PSItNDcwIiB5PSItMTEwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjkwIiByeD0iMTAiIHJ5PSIxMCIgZmlsbD0iIzY0NzQ4QiIgc3Ryb2tlPSIjNDc1NTY5IiBzdHJva2Utd2lkdGg9IjIiIC8+DQogICAgPGNpcmNsZSBjeD0iLTM4NSIgY3k9Ii04OC4xMiIgcj0iNS41IiBmaWxsPSIjRkZGRkZGIiAvPg0KICAgIDxwYXRoIGQ9Ik0tMzk4LC02Ny42MiBBMTMsMTMgMCAwIDEgLTM3MiwtNjcuNjIgWiIgZmlsbD0iI0ZGRkZGRiIgLz4NCiAgICA8dGV4dCB4PSItMzg1IiB5PSItNTguODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjRkZGRkZGIiBmb250LXdlaWdodD0iNjAwIj5BcmNoaXRlY3Q8L3RleHQ+DQogICAgPHRleHQgeD0iLTM4NSIgeT0iLTQzLjI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxMSIgZmlsbD0iI0ZGRkZGRiIgZmlsbC1vcGFjaXR5PSIwLjgiPldlYiBicm93c2VyPC90ZXh0Pg0KICA8L2c+DQogIDxnIGNsYXNzPSJlbGVtZW50IiBkYXRhLWlkPSJjNWExMGEwOCIgZGF0YS10eXBlPSJwcmltYXJ5QWN0b3IiPg0KICAgIDxyZWN0IHg9Ii00NzAiIHk9IjIwIiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjkwIiByeD0iMTAiIHJ5PSIxMCIgZmlsbD0iIzY0NzQ4QiIgc3Ryb2tlPSIjNDc1NTY5IiBzdHJva2Utd2lkdGg9IjIiIC8+DQogICAgPGNpcmNsZSBjeD0iLTM4NSIgY3k9IjM1IiByPSI1LjUiIGZpbGw9IiNGRkZGRkYiIC8+DQogICAgPHBhdGggZD0iTS0zOTgsNTUuNSBBMTMsMTMgMCAwIDEgLTM3Miw1NS41IFoiIGZpbGw9IiNGRkZGRkYiIC8+DQogICAgPHRleHQgeD0iLTM4NSIgeT0iNjQuMjUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjRkZGRkZGIiBmb250LXdlaWdodD0iNjAwIj5WaWV3ZXI8L3RleHQ+DQogICAgPHRleHQgeD0iLTM4NSIgeT0iNzkuODgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXNpemU9IjExIiBmaWxsPSIjRkZGRkZGIiBmaWxsLW9wYWNpdHk9IjAuOCI+V2ViIGJyb3dzZXIgKHNuYXBzaG90PC90ZXh0Pg0KICAgIDx0ZXh0IHg9Ii0zODUiIHk9IjkzLjYyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxMSIgZmlsbD0iI0ZGRkZGRiIgZmlsbC1vcGFjaXR5PSIwLjgiPmxpbmspPC90ZXh0Pg0KICA8L2c+DQogIDxnIGNsYXNzPSJlbGVtZW50IiBkYXRhLWlkPSJjNWExMGEwYSIgZGF0YS10eXBlPSJleHRlcm5hbFN5c3RlbSI+DQogICAgPHJlY3QgeD0iMjYwIiB5PSItMzA1IiB3aWR0aD0iMTcwIiBoZWlnaHQ9IjkwIiByeD0iMCIgcnk9IjAiIGZpbGw9IiNFMkU4RjAiIHN0cm9rZT0iIzk0QTNCOCIgc3Ryb2tlLXdpZHRoPSIyIiAvPg0KICAgIDx0ZXh0IHg9IjM0NSIgeT0iLTI2Ni44OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMxRTI5M0IiIGZvbnQtd2VpZ2h0PSI2MDAiPkNsaXBib2FyZDwvdGV4dD4NCiAgICA8dGV4dCB4PSIzNDUiIHk9Ii0yNTEuMjUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXNpemU9IjExIiBmaWxsPSIjMUUyOTNCIiBmaWxsLW9wYWNpdHk9IjAuOCI+QnJvd3NlciBDbGlwYm9hcmQgQVBJPC90ZXh0Pg0KICA8L2c+DQogIDxnIGNsYXNzPSJlbGVtZW50IiBkYXRhLWlkPSJjNWExMGEwNSIgZGF0YS10eXBlPSJzdG9yYWdlIj4NCiAgICA8Zz4NCiAgICAgIDxwYXRoIGQ9Ik0yNjAsLTE2MyBBODUsMTIgMCAwIDEgNDMwLC0xNjMgTDQzMCwtOTcgQTg1LDEyIDAgMCAxIDI2MCwtOTcgWiIgZmlsbD0iI0NCRDVFMSIgc3Ryb2tlPSIjNDc1NTY5IiBzdHJva2Utd2lkdGg9IjIiIC8+DQogICAgICA8cGF0aCBkPSJNMjYwLC0xNjMgQTg1LDEyIDAgMCAwIDQzMCwtMTYzIiBmaWxsPSJub25lIiBzdHJva2U9IiM0NzU1NjkiIHN0cm9rZS13aWR0aD0iMiIgLz4NCiAgICA8L2c+DQogICAgPHRleHQgeD0iMzQ1IiB5PSItMTM3Ljc1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzFFMjkzQiIgZm9udC13ZWlnaHQ9IjYwMCI+UHJvamVjdCBGaWxlczwvdGV4dD4NCiAgICA8dGV4dCB4PSIzNDUiIHk9Ii0xMjIuMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXNpemU9IjExIiBmaWxsPSIjMUUyOTNCIiBmaWxsLW9wYWNpdHk9IjAuOCI+TG9jYWwgZmlsZXM8L3RleHQ+DQogICAgPHRleHQgeD0iMzQ1IiB5PSItMTA4LjM4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzFFMjkzQiIgZmlsbC1vcGFjaXR5PSIwLjgiPigubW90aWZza2V0Y2guanNvbizigKY8L3RleHQ+DQogIDwvZz4NCiAgPGcgY2xhc3M9ImVsZW1lbnQiIGRhdGEtaWQ9ImM1YTEwYTA2IiBkYXRhLXR5cGU9InN0b3JhZ2UiPg0KICAgIDxnPg0KICAgICAgPHBhdGggZD0iTTI2MCwtMzMgQTg1LDEyIDAgMCAxIDQzMCwtMzMgTDQzMCwzMyBBODUsMTIgMCAwIDEgMjYwLDMzIFoiIGZpbGw9IiNDQkQ1RTEiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIyIiAvPg0KICAgICAgPHBhdGggZD0iTTI2MCwtMzMgQTg1LDEyIDAgMCAwIDQzMCwtMzMiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIyIiAvPg0KICAgIDwvZz4NCiAgICA8dGV4dCB4PSIzNDUiIHk9Ii0wLjg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzFFMjkzQiIgZm9udC13ZWlnaHQ9IjYwMCI+QnJvd3NlciBTdG9yYWdlPC90ZXh0Pg0KICAgIDx0ZXh0IHg9IjM0NSIgeT0iMTQuNzUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXNpemU9IjExIiBmaWxsPSIjMUUyOTNCIiBmaWxsLW9wYWNpdHk9IjAuOCI+SW5kZXhlZERCPC90ZXh0Pg0KICA8L2c+DQogIDxnIGNsYXNzPSJlbGVtZW50IiBkYXRhLWlkPSJjNWExMGEwNyIgZGF0YS10eXBlPSJzdG9yYWdlIj4NCiAgICA8Zz4NCiAgICAgIDxwYXRoIGQ9Ik0yNjAsOTcgQTg1LDEyIDAgMCAxIDQzMCw5NyBMNDMwLDE2MyBBODUsMTIgMCAwIDEgMjYwLDE2MyBaIiBmaWxsPSIjQ0JENUUxIiBzdHJva2U9IiM0NzU1NjkiIHN0cm9rZS13aWR0aD0iMiIgLz4NCiAgICAgIDxwYXRoIGQ9Ik0yNjAsOTcgQTg1LDEyIDAgMCAwIDQzMCw5NyIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNDc1NTY5IiBzdHJva2Utd2lkdGg9IjIiIC8+DQogICAgPC9nPg0KICAgIDx0ZXh0IHg9IjM0NSIgeT0iMTIyLjI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzFFMjkzQiIgZm9udC13ZWlnaHQ9IjYwMCI+RGlhZ3JhbSBFeHBvcnRzPC90ZXh0Pg0KICAgIDx0ZXh0IHg9IjM0NSIgeT0iMTM3Ljg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzFFMjkzQiIgZmlsbC1vcGFjaXR5PSIwLjgiPkxvY2FsIGZpbGVzIChTVkcsIHNhdmVkPC90ZXh0Pg0KICAgIDx0ZXh0IHg9IjM0NSIgeT0iMTUxLjYyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzFFMjkzQiIgZmlsbC1vcGFjaXR5PSIwLjgiPm9yIGRvd25sb2FkZWQpPC90ZXh0Pg0KICA8L2c+DQogIDxnIGNsYXNzPSJlbGVtZW50IiBkYXRhLWlkPSJjNWExMGEwOSIgZGF0YS10eXBlPSJzdG9yYWdlIj4NCiAgICA8Zz4NCiAgICAgIDxwYXRoIGQ9Ik0yNjAsMjI3IEE4NSwxMiAwIDAgMSA0MzAsMjI3IEw0MzAsMjkzIEE4NSwxMiAwIDAgMSAyNjAsMjkzIFoiIGZpbGw9IiNDQkQ1RTEiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIyIiAvPg0KICAgICAgPHBhdGggZD0iTTI2MCwyMjcgQTg1LDEyIDAgMCAwIDQzMCwyMjciIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIyIiAvPg0KICAgIDwvZz4NCiAgICA8dGV4dCB4PSIzNDUiIHk9IjI1Mi4yNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMxRTI5M0IiIGZvbnQtd2VpZ2h0PSI2MDAiPlNvbHV0aW9uIFBsYW5zPC90ZXh0Pg0KICAgIDx0ZXh0IHg9IjM0NSIgeT0iMjY3Ljg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC1zaXplPSIxMSIgZmlsbD0iIzFFMjkzQiIgZmlsbC1vcGFjaXR5PSIwLjgiPkxvY2FsIGZpbGVzIChNYXJrZG93biw8L3RleHQ+DQogICAgPHRleHQgeD0iMzQ1IiB5PSIyODEuNjIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXNpemU9IjExIiBmaWxsPSIjMUUyOTNCIiBmaWxsLW9wYWNpdHk9IjAuOCI+c2F2ZWQgb3IgZG93bmxvYWRlZCk8L3RleHQ+DQogIDwvZz4NCjwvc3ZnPg==";
+const SKETCH_SVG_B64 = "PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjxzdmcgd2lkdGg9IjEwMDMuOCIgaGVpZ2h0PSI4NjYuOCIgdmlld0JveD0iLTQ3MS42IC00NTMuNCAxMDAzLjggODY2LjgiIGZvbnQtZmFtaWx5PSJTZWdvZSBVSSwgQXJpYWwsIHNhbnMtc2VyaWYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+DQogIDxyZWN0IHg9Ii00NzEuNiIgeT0iLTQ1My40IiB3aWR0aD0iMTAwMy44IiBoZWlnaHQ9Ijg2Ni44IiBmaWxsPSIjZmZmZmZmIiAvPg0KICA8bGluZSB4MT0iMCIgeTE9Ii00NTMuNCIgeDI9IjAiIHkyPSI0MTMuNCIgc3Ryb2tlPSIjOTRBM0I4IiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWRhc2hhcnJheT0iNiA2IiAvPg0KICA8cG9seWdvbiBwb2ludHM9IjAsLTE3MCAtMTQ3LjIsLTg1IC0xNDcuMiw4NSAtMCwxNzAgMTQ3LjIsODUgMTQ3LjIsLTg1IiBmaWxsPSIjRjhGQUZDIiBzdHJva2U9IiMwRjE3MkEiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWpvaW49InJvdW5kIiAvPg0KICA8cG9seWdvbiBwb2ludHM9Ii05Ni4xLC0xMTQuNSAtMTQ3LjIsLTg1IC0xNDcuMiwtMCAtNzIsLTAgLTcxLjcsLTYuMyAtNzAuOSwtMTIuNSAtNjkuNSwtMTguNiAtNjcuNywtMjQuNiAtNjUuMywtMzAuNCAtNjIuNCwtMzYgLTU5LC00MS4zIC01NS4yLC00Ni4zIC01MC45LC01MC45IC00Ni4zLC01NS4yIiBmaWxsPSIjZmRlY2VhIiBzdHJva2U9IiNiMDNhMmUiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgLz4NCiAgPHBvbHlnb24gcG9pbnRzPSItMTQ3LjIsLTAgLTE0Ny4yLDg1IC05Ni4xLDExNC41IC00Ni4zLDU1LjIgLTUwLjksNTAuOSAtNTUuMiw0Ni4zIC01OSw0MS4zIC02Mi40LDM2IC02NS4zLDMwLjQgLTY3LjcsMjQuNiAtNjkuNSwxOC42IC03MC45LDEyLjUgLTcxLjcsNi4zIC03MiwtMCIgZmlsbD0iI2ZkZWNlYSIgc3Ryb2tlPSIjYjAzYTJlIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIC8+DQogIDxsaW5lIHgxPSItNzIiIHkxPSItMCIgeDI9Ii0xNDcuMiIgeTI9Ii0wIiBzdHJva2U9IiNiMDNhMmUiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtZGFzaGFycmF5PSI0IDMiIC8+DQogIDx0ZXh0IHg9Ii0xMDEuNiIgeT0iLTQxLjEiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiNiMDNhMmUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5UYXNrczwvdGV4dD4NCiAgPHRleHQgeD0iLTEwMS42IiB5PSI0MS4xIiBmb250LXNpemU9IjEzIiBmaWxsPSIjYjAzYTJlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+UXVlcmllczwvdGV4dD4NCiAgPGNpcmNsZSBjeD0iMCIgY3k9IjAiIHI9IjcyIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMwRjE3MkEiIHN0cm9rZS13aWR0aD0iMS41IiAvPg0KICA8dGV4dCB4PSIwIiB5PSIwIiBmb250LXNpemU9IjE2IiBmaWxsPSIjMEYxNzJBIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC13ZWlnaHQ9IjYwMCI+RG9tYWluPC90ZXh0Pg0KICA8bGluZSB4MT0iLTE0Ny4yIiB5MT0iLTAiIHgyPSItMjAyLjIiIHkyPSItMCIgc3Ryb2tlPSIjMEYxNzJBIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgLz4NCiAgPGxpbmUgeDE9Ii0yNDgiIHkxPSItMTAuMiIgeDI9Ii0yOTAuMiIgeTI9Ii0zMCIgc3Ryb2tlPSIjMEYxNzJBIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgLz4NCiAgPHJlY3QgeD0iLTQ1MS42IiB5PSItNTUiIHdpZHRoPSIxNjEuNCIgaGVpZ2h0PSI1MCIgcng9IjQiIGZpbGw9IiM2NDc0OEIiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIxLjIiIC8+DQogIDx0ZXh0IHg9Ii0zNzAuOSIgeT0iLTM4IiBmb250LXNpemU9IjEzIiBmaWxsPSIjRkZGRkZGIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC13ZWlnaHQ9IjYwMCI+V2ViIEFwcDwvdGV4dD4NCiAgPHRleHQgeD0iLTM3MC45IiB5PSItMjEiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNFMkU4RjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5CbGF6b3IgV2ViQXNzZW1ibHkgVUk8L3RleHQ+DQogIDxsaW5lIHgxPSItMjQ4IiB5MT0iMTAuMiIgeDI9Ii0yOTAuMiIgeTI9IjMwIiBzdHJva2U9IiMwRjE3MkEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiAvPg0KICA8cmVjdCB4PSItMzk2LjEiIHk9IjUiIHdpZHRoPSIxMDUuOSIgaGVpZ2h0PSI1MCIgcng9IjQiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzY0NzQ4QiIgc3Ryb2tlLXdpZHRoPSIxLjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUgMyIgLz4NCiAgPHRleHQgeD0iLTM0My4yIiB5PSIyMiIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzBGMTcyQSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtd2VpZ2h0PSI2MDAiPlNwZWNzPC90ZXh0Pg0KICA8dGV4dCB4PSItMzQzLjIiIHk9IjM5IiBmb250LXNpemU9IjExIiBmaWxsPSIjNjQ3NDhCIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+RmFrZSDCtyB4VW5pdDwvdGV4dD4NCiAgPGNpcmNsZSBjeD0iLTIyNi4yIiBjeT0iLTAiIHI9IjI0IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMzMzQxNTUiIHN0cm9rZS13aWR0aD0iNCIgLz4NCiAgPHRleHQgeD0iLTIyNi4yIiB5PSItNDAiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMzMzQxNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXdlaWdodD0iNjAwIj5Vc2VyPC90ZXh0Pg0KICA8bGluZSB4MT0iMzkuNCIgeTE9Ii0xNDcuMiIgeDI9IjUzLjciIHkyPSItMjAwLjQiIHN0cm9rZT0iIzBGMTcyQSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIC8+DQogIDxsaW5lIHgxPSI2MS45IiB5MT0iLTIzOS40IiB4Mj0iODEuOCIgeTI9Ii0zNjguNCIgc3Ryb2tlPSIjMEYxNzJBIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgLz4NCiAgPHJlY3QgeD0iODEuOCIgeT0iLTM5My40IiB3aWR0aD0iMjMwIiBoZWlnaHQ9IjUwIiByeD0iNCIgZmlsbD0iIzY0NzQ4QiIgc3Ryb2tlPSIjNDc1NTY5IiBzdHJva2Utd2lkdGg9IjEuMiIgLz4NCiAgPHRleHQgeD0iMTk2LjgiIHk9Ii0zNzYuNCIgZm9udC1zaXplPSIxMyIgZmlsbD0iI0ZGRkZGRiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtd2VpZ2h0PSI2MDAiPkJyb3dzZXIgRmlsZXM8L3RleHQ+DQogIDx0ZXh0IHg9IjE5Ni44IiB5PSItMzU5LjQiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNFMkU4RjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5GaWxlIFN5c3RlbSBBY2Nlc3MgQVBJLCBkb3dubG9hZCBm4oCmPC90ZXh0Pg0KICA8bGluZSB4MT0iNjMuOSIgeTE9Ii0yMzkiIHgyPSI4MS44IiB5Mj0iLTMwOC40IiBzdHJva2U9IiMwRjE3MkEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiAvPg0KICA8cmVjdCB4PSI4MS44IiB5PSItMzMzLjQiIHdpZHRoPSIxMjYuNiIgaGVpZ2h0PSI1MCIgcng9IjQiIGZpbGw9IiNmZmZmZmYiIHN0cm9rZT0iIzY0NzQ4QiIgc3Ryb2tlLXdpZHRoPSIxLjIiIHN0cm9rZS1kYXNoYXJyYXk9IjUgMyIgLz4NCiAgPHRleHQgeD0iMTQ1LjEiIHk9Ii0zMTYuNCIgZm9udC1zaXplPSIxMyIgZmlsbD0iIzBGMTcyQSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtd2VpZ2h0PSI2MDAiPkZha2UgUHJvamVjdHM8L3RleHQ+DQogIDx0ZXh0IHg9IjE0NS4xIiB5PSItMjk5LjQiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiM2NDc0OEIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5GYWtlPC90ZXh0Pg0KICA8Y2lyY2xlIGN4PSI1OC45IiBjeT0iLTIxOS43IiByPSIyMCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjMzM0MTU1IiBzdHJva2Utd2lkdGg9IjIiIC8+DQogIDx0ZXh0IHg9IjU4LjkiIHk9Ii0yNTUuNyIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzMzNDE1NSIgdGV4dC1hbmNob3I9ImVuZCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtd2VpZ2h0PSI2MDAiPlByb2plY3RzPC90ZXh0Pg0KICA8bGluZSB4MT0iMTI2LjQiIHkxPSItOTciIHgyPSIxNzAuMSIgeTI9Ii0xMzAuNSIgc3Ryb2tlPSIjMEYxNzJBIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgLz4NCiAgPGxpbmUgeDE9IjE5OC42IiB5MT0iLTE1OC4xIiB4Mj0iMjM1LjYiIHkyPSItMjAzLjEiIHN0cm9rZT0iIzBGMTcyQSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIC8+DQogIDxyZWN0IHg9IjIzNS42IiB5PSItMjI4LjEiIHdpZHRoPSIxMjQuNCIgaGVpZ2h0PSI1MCIgcng9IjQiIGZpbGw9IiM2NDc0OEIiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIxLjIiIC8+DQogIDx0ZXh0IHg9IjI5Ny44IiB5PSItMjExLjEiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiNGRkZGRkYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXdlaWdodD0iNjAwIj5JbmRleGVkREI8L3RleHQ+DQogIDx0ZXh0IHg9IjI5Ny44IiB5PSItMTk0LjEiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNFMkU4RjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5Ccm93c2VyIHN0b3JhZ2U8L3RleHQ+DQogIDxsaW5lIHgxPSIyMDUuOSIgeTE9Ii0xNDIuOCIgeDI9IjIzNS42IiB5Mj0iLTE0My4xIiBzdHJva2U9IiMwRjE3MkEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiAvPg0KICA8cmVjdCB4PSIyMzUuNiIgeT0iLTE2OC4xIiB3aWR0aD0iMTI2LjYiIGhlaWdodD0iNTAiIHJ4PSI0IiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiM2NDc0OEIiIHN0cm9rZS13aWR0aD0iMS4yIiBzdHJva2UtZGFzaGFycmF5PSI1IDMiIC8+DQogIDx0ZXh0IHg9IjI5OC45IiB5PSItMTUxLjEiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiMwRjE3MkEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXdlaWdodD0iNjAwIj5GYWtlIEF1dG9zYXZlPC90ZXh0Pg0KICA8dGV4dCB4PSIyOTguOSIgeT0iLTEzNC4xIiBmb250LXNpemU9IjExIiBmaWxsPSIjNjQ3NDhCIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+RmFrZTwvdGV4dD4NCiAgPGNpcmNsZSBjeD0iMTg1LjkiIGN5PSItMTQyLjciIHI9IjIwIiBmaWxsPSIjZmZmZmZmIiBzdHJva2U9IiMzMzQxNTUiIHN0cm9rZS13aWR0aD0iMiIgLz4NCiAgPHRleHQgeD0iMTg1LjkiIHk9Ii0xNzguNyIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzMzNDE1NSIgdGV4dC1hbmNob3I9ImVuZCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtd2VpZ2h0PSI2MDAiPkF1dG9zYXZlPC90ZXh0Pg0KICA8bGluZSB4MT0iMTQ3LjIiIHkxPSItMCIgeDI9IjIwMi4yIiB5Mj0iLTAiIHN0cm9rZT0iIzBGMTcyQSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIC8+DQogIDxsaW5lIHgxPSIyNDAuMSIgeTE9Ii04LjkiIHgyPSIyODIuMiIgeTI9Ii0zMCIgc3Ryb2tlPSIjMEYxNzJBIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgLz4NCiAgPHJlY3QgeD0iMjgyLjIiIHk9Ii01NSIgd2lkdGg9IjIzMCIgaGVpZ2h0PSI1MCIgcng9IjQiIGZpbGw9IiM2NDc0OEIiIHN0cm9rZT0iIzQ3NTU2OSIgc3Ryb2tlLXdpZHRoPSIxLjIiIC8+DQogIDx0ZXh0IHg9IjM5Ny4yIiB5PSItMzgiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiNGRkZGRkYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXdlaWdodD0iNjAwIj5TVkcgRmlsZXM8L3RleHQ+DQogIDx0ZXh0IHg9IjM5Ny4yIiB5PSItMjEiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNFMkU4RjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5Ccm93c2VyIEZpbGVzIChGaWxlIFN5c3RlbSBBY2Nlc3Mg4oCmPC90ZXh0Pg0KICA8bGluZSB4MT0iMjQwLjEiIHkxPSI4LjkiIHgyPSIyODIuMiIgeTI9IjMwIiBzdHJva2U9IiMwRjE3MkEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiAvPg0KICA8cmVjdCB4PSIyODIuMiIgeT0iNSIgd2lkdGg9IjE3Ny42IiBoZWlnaHQ9IjUwIiByeD0iNCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjEuMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSAzIiAvPg0KICA8dGV4dCB4PSIzNzEiIHk9IjIyIiBmb250LXNpemU9IjEzIiBmaWxsPSIjMEYxNzJBIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC13ZWlnaHQ9IjYwMCI+RmFrZSBEaWFncmFtIEV4cG9ydHM8L3RleHQ+DQogIDx0ZXh0IHg9IjM3MSIgeT0iMzkiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiM2NDc0OEIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5GYWtlPC90ZXh0Pg0KICA8Y2lyY2xlIGN4PSIyMjIuMiIgY3k9Ii0wIiByPSIyMCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjMzM0MTU1IiBzdHJva2Utd2lkdGg9IjIiIC8+DQogIDx0ZXh0IHg9IjIyMi4yIiB5PSItMzYiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiMzMzQxNTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXdlaWdodD0iNjAwIj5EaWFncmFtIEV4cG9ydHM8L3RleHQ+DQogIDxsaW5lIHgxPSIxMjYuNCIgeTE9Ijk3IiB4Mj0iMTcwLjEiIHkyPSIxMzAuNSIgc3Ryb2tlPSIjMEYxNzJBIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgLz4NCiAgPGxpbmUgeDE9IjIwNS45IiB5MT0iMTQyLjgiIHgyPSIyMzUuNiIgeTI9IjE0My4xIiBzdHJva2U9IiMwRjE3MkEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiAvPg0KICA8cmVjdCB4PSIyMzUuNiIgeT0iMTE4LjEiIHdpZHRoPSIyMzAiIGhlaWdodD0iNTAiIHJ4PSI0IiBmaWxsPSIjNjQ3NDhCIiBzdHJva2U9IiM0NzU1NjkiIHN0cm9rZS13aWR0aD0iMS4yIiAvPg0KICA8dGV4dCB4PSIzNTAuNiIgeT0iMTM1LjEiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiNGRkZGRkYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXdlaWdodD0iNjAwIj5NYXJrZG93biBQbGFuPC90ZXh0Pg0KICA8dGV4dCB4PSIzNTAuNiIgeT0iMTUyLjEiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNFMkU4RjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5Ccm93c2VyIEZpbGVzIChGaWxlIFN5c3RlbSBBY2Nlc3Mg4oCmPC90ZXh0Pg0KICA8bGluZSB4MT0iMTk4LjYiIHkxPSIxNTguMSIgeDI9IjIzNS42IiB5Mj0iMjAzLjEiIHN0cm9rZT0iIzBGMTcyQSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIC8+DQogIDxyZWN0IHg9IjIzNS42IiB5PSIxNzguMSIgd2lkdGg9IjE3MC4zIiBoZWlnaHQ9IjUwIiByeD0iNCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjEuMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSAzIiAvPg0KICA8dGV4dCB4PSIzMjAuOCIgeT0iMTk1LjEiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiMwRjE3MkEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXdlaWdodD0iNjAwIj5GYWtlIFNvbHV0aW9uIFN0dWJzPC90ZXh0Pg0KICA8dGV4dCB4PSIzMjAuOCIgeT0iMjEyLjEiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiM2NDc0OEIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5GYWtlPC90ZXh0Pg0KICA8Y2lyY2xlIGN4PSIxODUuOSIgY3k9IjE0Mi43IiByPSIyMCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjMzM0MTU1IiBzdHJva2Utd2lkdGg9IjIiIC8+DQogIDx0ZXh0IHg9IjE4NS45IiB5PSIxNzguNyIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzMzNDE1NSIgdGV4dC1hbmNob3I9ImVuZCIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIGZvbnQtd2VpZ2h0PSI2MDAiPlNvbHV0aW9uIFN0dWJzPC90ZXh0Pg0KICA8bGluZSB4MT0iMzkuNCIgeTE9IjE0Ny4yIiB4Mj0iNTMuNyIgeTI9IjIwMC40IiBzdHJva2U9IiMwRjE3MkEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiAvPg0KICA8bGluZSB4MT0iNjMuOSIgeTE9IjIzOSIgeDI9IjgxLjgiIHkyPSIzMDguNCIgc3Ryb2tlPSIjMEYxNzJBIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgLz4NCiAgPHJlY3QgeD0iODEuOCIgeT0iMjgzLjQiIHdpZHRoPSIyMzAiIGhlaWdodD0iNTAiIHJ4PSI0IiBmaWxsPSIjNjQ3NDhCIiBzdHJva2U9IiM0NzU1NjkiIHN0cm9rZS13aWR0aD0iMS4yIiAvPg0KICA8dGV4dCB4PSIxOTYuOCIgeT0iMzAwLjQiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiNGRkZGRkYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXdlaWdodD0iNjAwIj5Ccm93c2VyPC90ZXh0Pg0KICA8dGV4dCB4PSIxOTYuOCIgeT0iMzE3LjQiIGZvbnQtc2l6ZT0iMTEiIGZpbGw9IiNFMkU4RjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIj5Ccm93c2VyIENsaXBib2FyZCBBUEkgKEpTIGludGVyb3ApPC90ZXh0Pg0KICA8bGluZSB4MT0iNjEuOSIgeTE9IjIzOS40IiB4Mj0iODEuOCIgeTI9IjM2OC40IiBzdHJva2U9IiMwRjE3MkEiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiAvPg0KICA8cmVjdCB4PSI4MS44IiB5PSIzNDMuNCIgd2lkdGg9IjEzMy45IiBoZWlnaHQ9IjUwIiByeD0iNCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjNjQ3NDhCIiBzdHJva2Utd2lkdGg9IjEuMiIgc3Ryb2tlLWRhc2hhcnJheT0iNSAzIiAvPg0KICA8dGV4dCB4PSIxNDguOCIgeT0iMzYwLjQiIGZvbnQtc2l6ZT0iMTMiIGZpbGw9IiMwRjE3MkEiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJjZW50cmFsIiBmb250LXdlaWdodD0iNjAwIj5GYWtlIENsaXBib2FyZDwvdGV4dD4NCiAgPHRleHQgeD0iMTQ4LjgiIHk9IjM3Ny40IiBmb250LXNpemU9IjExIiBmaWxsPSIjNjQ3NDhCIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCI+RmFrZTwvdGV4dD4NCiAgPGNpcmNsZSBjeD0iNTguOSIgY3k9IjIxOS43IiByPSIyMCIgZmlsbD0iI2ZmZmZmZiIgc3Ryb2tlPSIjMzM0MTU1IiBzdHJva2Utd2lkdGg9IjIiIC8+DQogIDx0ZXh0IHg9IjU4LjkiIHk9IjI1NS43IiBmb250LXNpemU9IjE0IiBmaWxsPSIjMzM0MTU1IiB0ZXh0LWFuY2hvcj0iZW5kIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC13ZWlnaHQ9IjYwMCI+Q2xpcGJvYXJkPC90ZXh0Pg0KICA8dGV4dCB4PSItNDUxLjYiIHk9Ii00MjMuNCIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzBGMTcyQSIgdGV4dC1hbmNob3I9InN0YXJ0IiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgZm9udC13ZWlnaHQ9IjYwMCI+TW90aWYgU2tldGNoPC90ZXh0Pg0KPC9zdmc+DQo=";
+const dec = b => new TextDecoder().decode(Uint8Array.from(atob(b), c => c.charCodeAt(0)));
+
+const MARKS = {
+  a: `<svg class="mark" viewBox="0 0 24 24"><rect x="2.5" y="13.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="8.5" y="8.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14.5" y="3.5" width="7" height="7" rx="1.5" fill="var(--accent)"/></svg>`,
+  b: `<svg class="mark" viewBox="0 0 24 24"><line x1="7.2" y1="16.8" x2="16.8" y2="7.2" stroke="currentColor" stroke-width="1.8"/><circle cx="5.5" cy="18.5" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18.5" cy="5.5" r="3.5" fill="var(--accent)"/></svg>`,
+  c: `<svg class="mark" viewBox="0 0 24 24"><path d="M3.5 20V4.5l8.5 9 8.5-9V20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="2.6" fill="var(--accent)"/></svg>`
+};
+
+const FIRST_SVG = `<svg viewBox="-300 -200 600 400" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <rect x="-300" y="-200" width="600" height="400" fill="#FFFFFF"/>
+  <g class="element" data-id="new" data-type="system"><rect x="-120" y="-65" width="240" height="130" rx="6" fill="#FFFFFF" stroke="#0F172A" stroke-width="3"/>
+  <text x="0" y="-8" text-anchor="middle" dominant-baseline="central" font-size="16" font-weight="600" fill="#0F172A">Your system</text>
+  <text x="0" y="16" text-anchor="middle" dominant-baseline="central" font-size="11" fill="#64748B">What does it do?</text></g></svg>`;
+
+const TYPE_LABEL = { system: 'System', primaryActor: 'Primary actor', secondaryActor: 'Secondary actor', externalSystem: 'External system', storage: 'Storage' };
+
+function mount(host, svgText) {
+  host.innerHTML = svgText.replace(/^<\?xml[^>]*>\s*/, '');
+  const svg = host.querySelector('svg');
+  svg.removeAttribute('width'); svg.removeAttribute('height');
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+  return svg;
+}
+
+// Context diagram
+const ctxSvg = mount(document.getElementById('ctxDiagram'), dec(CONTEXT_SVG_B64));
+ctxSvg.querySelectorAll('g.element').forEach(g => g.classList.add('hit'));
+const firstSvg = mount(document.getElementById('firstDiagram'), FIRST_SVG);
+
+// Sketch: restyle Specs as Checks (decision 32), mark hit targets
+const hexSvg = mount(document.getElementById('hexDiagram'), dec(SKETCH_SVG_B64));
+[...hexSvg.querySelectorAll('text')].filter(t => t.textContent === 'Specs').forEach(t => {
+  const r = t.previousElementSibling;
+  r.setAttribute('fill', '#E2E8F0'); r.setAttribute('stroke', '#52606D'); r.setAttribute('stroke-width', '1'); r.removeAttribute('stroke-dasharray');
+  const sub = t.nextElementSibling; sub.textContent = 'Checks · xUnit'; sub.setAttribute('fill', '#475569');
+});
+hexSvg.querySelectorAll('rect[rx], circle[r="24"], circle[r="20"], circle[r="22"]').forEach(s => s.classList.add('hit'));
+hexSvg.querySelectorAll('circle').forEach(c => { if (+c.getAttribute('r') < 40) c.classList.add('hit'); });
+
+// Thumbnails are the live diagrams, scaled
+function refreshThumbs() {
+  document.querySelector('[data-thumb=context]').innerHTML = (document.body.classList.contains('mode-first') ? firstSvg : ctxSvg).outerHTML;
+  document.querySelector('[data-thumb=sketch]').innerHTML = hexSvg.outerHTML;
+  document.querySelectorAll('.mini .sel').forEach(e => e.classList.remove('sel'));
+}
+
+// Selection and the properties card
+let selEl = null;
+function clearSel() {
+  document.querySelectorAll('.diagram .sel').forEach(e => e.classList.remove('sel'));
+  document.querySelectorAll('.props').forEach(c => c.remove());
+  selEl = null;
+}
+function field(label, value, area) {
+  return `<div class="field"><label>${label}</label>${area ? `<textarea>${value}</textarea>` : `<input value="${value.replace(/"/g, '&quot;')}">`}</div>`;
+}
+function showCard(pane, title, sub, fields) {
+  const ro = document.body.classList.contains('mode-viewer');
+  const card = document.createElement('div');
+  card.className = 'card props' + (ro ? ' ro' : '');
+  card.innerHTML = `<header><div class="t"><b>${title}</b><span>${sub}</span></div><button class="x" title="Close (Esc)">✕</button></header><div class="body">${fields}</div>`;
+  card.querySelector('.x').onclick = clearSel;
+  card.addEventListener('click', e => e.stopPropagation());
+  const canvas = document.querySelector(`[data-canvas=${pane}]`);
+  canvas.appendChild(card);
+  placeCard(card, canvas, pane);
+  return card;
+}
+
+// Put the properties card in the canvas corner that covers least of the
+// selection (and the other floating cards). Stay in the last corner while it
+// still covers nothing, so the card doesn't jump about on every click.
+const lastCorner = { context: 'tr', sketch: 'tr' };
+const CORNER_ORDER = ['tr', 'br', 'tl', 'bl'];
+function overlap(a, b) {
+  const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+  const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+  return w > 0 && h > 0 ? w * h : 0;
+}
+function placeCard(card, canvas, pane) {
+  const M = 12, c = canvas.getBoundingClientRect(), w = card.offsetWidth, h = card.offsetHeight;
+  const rectAt = k => {
+    const left = k[1] === 'l' ? c.left + M : c.right - M - w;
+    const top = k[0] === 't' ? c.top + M : c.bottom - M - h;
+    return { left, top, right: left + w, bottom: top + h };
+  };
+  const target = selEl ? selEl.getBoundingClientRect() : null;
+  const others = [...canvas.querySelectorAll('.card:not(.props), .badge')]
+    .filter(o => o.offsetParent).map(o => o.getBoundingClientRect());
+  const score = k => {
+    const r = rectAt(k);
+    return (target ? overlap(r, target) * 10 : 0) + others.reduce((s, o) => s + overlap(r, o), 0);
+  };
+  let best = lastCorner[pane];
+  if (score(best) > 0) {
+    const cx = target ? (target.left + target.right) / 2 : 0, cy = target ? (target.top + target.bottom) / 2 : 0;
+    const dist = k => { const r = rectAt(k); return Math.hypot((r.left + r.right) / 2 - cx, (r.top + r.bottom) / 2 - cy); };
+    best = CORNER_ORDER.slice().sort((a, b) => score(a) - score(b) || dist(b) - dist(a))[0];
+  }
+  lastCorner[pane] = best;
+  Object.assign(card.style, { top: 'auto', bottom: 'auto', left: 'auto', right: 'auto' });
+  card.style[best[0] === 't' ? 'top' : 'bottom'] = M + 'px';
+  card.style[best[1] === 'l' ? 'left' : 'right'] = M + 'px';
+  card.dataset.corner = best;
+}
+function selectContext(g) {
+  clearSel();
+  const shape = g.querySelector('rect, path, ellipse');
+  g.querySelectorAll(':scope > rect, :scope > path, :scope > ellipse').forEach(s => s.classList.add('sel'));
+  selEl = g;
+  const texts = [...g.querySelectorAll('text')].map(t => t.textContent);
+  const type = g.dataset.type;
+  const name = texts[0] || '';
+  const card = showCard('context', name, TYPE_LABEL[type] || '',
+    field('Name', name) + field('Technology', texts.slice(1).join(' ').slice(0, 60)) + field('Description', '', true) +
+    (type === 'system' ? '' : field('Type', TYPE_LABEL[type])));
+  return card;
+}
+function selectSketch(shape) {
+  clearSel();
+  shape.classList.add('sel'); selEl = shape;
+  if (shape.tagName === 'circle') {
+    let t = shape.nextElementSibling; while (t && t.tagName !== 'text') t = t.nextElementSibling;
+    const name = t ? t.textContent : 'Port';
+    showCard('sketch', name, name === 'User' ? 'Driving port · always present' : 'Port',
+      field('Name', name) + field('Description', '', true));
+    return;
+  }
+  const title = shape.nextElementSibling, sub = title && title.nextElementSibling;
+  const name = title ? title.textContent : '';
+  const dashed = shape.hasAttribute('stroke-dasharray');
+  const checks = (shape.getAttribute('fill') || '').toUpperCase() === '#E2E8F0';
+  const kind = checks ? 'Checks' : dashed ? 'Fake' : 'Real';
+  const tech = sub ? sub.textContent.replace(/^(Fake|Checks)( · )?/, '') : '';
+  const cls = checks ? 'Motif.Sketch.Specs' : kind === 'Fake' ? name.replace(/\s/g, '') : name.replace(/\s/g, '');
+  showCard('sketch', name, kind + ' adapter',
+    field('Name', name) + field('Technology', tech) +
+    `<div class="field"><label>Kind</label><select><option>${kind}</option></select></div>` +
+    `<div class="field"><label>In the plan</label><span class="code">${cls}</span></div>`);
+}
+
+document.querySelectorAll('[data-canvas]').forEach(c => c.addEventListener('click', e => {
+  if (e.target.closest('.card, .badge')) return;
+  const pane = c.dataset.canvas;
+  if (pane === 'context') {
+    const g = e.target.closest('.diagram g.element');
+    g ? selectContext(g) : clearSel();
+  } else {
+    const s = e.target.closest('.diagram .hit');
+    s ? selectSketch(s) : clearSel();
+  }
+}));
+addEventListener('keydown', e => {
+  if (e.key === 'Escape') { clearSel(); closeMenus(); }
+  if (e.altKey && '123'.includes(e.key)) { e.preventDefault(); setState({ 1: 'context', 2: 'split', 3: 'sketch' }[e.key]); }
+});
+
+// Layout states
+const work = document.getElementById('work');
+const panes = { context: work.querySelector('.pane.context'), sketch: work.querySelector('.pane.sketch') };
+const narrow = matchMedia('(max-width: 899px)');
+let state = 'split';
+function setState(s) {
+  const first = document.body.classList.contains('mode-first');
+  if (first) s = 'context';
+  if (s === 'split' && narrow.matches) s = 'context';
+  state = s;
+  work.classList.remove('s-context', 's-split', 's-sketch'); work.classList.add('s-' + s);
+  panes.context.classList.toggle('collapsed', s === 'sketch');
+  panes.sketch.classList.toggle('collapsed', s === 'context');
+  document.querySelectorAll('.switch button').forEach(b => { b.setAttribute('aria-pressed', String(b.dataset.s === s)); b.disabled = first && b.dataset.s !== 'context'; b.style.opacity = b.disabled ? .35 : ''; });
+  if (selEl && selEl.closest('.pane').classList.contains('collapsed')) clearSel();
+}
+document.querySelectorAll('.switch button').forEach(b => b.onclick = () => setState(b.dataset.s));
+document.querySelectorAll('[data-go]').forEach(el => el.addEventListener('click', e => {
+  if (e.target.closest('#startSketch')) return;
+  setState(state === el.dataset.go ? 'split' : el.dataset.go);
+}));
+document.getElementById('minUnplaced').onclick = () => work.classList.add('unplaced-min');
+document.getElementById('badge').onclick = () => work.classList.remove('unplaced-min');
+document.getElementById('welcome').querySelector('[data-close]').onclick = e => { e.stopPropagation(); e.target.closest('.card').style.display = 'none'; };
+document.getElementById('startSketch').onclick = e => { e.stopPropagation(); setMode('edit'); setState('split'); };
+
+// Divider
+const divider = document.getElementById('divider');
+divider.addEventListener('pointerdown', e => {
+  divider.setPointerCapture(e.pointerId);
+  const move = ev => { const r = work.getBoundingClientRect(); work.style.setProperty('--left', Math.min(70, Math.max(30, (ev.clientX - r.left) / r.width * 100)) + '%'); };
+  divider.addEventListener('pointermove', move);
+  divider.addEventListener('pointerup', () => divider.removeEventListener('pointermove', move), { once: true });
+});
+
+// Menus
+function closeMenus() { document.querySelectorAll('.menu.open').forEach(m => m.classList.remove('open')); }
+document.querySelectorAll('.menu [data-menu]').forEach(b => b.onclick = e => {
+  e.stopPropagation(); const m = b.closest('.menu'); const was = m.classList.contains('open'); closeMenus(); if (!was) m.classList.add('open');
+});
+addEventListener('click', closeMenus);
+
+// Theme: System / Light / Dark, remembered in this browser only (decision 37)
+const ICONS = {
+  light: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  dark: '<path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/>',
+  system: '<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>'
+};
+const sysDark = matchMedia('(prefers-color-scheme: dark)');
+let pref = 'system';
+try { pref = localStorage.getItem('motif-theme') || 'system'; } catch {}
+function applyTheme() {
+  const t = pref === 'system' ? (sysDark.matches ? 'dark' : 'light') : pref;
+  document.documentElement.dataset.theme = t;
+  document.getElementById('themeIcon').innerHTML = ICONS[pref];
+  document.querySelectorAll('#themeMenu [data-t]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.t === pref)));
+}
+document.querySelectorAll('#themeMenu [data-t]').forEach(b => b.onclick = () => { pref = b.dataset.t; try { localStorage.setItem('motif-theme', pref); } catch {} applyTheme(); });
+sysDark.addEventListener('change', applyTheme);
+
+// Mockup controls
+function setMode(m) {
+  document.body.classList.remove('mode-edit', 'mode-first', 'mode-viewer'); document.body.classList.add('mode-' + m);
+  document.querySelectorAll('#modeSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.m === m)));
+  document.getElementById('welcome').style.display = '';
+  clearSel(); refreshThumbs();
+  if (m === 'first') {
+    setState('context');
+    const card = selectContext(firstSvg.querySelector('g.element'));
+    const input = card.querySelector('input'); input.value = ''; input.placeholder = 'Name your system'; setTimeout(() => input.focus(), 0);
+  } else setState(state === 'context' && m !== 'first' ? 'split' : state);
+}
+document.querySelectorAll('#modeSeg button').forEach(b => b.onclick = () => setMode(b.dataset.m));
+function setMark(k) {
+  document.getElementById('markSlot').innerHTML = MARKS[k];
+  document.querySelectorAll('#markSeg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.k === k)));
+}
+document.querySelectorAll('#markSeg button').forEach(b => b.onclick = () => setMark(b.dataset.k));
+
+narrow.addEventListener('change', () => setState(state));
+applyTheme(); setMark('a'); refreshThumbs(); setState('split');
+</script>
+</body>
+</html>

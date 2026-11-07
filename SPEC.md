@@ -4,7 +4,7 @@ Motif Sketch is the first tool in the **Motif** suite. It combines Context Sketc
 
 The two desktop tools are the reference implementations. Their DESIGN.md files describe their diagram scheme, layout rules and plan opinions. Unless this spec says otherwise, Motif Sketch keeps their behaviour. `decisions.md` records why each choice below was made. `Motif Sketch - Context Diagram.contextsketch.json` and `Motif Sketch.hexasketch.json` are Motif Sketch's own design, drawn in the old tools.
 
-**Workflow request:** use plan mode. Propose the architecture and a phased plan, resolve section 10, and confirm before writing code. Section 9 (look and feel) is designed separately before the build. Don't invent it.
+**Workflow request:** use plan mode. Propose the architecture and a phased plan, resolve section 10, and confirm before writing code. Section 9 (look and feel) has been designed separately; follow it and don't invent your own.
 
 ## 1. Goals and non-goals
 
@@ -170,7 +170,7 @@ Every edit in either view is one undo step: Ctrl+Z / Ctrl+Y. There is one histor
 
 - **Export context diagram** and **Export sketch** each write a standalone SVG of that view, cropped to the content.
   - The on-screen-only parts (selection highlight, centre divider) are left out.
-  - The SVG and the screen are drawn from the same style definitions.
+  - The SVG and the screen are drawn from the same style definitions: the same shapes, layout and text. Exports always use the light palette; on screen, dark mode swaps in the dark twin of that palette.
 - **Export plan** writes the Markdown solution plan to the Solution Stubs port. It follows HexaSketch's plan opinions with these changes:
   - **Dotted names are kept as the root**: `Motif.Sketch.Domain`, not `MotifSketch.Domain`.
   - **Two-letter acronyms stay in capitals** in code names (`IndexedDB`, `UI`), which overrides the .NET guidelines.
@@ -206,7 +206,8 @@ These are carried over unchanged, because they're part of the suite's identity:
   - Ports are circles on stalks, and the User port is heavier.
   - Real adapters are solid slate. Fake and simulated adapters are white and dashed.
   - The User area is red.
-- **Checks adapters** need their own look, distinct from both Real and Fake: part of the look-and-feel pass (section 9).
+- **Checks adapters** are pale slate boxes with a solid outline, between solid Real and white dashed Fake (decision 32).
+- Diagram text uses IBM Plex Sans, whose width table the core uses to wrap labels (decision 34).
 
 ## 7. Quality bar
 
@@ -228,14 +229,14 @@ These are carried over unchanged, because they're part of the suite's identity:
 - [ ] Specs is there on the User port from the start. Fakes are named "Fake ⟨Port⟩".
 - [ ] Save, close the tab, reopen: in Edge/Chrome, Save still goes to the same file. In Firefox, Save downloads a copy.
 - [ ] A refresh mid-edit loses nothing.
-- [ ] Both SVG exports open in a browser and match the screen.
+- [ ] Both SVG exports open in a browser and match the screen in light mode.
 - [ ] The plan uses `Motif.Sketch.*` names, and following it gives a solution with the same shape as this app.
 - [ ] A snapshot link opens read-only in another browser, and Make a copy turns it into my own work.
 - [ ] Open example shows Motif Sketch's own design.
 - [ ] Invalid files and links give friendly errors and never lose the current work.
 - [ ] Pushing to `main` deploys to GitHub Pages.
 
-## 9. UI and look and feel (designed separately, before the build)
+## 9. UI and look and feel
 
 This spec fixes what the UI must offer, not how it looks:
 - the two views, and the means of switching between them
@@ -247,16 +248,15 @@ This spec fixes what the UI must offer, not how it looks:
 - a clear Viewer-mode indication
 - friendly error and confirmation messages
 
-The **look and feel** gets its own design pass, with mockups, before any UI code is written. It covers:
-- the overall layout and app chrome (toolbar vs menu, panel placement)
-- how the two views relate (tabs, side by side, or one canvas)
-- the Motif suite's visual identity (logo, typography, colour beyond the diagram palette, light/dark)
-- touch and narrow screens (supported, or desktop-only)
-- the look of Checks adapters
-- empty states and first-run
-- Viewer mode's appearance
+The **look and feel** has had its design pass. The decisions are 26–39 in `decisions.md`, and the mockups are `docs/mockups/layout.html` (layout) and `docs/mockups/v2.html` (look):
+- **Layout and chrome:** three layouts (Context, Split, Sketch), with the hidden view shrunk to a live thumbnail strip, and a three-way switch. A slim app bar holds the project commands, and each pane has its own tool strip. Properties and the unplaced list are floating cards.
+- **Identity:** IBM Plex Sans, self-hosted. The chrome is slate plus orange only. The logo is a Motif suite mark (stepped squares) plus the tool name. Light and dark follow the system, with an override. The diagrams have a dark twin on screen, and exports are always light.
+- **Devices:** desktop and tablet edit, with touch. Phones are read-only.
+- **Checks adapters:** pale slate (§6).
+- **First-run:** a blank project with the system ready to name, plus a dismissible welcome card.
+- **Viewer mode:** editing controls hidden; Make a copy to edit as the one primary action.
 
-The planner should leave this section to that pass. A plain placeholder UI is fine for the early phases.
+The planner follows these. The styling in `v2.html` is a first pass, so exact spacing and shades may still change. A plain placeholder UI is fine for the early phases.
 
 ## 10. Decisions for the planner
 
