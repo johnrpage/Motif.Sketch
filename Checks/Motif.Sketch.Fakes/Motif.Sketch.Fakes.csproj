@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Motif.Sketch.Fakes</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Motif.Sketch\Motif.Sketch.UseCases\Motif.Sketch.UseCases.csproj" />
+  </ItemGroup>
+
+</Project>

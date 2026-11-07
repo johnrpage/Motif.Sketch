@@ -43,6 +43,16 @@ Motif Sketch is the first tool in the Motif suite. It combines Context Sketch an
 | 37 | Theme choice | Follows the system by default, with a Light / Dark / System override remembered in this browser only. The override also lets a dark-mode user preview the (always light) export palette. |
 | 38 | Logo | One Motif suite mark, followed by the tool's name as a wordmark ("Motif **Sketch**" in Plex). Later tools reuse the mark with their own name. The mark uses the diagram language (slate strokes, an orange accent) but isn't tied to ports and adapters. The favicon may add a small per-tool detail. The mark is **stepped squares**: three rounded squares rising diagonally, two slate outlines and the top one solid orange (a shape repeating, the literal "motif"). Chosen over two linked nodes and an M monogram. |
 | 39 | Mockups | `docs/mockups/layout.html` settled the layout. `docs/mockups/v2.html` is the look: Plex, slate-plus-orange chrome, the dark diagram twin, mark A, and the Editing, First run and Viewer states. It's a first styling pass and can still be iterated. |
+| 40 | Rendering (SPEC §10.1) | The core draws each view once, as a **scene**: SVG nodes whose colours name `DiagramStyle` tokens. The SVG export writes the scene in the light palette; the screen renders the same scene with Razor, turning tokens into CSS variables (the dark twin) and adding the screen-only parts (selection, divider, the "source deleted" flag). So the screen and the export can't drift apart. |
+| 41 | Interaction (SPEC §10.2) | Pointer events in C# for select, drag-to-pin, pan, pinch and drag-and-drop (touch works; HTML5 drag-and-drop doesn't). The App's one small `app.js` does only what C# can't: pointer capture, a non-passive wheel listener, hit testing (`elementsFromPoint`), a document `keydown`, `beforeunload`, theme and viewport. |
+| 42 | Snapshot links (SPEC §10.3) | .NET `DeflateStream` (raw deflate) in the core, base64url, `#v1.` prefix. The core tests encode, decode and bad links without a browser. Links over **8,000 characters** are still copied, with a warning. The whole example is about 1.9 KB. If the browser refuses the clipboard, the link is shown to copy by hand. |
+| 43 | Undo (SPEC §10.4) | Whole-project snapshots, capped at 200 steps, one history for both views. The §5.3 follow-up runs inside the same edit, so it's the same step. |
+| 44 | Startup (SPEC §10.5) | Trimmed, no AOT, `InvariantGlobalization`, and a static splash with the mark. Measured at phase 0: about **2.8 MB** gzipped. JSON uses source generation so it survives trimming. |
+| 45 | Browser tests (SPEC §10.6) | None in v1: the JS modules are thin, and `docs/manual-checks.md` is run before a release. Add Playwright if a regression gets through. |
+| 46 | File handles across adapters | Adapters never reference each other, so the core passes only an opaque handle id. `globalThis.motifFileHandles` (a `Map` from id to `FileSystemFileHandle`) is the one shared browser contract: Projects adds handles to it; Autosave stores the handle itself in IndexedDB beside the work and puts it back in the map on restore. |
+| 47 | Tab ownership | Web Locks (`ifAvailable`) decide which tab owns autosave. "Use this tab instead" posts on a `BroadcastChannel`; the owner writes its last autosave, goes read-only and lets the lock go. Autosave writes are coalesced: while one is in flight only the newest pending one is written next. |
+| 48 | The example's system name | The plan keeps a dotted system name as its root (decision 16), so the example's system is named **`Motif.Sketch`**, which gives `Motif.Sketch.*` projects. A name with spaces ("Motif Sketch") gives `MotifSketch.*`, as before. The project title stays "Motif Sketch". |
+| 49 | Plan templates | The plan exporter maps "Blazor" to `blazorwasm`, and in a Blazor solution puts driven adapters on `razorclasslib` with `Microsoft.JSInterop`, as this repo does. The golden spec checks the example's plan against `Checks/Motif.Sketch.Specs/Golden/Motif.Sketch.plan.md`. |
 
 ## Later (not v1)
 
@@ -52,4 +62,8 @@ Motif Sketch is the first tool in the Motif suite. It combines Context Sketch an
 
 ## Still open
 
-Nothing. The spec (SPEC.md) has no open questions either.
+Questions the build raised, not yet settled:
+
+1. **Code root vs. display name** (decision 48). The example's system is named `Motif.Sketch` so the plan's root comes out as `Motif.Sketch.*`, and that's also the name shown in the hexagon and the context diagram. Should the system get a separate, optional "code root" field instead, so it can be shown as "Motif Sketch"? That would be a small schema addition (`codeRoot` on the system element).
+2. **Diagram pictures in the README.** `docs/context-diagram.svg` and `docs/ports-and-adapters.svg` were drawn by the old tools, from the two old diagram files. Should they be replaced by Motif Sketch's own exports of the bundled example, and the two old `.contextsketch.json` / `.hexasketch.json` files retired (SPEC §5.9 only needed them until the real `.motifsketch.json` existed)?
+3. **Copy link without the clipboard.** If the browser refuses clipboard access, the link is shown in a dialog to copy by hand. Is that enough, or should Copy link always show the link too?

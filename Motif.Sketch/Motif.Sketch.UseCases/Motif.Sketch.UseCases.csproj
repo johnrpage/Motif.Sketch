@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Motif.Sketch</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Motif.Sketch.Domain\Motif.Sketch.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Example\example.motifsketch.json" LogicalName="Motif.Sketch.example.motifsketch.json" />
+  </ItemGroup>
+
+</Project>

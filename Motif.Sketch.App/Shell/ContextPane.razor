@@ -1,0 +1,272 @@
+@namespace Motif.Sketch.App
+@implements IDisposable
+@inject MotifSketchApplication App
+@inject Ui Ui
+@inject Browser Browser
+
+<section class="pane context @(Collapsed ? "collapsed" : "")" style="@Style" @onpointerdown="Activate">
+    @if (!ReadOnly)
+    {
+        <div class="tools">
+            <span class="name">Context</span>
+            @foreach (var type in AddableTypes)
+            {
+                <button class="tool" title="Add a @Icons.TypeName(type).ToLowerInvariant()" @onclick="() => Add(type)">
+                    @Icons.Glyph(type)<span class="label">@Icons.TypeName(type)</span>
+                </button>
+            }
+            <div class="vsep"></div>
+            <button class="tool" title="Lay out the elements you haven't moved" @onclick="() => Ui.Run(App.AutoLayout)">@Icons.Grid<span class="label">Auto-layout</span></button>
+            <button class="tool" title="Release every pin and lay everything out" @onclick="() => Ui.Run(App.AutoLayoutAll)"><span class="label">All</span></button>
+            <div class="spacer"></div>
+            <button class="tool" title="Fit" @onclick="() => canvas?.Fit()">@Icons.Fit</button>
+            <button class="tool wide" title="Context diagram only (Alt+1)" @onclick="OnMaximise">@Icons.Maximise</button>
+        </div>
+    }
+    else
+    {
+        <div class="tools viewer-tools">
+            <span class="name">Context</span>
+            <div class="spacer"></div>
+            <button class="tool" title="Fit" @onclick="() => canvas?.Fit()">@Icons.Fit</button>
+            <button class="tool wide" title="Context diagram only (Alt+1)" @onclick="OnMaximise">@Icons.Maximise</button>
+        </div>
+    }
+
+    <DiagramCanvas @ref="canvas" Scene="@(preview ?? App.ContextScene)" Selected="@Highlighted" Divider="true"
+                   CanDrag="@(ReadOnly ? null : h => h.StartsWith("element:"))" FitKey="FitKey"
+                   OnPick="Pick" OnOpen="Open" OnDragMove="DragMove" OnDrop="Drop" OnViewChanged="Place">
+        @if (Selection is { } sel && Selected() is { } item)
+        {
+            <div class="card props @(ReadOnly ? "ro" : "")" style="@CardPlacement.Style(corner)" @onpointerdown:stopPropagation="true" @ondblclick:stopPropagation="true">
+                <header>
+                    <div class="t">
+                        <b>@(sel.Kind == "relationship" ? "Relationship" : item.Element.Name)</b>
+                        <span>@(sel.Kind == "relationship" ? $"{Name(item.Relationship?.From)} → {Name(item.Relationship?.To)}" : Icons.TypeName(item.Element.Type) + (item.Element.Pinned ? " · pinned" : ""))</span>
+                    </div>
+                    @if (!ReadOnly && item.Element.Type != ElementType.System && sel.Kind == "element")
+                    {
+                        <button class="x" title="Delete (Delete)" @onclick="Delete">@Icons.Trash</button>
+                    }
+                    <button class="x" title="Close (Esc)" @onclick="Clear">@Icons.Close</button>
+                </header>
+                <div class="body">
+                    @if (sel.Kind == "element")
+                    {
+                        var e = item.Element;
+                        <div class="field">
+                            <label for="prop-name">Name</label>
+                            <input id="prop-name" value="@e.Name" readonly="@ReadOnly" @onchange="v => Ui.Run(() => App.RenameElement(e.Id, Text(v)))" />
+                        </div>
+                        @if (e.Type != ElementType.System)
+                        {
+                            <div class="field">
+                                <label for="prop-type">Type</label>
+                                <select id="prop-type" disabled="@ReadOnly" @onchange="v => Ui.Run(() => App.SetElementType(e.Id, Enum.Parse<ElementType>(Text(v))))">
+                                    @foreach (var type in AddableTypes)
+                                    {
+                                        <option value="@type" selected="@(type == e.Type)">@Icons.TypeName(type)</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                        <div class="field">
+                            <label for="prop-tech">@(e.Type == ElementType.PrimaryActor ? "Technology (how they reach the system)" : "Technology")</label>
+                            <input id="prop-tech" value="@e.Technology" readonly="@ReadOnly" placeholder="@(ReadOnly ? "" : "e.g. Web browser")" @onchange="v => Ui.Run(() => App.SetElementTechnology(e.Id, Text(v)))" />
+                        </div>
+                        <div class="field">
+                            <label for="prop-desc">Description</label>
+                            <textarea id="prop-desc" readonly="@ReadOnly" placeholder="@(ReadOnly ? "" : e.Type == ElementType.System ? "What does it do?" : "")" @onchange="v => Ui.Run(() => App.DescribeElement(e.Id, Text(v)))">@e.Description</textarea>
+                        </div>
+                    }
+                    @if (item.Relationship is { } r)
+                    {
+                        if (sel.Kind == "element") { <div class="section">Relationship with @Name(r.From == item.Element.Id ? r.To : r.From)</div> }
+                        <div class="field">
+                            <label for="prop-label">Label</label>
+                            <input id="prop-label" value="@r.Label" readonly="@ReadOnly" placeholder="@(ReadOnly ? "" : "A plain sentence, e.g. Places orders")" @onchange="v => Ui.Run(() => App.SetRelationshipLabel(r.Id, Text(v)))" />
+                        </div>
+                        <div class="field">
+                            <label for="prop-dir">Direction</label>
+                            <select id="prop-dir" disabled="@ReadOnly" @onchange="v => Ui.Run(() => App.SetRelationshipDirection(r.Id, Enum.Parse<RelationshipDirection>(Text(v))))">
+                                <option value="@RelationshipDirection.OneWay" selected="@(r.Direction == RelationshipDirection.OneWay)">One way: from @Name(r.From)</option>
+                                <option value="@RelationshipDirection.TwoWay" selected="@(r.Direction == RelationshipDirection.TwoWay)">Two way: both sides start it</option>
+                            </select>
+                        </div>
+                        <p class="help">An arrow points from whoever starts the interaction.</p>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (ShowWelcome && !ReadOnly)
+        {
+            <div class="card welcome" @onpointerdown:stopPropagation="true" @ondblclick:stopPropagation="true">
+                <header><div class="t"><b>Sketch your system's context</b></div><button class="x" title="Dismiss" @onclick="OnDismissWelcome">@Icons.Close</button></header>
+                <div class="body">
+                    <p>Name your system, then add the people and systems around it. When it looks right, start the ports-and-adapters sketch.</p>
+                    <div class="tip">@Icons.Arrow<span>An arrow points from whoever starts the interaction.</span></div>
+                    <div class="row"><button class="ghost" @onclick="OnOpenExample">Open example</button><button class="ghost" @onclick="OnOpenFile">Open file…</button></div>
+                </div>
+            </div>
+        }
+    </DiagramCanvas>
+
+    <div class="thumb" title="Show the context diagram" @onclick="OnExpand">
+        <span class="label">Context</span>
+        <div class="mini"><SceneSvg Scene="App.ContextScene" /></div>
+        <span class="hint">@ExpandHint</span>
+    </div>
+</section>
+
+@code {
+    protected override void OnInitialized() => App.Changed += Redraw;
+
+    private void Redraw() => InvokeAsync(() => { OnParametersSet(); StateHasChanged(); });
+
+    public void Dispose() => App.Changed -= Redraw;
+
+    private static readonly ElementType[] AddableTypes =
+        [ElementType.PrimaryActor, ElementType.SecondaryActor, ElementType.ExternalSystem, ElementType.Storage];
+
+    [Parameter] public bool ReadOnly { get; set; }
+    [Parameter] public bool Collapsed { get; set; }
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public int FitKey { get; set; }
+    [Parameter] public bool ShowWelcome { get; set; }
+    [Parameter] public string ExpandHint { get; set; } = "";
+    [Parameter] public EventCallback OnExpand { get; set; }
+    [Parameter] public EventCallback OnMaximise { get; set; }
+    [Parameter] public EventCallback OnDismissWelcome { get; set; }
+    [Parameter] public EventCallback OnOpenExample { get; set; }
+    [Parameter] public EventCallback OnOpenFile { get; set; }
+    [Parameter] public EventCallback OnActivate { get; set; }
+    [Parameter] public EventCallback OnElementAdded { get; set; }
+
+    private DiagramCanvas? canvas;
+    private Scene? preview;
+    private string corner = "tr";
+
+    /// <summary>What's selected: an element or a relationship, by id.</summary>
+    public (string Kind, string Id)? Selection { get; private set; }
+
+    private string? Highlighted => Selection is { } s ? $"{s.Kind}:{s.Id}" : null;
+
+    private (ElementView Element, RelationshipView? Relationship)? Selected()
+    {
+        if (Selection is not { } s) return null;
+        var view = App.Context;
+        if (s.Kind == "element")
+            return view.Element(s.Id) is { } e ? (e, view.RelationshipOf(e.Id)) : null;
+        var r = view.Relationships.FirstOrDefault(x => x.Id == s.Id);
+        if (r is null) return null;
+        var other = view.Element(r.From)!.Type == ElementType.System ? r.To : r.From;
+        return (view.Element(other)!, r);
+    }
+
+    private string Name(string? id) => id is null ? "" : App.Context.Element(id)?.Name ?? "";
+
+    private static string Text(ChangeEventArgs e) => e.Value?.ToString() ?? "";
+
+    protected override void OnParametersSet()
+    {
+        if (Selection is not null && Selected() is null) Selection = null;
+    }
+
+    public void Select(string kind, string id)
+    {
+        Selection = (kind, id);
+        Place();
+    }
+
+    public void Clear()
+    {
+        Selection = null;
+        StateHasChanged();
+    }
+
+    /// <summary>Rename: focus the name field (or the label, for a relationship).</summary>
+    public void Rename()
+    {
+        if (Selection is null || ReadOnly) return;
+        focus = Selection.Value.Kind == "relationship" ? "#prop-label" : "#prop-name";
+        StateHasChanged();
+    }
+
+    private string? focus;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (focus is null) return;
+        Browser.Focus(focus);
+        focus = null;
+    }
+
+    public void DeleteSelection()
+    {
+        if (ReadOnly || Selection is not { Kind: "element" } s) return;
+        if (App.Context.Element(s.Id)?.Type == ElementType.System) return;
+        if (Ui.Run(() => App.DeleteElement(s.Id))) Selection = null;
+    }
+
+    private void Delete() => DeleteSelection();
+
+    private async Task Add(ElementType type)
+    {
+        string? id = null;
+        if (!Ui.Run(() => id = App.AddElement(type))) return;
+        Select("element", id!);
+        await OnElementAdded.InvokeAsync();
+    }
+
+    private Task Activate() => OnActivate.InvokeAsync();
+
+    private void Pick(string? hit)
+    {
+        if (hit is null) { Selection = null; return; }
+        var (kind, id) = Split(hit);
+        if (kind is "element" or "relationship") Select(kind, id);
+    }
+
+    private void Open(string hit)
+    {
+        Pick(hit);
+        Rename();
+    }
+
+    private void DragMove(DiagramCanvas.Drag drag)
+    {
+        var (_, id) = Split(drag.Hit);
+        if (App.Context.Element(id) is not { } e) return;
+        var c = e.Box.Centre;
+        preview = App.PreviewMove(id, c.X + drag.Now.X - drag.Start.X, c.Y + drag.Now.Y - drag.Start.Y);
+    }
+
+    private void Drop(DiagramCanvas.Drag drag)
+    {
+        preview = null;
+        var (_, id) = Split(drag.Hit);
+        if (App.Context.Element(id) is not { } e) return;
+        var c = e.Box.Centre;
+        Ui.Run(() => App.MoveElement(id, c.X + drag.Now.X - drag.Start.X, c.Y + drag.Now.Y - drag.Start.Y));
+        Place();
+    }
+
+    /// <summary>Moves the properties card to the corner that hides least of the selection.</summary>
+    private void Place()
+    {
+        if (canvas is null || Selected() is not { } item) return;
+        var box = Selection!.Value.Kind == "relationship" && item.Relationship is { } r
+            ? Rect.Bound([r.Line.From, r.Line.To])
+            : item.Element.Box;
+        var (w, h) = canvas.Size;
+        var avoid = ShowWelcome ? new List<Rect> { new(20, h - 220, 340, 200) } : [];
+        corner = CardPlacement.Choose(canvas.ToCanvas(box), w, h, 260, 340, avoid, corner);
+    }
+
+    private static (string Kind, string Id) Split(string hit)
+    {
+        var colon = hit.IndexOf(':');
+        return colon < 0 ? (hit, "") : (hit[..colon], hit[(colon + 1)..]);
+    }
+}

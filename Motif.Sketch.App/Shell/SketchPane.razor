@@ -1,0 +1,458 @@
+@namespace Motif.Sketch.App
+@implements IDisposable
+@inject MotifSketchApplication App
+@inject Ui Ui
+@inject Browser Browser
+
+<section class="pane sketch @(Collapsed ? "collapsed" : "")" style="@Style" @onpointerdown="Activate"
+         @onpointermove="MoveItemDrag" @onpointerup="EndItemDrag" @onpointercancel="CancelItemDrag">
+    <div class="tools @(ReadOnly ? "viewer-tools" : "")">
+        <span class="name">Ports and adapters</span>
+        @if (!ReadOnly && App.HasSketch)
+        {
+            <button class="tool" title="Add a driving port (left)" @onclick="() => AddPort(Side.Driving)">@Icons.PortGlyph<span class="label">Driving port</span></button>
+            <button class="tool" title="Add a driven port (right)" @onclick="() => AddPort(Side.Driven)">@Icons.PortGlyph<span class="label">Driven port</span></button>
+            <button class="tool" title="Add a hand-made adapter to the selected port" @onclick="AddAdapter">@Icons.AdapterGlyph<span class="label">Adapter</span></button>
+        }
+        <div class="spacer"></div>
+        @if (App.HasSketch)
+        {
+            <button class="tool" title="Fit" @onclick="() => canvas?.Fit()">@Icons.Fit</button>
+        }
+        <button class="tool wide" title="Ports and adapters only (Alt+3)" @onclick="OnMaximise">@Icons.Maximise</button>
+    </div>
+
+    @if (App.SketchScene is { } scene)
+    {
+        <DiagramCanvas @ref="canvas" Scene="scene" Selected="@Selection" DropTarget="@dropTarget" FitKey="FitKey"
+                       CanDrag="@(ReadOnly ? null : CanDrag)"
+                       OnPick="Pick" OnOpen="Open" OnDragMove="DragMove" OnDrop="Drop" OnViewChanged="Place">
+            @if (Selection is not null && !Collapsed)
+            {
+                <div class="card props @(ReadOnly ? "ro" : "")" style="@CardPlacement.Style(corner)" @onpointerdown:stopPropagation="true" @ondblclick:stopPropagation="true">
+                    @Properties()
+                </div>
+            }
+            @if (!ReadOnly && App.Unplaced.Count > 0)
+            {
+                @if (unplacedMinimised)
+                {
+                    <button class="badge" @onpointerdown:stopPropagation="true" @onclick="() => unplacedMinimised = false"><i></i>@App.Unplaced.Count not placed</button>
+                }
+                else
+                {
+                    <div class="card unplaced @(dropTarget == "unplaced" ? "drop" : "")" data-hit="unplaced" @onpointerdown:stopPropagation="true" @ondblclick:stopPropagation="true">
+                        <header>
+                            <div class="t"><b>Not placed</b></div><span class="count">@App.Unplaced.Count</span>
+                            <button class="x" title="Minimise" @onclick="() => unplacedMinimised = true">–</button>
+                        </header>
+                        <div class="body">
+                            <p class="help">Drag onto a port, an adapter or the hexagon.</p>
+                            @foreach (var item in App.Unplaced)
+                            {
+                                <div class="item" @key="item.ElementId"
+                                     @onpointerdown="e => StartItemDrag(e, item)" @onpointerdown:stopPropagation="true">
+                                    @Icons.Glyph(item.Type)
+                                    <div><b>@item.Name</b><span>@Icons.TypeName(item.Type)@(item.Technology is null ? "" : " · " + item.Technology)</span></div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else if (!ReadOnly && Selection is null && App.Unplaced.Count == 0 && hintVisible)
+            {
+                <div class="hint-chip">Everything in the context diagram is placed.</div>
+            }
+        </DiagramCanvas>
+    }
+    else
+    {
+        <div class="canvas empty">
+            @if (ReadOnly)
+            {
+                <p class="empty-note">This project has no ports-and-adapters sketch yet.</p>
+            }
+            else
+            {
+                <button class="start-btn big" @onclick="Start">Start sketch<small>Turn the context into ports and adapters</small></button>
+            }
+        </div>
+    }
+
+    <div class="thumb" title="Show the ports-and-adapters sketch" @onclick="ThumbClick">
+        <span class="label">Sketch</span>
+        @if (App.SketchScene is { } mini)
+        {
+            <div class="mini"><SceneSvg Scene="mini" /></div>
+            <span class="hint">@ExpandHint</span>
+        }
+        else if (!ReadOnly)
+        {
+            <button class="start-btn" @onclick="Start" @onclick:stopPropagation="true">Start sketch<small>Turn the context into ports and adapters</small></button>
+        }
+        else
+        {
+            <span class="hint">No sketch yet</span>
+        }
+    </div>
+
+    @if (ghost is { } g)
+    {
+        <div class="ghost-drag" style="left: @Format.N(g.X + 12)px; top: @Format.N(g.Y + 8)px">@g.Label</div>
+    }
+</section>
+
+@code {
+    protected override void OnInitialized() => App.Changed += Redraw;
+
+    private void Redraw() => InvokeAsync(() => { OnParametersSet(); StateHasChanged(); });
+
+    public void Dispose() => App.Changed -= Redraw;
+
+    [Parameter] public bool ReadOnly { get; set; }
+    [Parameter] public bool Collapsed { get; set; }
+    [Parameter] public string? Style { get; set; }
+    [Parameter] public int FitKey { get; set; }
+    [Parameter] public string ExpandHint { get; set; } = "";
+    [Parameter] public EventCallback OnExpand { get; set; }
+    [Parameter] public EventCallback OnMaximise { get; set; }
+    [Parameter] public EventCallback OnStarted { get; set; }
+    [Parameter] public EventCallback OnActivate { get; set; }
+
+    private DiagramCanvas? canvas;
+    private string corner = "tr";
+    private string? dropTarget;
+    private bool unplacedMinimised;
+    private bool hintVisible = true;
+    private (double X, double Y, string Label)? ghost;
+    private UnplacedItem? draggedItem;
+    private long? itemPointer;
+    private (double X, double Y) itemDownAt;
+    private string? focus;
+
+    /// <summary>The selected hit: "port:id", "adapter:id" or "hexagon".</summary>
+    public string? Selection { get; private set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Selection is null || App.Sketch is not { } view) { if (!App.HasSketch) Selection = null; return; }
+        var (kind, id) = Split(Selection);
+        if (kind == "port" && view.Port(id) is null || kind == "adapter" && view.Adapter(id) is null) Selection = null;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (focus is null) return;
+        Browser.Focus(focus);
+        focus = null;
+    }
+
+    public void Clear()
+    {
+        Selection = null;
+        StateHasChanged();
+    }
+
+    public void Rename()
+    {
+        if (Selection is null || ReadOnly) return;
+        focus = "#sk-name";
+        StateHasChanged();
+    }
+
+    public async Task DeleteSelection()
+    {
+        if (ReadOnly || Selection is null) return;
+        var (kind, id) = Split(Selection);
+        if (kind == "adapter")
+        {
+            if (Ui.Run(() => App.RemoveAdapter(id))) Selection = null;
+        }
+        else if (kind == "port" && App.Sketch!.Port(id) is { IsUser: false } port)
+        {
+            if (port.Adapters.Count > 0 && !await Ui.Confirm($"Delete the {port.Name} port?",
+                    $"Its {port.Adapters.Count} adapter{(port.Adapters.Count == 1 ? "" : "s")} go with it. Items they stood for return to Not placed.",
+                    "Delete port")) return;
+            if (Ui.Run(() => App.DeletePort(id))) Selection = null;
+        }
+        StateHasChanged();
+    }
+
+    private RenderFragment Properties() => __builder =>
+    {
+        var view = App.Sketch!;
+        var (kind, id) = Split(Selection!);
+        if (kind == "hexagon")
+        {
+            var system = App.Context.Elements.Single(e => e.Type == ElementType.System);
+            <header><div class="t"><b>@system.Name</b><span>The system · its core is Domain, Tasks and Queries</span></div>
+                <button class="x" title="Close (Esc)" @onclick="Clear">@Icons.Close</button></header>
+            <div class="body">
+                <div class="field"><label for="sk-name">System name</label>
+                    <input id="sk-name" value="@system.Name" readonly="@ReadOnly" @onchange="v => Ui.Run(() => App.RenameElement(system.Id, Text(v)))" /></div>
+                <div class="field"><label>Code root</label><div class="code">@CodeOr(CodeName.Root(system.Name))</div></div>
+                <div class="field"><label for="sk-desc">Description</label>
+                    <textarea id="sk-desc" readonly="@ReadOnly" @onchange="v => Ui.Run(() => App.DescribeElement(system.Id, Text(v)))">@system.Description</textarea></div>
+                <p class="help">A dotted name such as Motif.Sketch keeps its dots as the plan's root.</p>
+            </div>
+        }
+        else if (kind == "port" && view.Port(id) is { } port)
+        {
+            <header><div class="t"><b>@port.Name</b><span>@(port.IsUser ? "The User port" : port.Side == Side.Driving ? "Driving port" : "Driven port") · @port.Adapters.Count adapter@(port.Adapters.Count == 1 ? "" : "s")</span></div>
+                @if (!ReadOnly && !port.IsUser) { <button class="x" title="Delete (Delete)" @onclick="DeleteSelection">@Icons.Trash</button> }
+                <button class="x" title="Close (Esc)" @onclick="Clear">@Icons.Close</button></header>
+            <div class="body">
+                <div class="field"><label for="sk-name">Name</label>
+                    <input id="sk-name" value="@port.Name" readonly="@(ReadOnly || port.IsUser)" @onchange="v => Ui.Run(() => App.RenamePort(port.Id, Text(v)))" /></div>
+                <div class="field"><label>Interface</label><div class="code">@(port.IsUser ? "UserTasks, UserQueries" : CodeOr(CodeName.From(port.Name)))</div></div>
+                <div class="field"><label for="sk-desc">Description</label>
+                    <textarea id="sk-desc" readonly="@ReadOnly" @onchange="v => Ui.Run(() => App.DescribePort(port.Id, Text(v)))">@port.Description</textarea></div>
+                @if (!ReadOnly)
+                {
+                    <div class="field"><label>Add an adapter</label>
+                        <div class="row wrap">
+                            <button class="ghost small" @onclick="() => Add(port.Id, AdapterKind.Real)">Real</button>
+                            <button class="ghost small" @onclick="() => Add(port.Id, AdapterKind.Fake)">Fake</button>
+                            <button class="ghost small" @onclick="() => Add(port.Id, AdapterKind.Simulated)">Simulated</button>
+                            @if (port.Side == Side.Driving) { <button class="ghost small" @onclick="() => Add(port.Id, AdapterKind.Checks)">Checks</button> }
+                        </div></div>
+                }
+            </div>
+        }
+        else if (kind == "adapter" && view.Adapter(id) is { } a)
+        {
+            var portOf = view.Port(a.PortId)!;
+            <header><div class="t"><b>@a.Name</b><span>@a.Kind adapter on @portOf.Name</span></div>
+                @if (!ReadOnly) { <button class="x" title="Delete (Delete)" @onclick="DeleteSelection">@Icons.Trash</button> }
+                <button class="x" title="Close (Esc)" @onclick="Clear">@Icons.Close</button></header>
+            <div class="body">
+                @if (a.SourceDeleted)
+                {
+                    <p class="flag-note">It stood for a context diagram element that has been deleted. Edit, re-source or delete it.</p>
+                }
+                <div class="field"><label for="sk-name">Name</label>
+                    <input id="sk-name" value="@a.Name" readonly="@ReadOnly" @onchange="v => Ui.Run(() => App.RenameAdapter(a.Id, Text(v)))" /></div>
+                <div class="field"><label for="sk-kind">Kind</label>
+                    <select id="sk-kind" disabled="@ReadOnly" @onchange="v => Ui.Run(() => App.SetAdapterKind(a.Id, Enum.Parse<AdapterKind>(Text(v))))">
+                        @foreach (var k in Enum.GetValues<AdapterKind>().Where(k => k != AdapterKind.Checks || portOf.Side == Side.Driving))
+                        {
+                            <option value="@k" selected="@(k == a.Kind)">@k</option>
+                        }
+                    </select></div>
+                <div class="field"><label for="sk-tech">Technology</label>
+                    <input id="sk-tech" value="@a.Technology" readonly="@ReadOnly" @onchange="v => Ui.Run(() => App.SetAdapterTechnology(a.Id, Text(v)))" /></div>
+                @if (portOf.Side == Side.Driven)
+                {
+                    <div class="field"><label>Class</label><div class="code">@CodeOr(SolutionPlanner.ClassFor(CodeName.From(portOf.Name), CodeName.From(a.Name), a.Technology, a.Kind))</div></div>
+                }
+                <div class="field"><label for="sk-desc">Description</label>
+                    <textarea id="sk-desc" readonly="@ReadOnly" @onchange="v => Ui.Run(() => App.DescribeAdapter(a.Id, Text(v)))">@a.Description</textarea></div>
+                <div class="field"><label>Stands for</label>
+                    @if (a.Sources.Count == 0) { <div class="muted">Nothing in the context diagram (hand-made)</div> }
+                    @foreach (var s in a.Sources)
+                    {
+                        <div class="source">@Icons.Glyph(s.Type)<span>@s.Name</span>
+                            @if (!ReadOnly) { <button class="x small" title="Return @s.Name to Not placed" @onclick="() => Ui.Run(() => App.RemoveSource(a.Id, s.ElementId))">@Icons.Close</button> }
+                        </div>
+                    }
+                    @if (!ReadOnly) { <p class="help">Drop another item on this adapter to merge it in. Naming a real adapter after its technology keeps class names clean.</p> }
+                </div>
+            </div>
+        }
+    };
+
+    private static string CodeOr(string? code) => string.IsNullOrEmpty(code) ? "(not a usable code name)" : code;
+
+    private static string Text(ChangeEventArgs e) => e.Value?.ToString() ?? "";
+
+    private Task Activate() => OnActivate.InvokeAsync();
+
+    private async Task ThumbClick() => await OnExpand.InvokeAsync();
+
+    private async Task Start()
+    {
+        if (!Ui.Run(App.StartSketch)) return;
+        await OnStarted.InvokeAsync();
+    }
+
+    private void AddPort(Side side)
+    {
+        string? id = null;
+        if (Ui.Run(() => id = App.AddPort(side))) Select($"port:{id}");
+    }
+
+    private void AddAdapter()
+    {
+        var view = App.Sketch!;
+        var portId = Selection is { } s ? Split(s) switch
+        {
+            ("port", var id) => id,
+            ("adapter", var id) => view.Adapter(id)?.PortId,
+            _ => null,
+        } : null;
+        Add(portId ?? view.Ports.Single(p => p.IsUser).Id, AdapterKind.Real);
+    }
+
+    private void Add(string portId, AdapterKind kind)
+    {
+        string? id = null;
+        if (Ui.Run(() => id = App.AddAdapter(portId, kind))) Select($"adapter:{id}");
+    }
+
+    private void Select(string? hit)
+    {
+        Selection = hit;
+        hintVisible = false;
+        Place();
+    }
+
+    private void Pick(string? hit)
+    {
+        if (hit is null || hit.StartsWith("port:") || hit.StartsWith("adapter:") || hit == "hexagon") Select(hit);
+    }
+
+    private void Open(string hit)
+    {
+        Pick(hit);
+        Rename();
+    }
+
+    private bool CanDrag(string hit) =>
+        hit.StartsWith("adapter:") || hit.StartsWith("port:") && App.Sketch?.Port(Split(hit).Id) is { IsUser: false };
+
+    // ---- Dragging adapters and ports inside the sketch -------------------------------------------
+
+    private void DragMove(DiagramCanvas.Drag drag)
+    {
+        ghost = (drag.ClientX, drag.ClientY, LabelOf(drag.Hit));
+        dropTarget = ValidTarget(drag.Hit, drag.Over);
+    }
+
+    private void Drop(DiagramCanvas.Drag drag)
+    {
+        ghost = null;
+        var target = ValidTarget(drag.Hit, drag.Over);
+        dropTarget = null;
+        if (target is null) return;
+        var view = App.Sketch!;
+        var (kind, id) = Split(drag.Hit);
+        var (targetKind, targetId) = Split(target);
+        if (kind == "adapter")
+        {
+            if (targetKind == "unplaced") { Ui.Run(() => App.RemoveAdapter(id)); Selection = null; }
+            else if (targetKind == "port") Ui.Run(() => App.MoveAdapter(id, targetId));
+            else if (targetKind == "adapter" && view.Adapter(targetId) is { } other)
+            {
+                var index = view.Port(other.PortId)!.Adapters.ToList().FindIndex(x => x.Id == other.Id);
+                Ui.Run(() => App.MoveAdapter(id, other.PortId, index));
+            }
+        }
+        else if (kind == "port" && targetKind == "port" && view.Port(targetId) is { } to)
+        {
+            var sameSide = view.Ports.Where(p => p.Side == to.Side).ToList();
+            Ui.Run(() => App.MovePort(id, sameSide.FindIndex(p => p.Id == to.Id)));
+        }
+        Place();
+    }
+
+    private string? ValidTarget(string dragged, string? over)
+    {
+        if (over is null || over == dragged || App.Sketch is not { } view) return null;
+        var (kind, id) = Split(dragged);
+        var (overKind, overId) = Split(over);
+        if (kind == "adapter")
+            return overKind is "port" or "adapter" || overKind == "unplaced" && view.Adapter(id)?.Sources.Count > 0 ? over : null;
+        if (kind == "port")
+            return overKind == "port" && view.Port(overId) is { IsUser: false } p && p.Side == view.Port(id)?.Side ? over : null;
+        return null;
+    }
+
+    private string LabelOf(string hit)
+    {
+        var (kind, id) = Split(hit);
+        return kind == "adapter" ? App.Sketch?.Adapter(id)?.Name ?? "" : App.Sketch?.Port(id)?.Name ?? "";
+    }
+
+    // ---- Dragging items from the Not placed card -------------------------------------------------
+
+    private void StartItemDrag(PointerEventArgs e, UnplacedItem item)
+    {
+        if (ReadOnly || e.PointerType == "mouse" && e.Button != 0) return;
+        draggedItem = item;
+        itemPointer = e.PointerId;
+        itemDownAt = (e.ClientX, e.ClientY);
+    }
+
+    private void MoveItemDrag(PointerEventArgs e)
+    {
+        if (draggedItem is null || e.PointerId != itemPointer) return;
+        if (ghost is null)
+        {
+            var dx = e.ClientX - itemDownAt.X;
+            var dy = e.ClientY - itemDownAt.Y;
+            if (dx * dx + dy * dy < 16) return;
+        }
+        ghost = (e.ClientX, e.ClientY, draggedItem.Name);
+        var over = Browser.HitAt(e.ClientX, e.ClientY);
+        dropTarget = over is not null && (over.StartsWith("port:") || over.StartsWith("adapter:") || over == "hexagon") ? over : null;
+    }
+
+    private void EndItemDrag(PointerEventArgs e)
+    {
+        if (draggedItem is not { } item || e.PointerId != itemPointer) return;
+        var dragged = ghost is not null;
+        ghost = null;
+        draggedItem = null;
+        var target = dropTarget;
+        dropTarget = null;
+        if (!dragged || target is null) return;
+        var (kind, id) = Split(target);
+        string? made = null;
+        var ok = kind switch
+        {
+            "port" => Ui.Run(() => made = App.Place(item.ElementId, id)),
+            "adapter" => Ui.Run(() => App.MergeInto(item.ElementId, id)),
+            "hexagon" => Ui.Run(() =>
+            {
+                var at = canvas!.DiagramPointAt(e.ClientX, e.ClientY);
+                made = App.PlaceOnNewPort(item.ElementId, at.X < 0 ? Side.Driving : Side.Driven);
+            }),
+            _ => false,
+        };
+        if (ok) Select(made is null ? target : $"adapter:{made}");
+    }
+
+    private void CancelItemDrag(PointerEventArgs e)
+    {
+        ghost = null;
+        draggedItem = null;
+        dropTarget = null;
+    }
+
+    /// <summary>Moves the properties card to the corner that hides least of the selection.</summary>
+    private void Place()
+    {
+        if (canvas is null || Selection is null || App.Sketch is not { } view) return;
+        var (kind, id) = Split(Selection);
+        Rect? box = kind switch
+        {
+            "adapter" => view.Adapter(id)?.Box,
+            "port" when view.Port(id) is { } p => new Rect(p.Centre.X - p.Radius, p.Centre.Y - p.Radius, p.Radius * 2, p.Radius * 2),
+            "hexagon" => Rect.Bound(view.Hexagon.Corners),
+            _ => null,
+        };
+        if (box is null) return;
+        var (w, h) = canvas.Size;
+        var avoid = !ReadOnly && App.Unplaced.Count > 0 && !unplacedMinimised
+            ? new List<Rect> { new(12, 12, 232, 70 + 50 * App.Unplaced.Count) }
+            : [];
+        corner = CardPlacement.Choose(canvas.ToCanvas(box.Value), w, h, 260, 380, avoid, corner);
+    }
+
+    private static (string Kind, string Id) Split(string hit)
+    {
+        var colon = hit.IndexOf(':');
+        return colon < 0 ? (hit, "") : (hit[..colon], hit[(colon + 1)..]);
+    }
+}

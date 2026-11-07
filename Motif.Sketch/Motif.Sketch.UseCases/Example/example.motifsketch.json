@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "title": "Motif Sketch",
+  "contextDiagram": {
+    "elements": [
+      {
+        "id": "c5a10a01",
+        "type": "system",
+        "name": "Motif.Sketch",
+        "description": "Sketch a context diagram, turn it into a ports-and-adapters sketch, then export the diagrams and a solution plan",
+        "technology": "Blazor WebAssembly (GitHub Pages)",
+        "x": 0,
+        "y": 0,
+        "pinned": false
+      },
+      {
+        "id": "c5a10a02",
+        "type": "primaryActor",
+        "name": "Architect",
+        "description": "Sketches the context diagram, then the ports and adapters; exports diagrams and plan, and shares links",
+        "technology": "Web browser",
+        "x": -375,
+        "y": -65,
+        "pinned": false
+      },
+      {
+        "id": "c5a10a08",
+        "type": "primaryActor",
+        "name": "Viewer",
+        "description": "Opens a diagram someone shared, read-only",
+        "technology": "Web browser (snapshot link)",
+        "x": -375,
+        "y": 65,
+        "pinned": false
+      },
+      {
+        "id": "c5a10a0a",
+        "type": "externalSystem",
+        "name": "Clipboard",
+        "description": "Where Copy link puts a snapshot link, ready to paste",
+        "technology": "Browser Clipboard API",
+        "x": 345,
+        "y": -285,
+        "pinned": false
+      },
+      {
+        "id": "c5a10a05",
+        "type": "storage",
+        "name": "Project Files",
+        "description": "Saved projects: one file per system holding the context diagram and, once started, its ports-and-adapters sketch",
+        "technology": "Local files (.motifsketch.json, saved in place or downloaded)",
+        "x": 345,
+        "y": -105,
+        "pinned": false
+      },
+      {
+        "id": "c5a10a06",
+        "type": "storage",
+        "name": "Browser Storage",
+        "description": "Autosaved work in progress and its file handle, so a refresh or closed tab loses nothing and Save still goes to the same file",
+        "technology": "IndexedDB",
+        "x": 345,
+        "y": 25,
+        "pinned": false
+      },
+      {
+        "id": "c5a10a07",
+        "type": "storage",
+        "name": "Diagram Exports",
+        "description": "The context diagram and the ports-and-adapters sketch as pictures",
+        "technology": "Local files (SVG, saved or downloaded)",
+        "x": 345,
+        "y": 155,
+        "pinned": false
+      },
+      {
+        "id": "c5a10a09",
+        "type": "storage",
+        "name": "Solution Plans",
+        "description": "The solution stub plan a coding agent builds from",
+        "technology": "Local files (Markdown, saved or downloaded)",
+        "x": 345,
+        "y": 285,
+        "pinned": false
+      }
+    ],
+    "relationships": [
+      {
+        "id": "c5a10b01",
+        "from": "c5a10a02",
+        "to": "c5a10a01",
+        "label": "Sketches, exports and shares diagrams",
+        "direction": "oneWay"
+      },
+      {
+        "id": "c5a10b07",
+        "from": "c5a10a08",
+        "to": "c5a10a01",
+        "label": "Views shared diagrams",
+        "direction": "oneWay"
+      },
+      {
+        "id": "c5a10b04",
+        "from": "c5a10a01",
+        "to": "c5a10a05",
+        "label": "Opens and saves projects",
+        "direction": "oneWay"
+      },
+      {
+        "id": "c5a10b05",
+        "from": "c5a10a01",
+        "to": "c5a10a06",
+        "label": "Autosaves and restores work",
+        "direction": "oneWay"
+      },
+      {
+        "id": "c5a10b06",
+        "from": "c5a10a01",
+        "to": "c5a10a07",
+        "label": "Writes diagram pictures",
+        "direction": "oneWay"
+      },
+      {
+        "id": "c5a10b08",
+        "from": "c5a10a01",
+        "to": "c5a10a09",
+        "label": "Writes solution plan",
+        "direction": "oneWay"
+      },
+      {
+        "id": "c5a10b09",
+        "from": "c5a10a01",
+        "to": "c5a10a0a",
+        "label": "Copies share links",
+        "direction": "oneWay"
+      }
+    ]
+  },
+  "sketch": {
+    "ports": [
+      {
+        "id": "d6b20c01",
+        "name": "User",
+        "side": "driving",
+        "isUser": true,
+        "adapters": [
+          {
+            "id": "d6b20d01",
+            "name": "Web App",
+            "technology": "Blazor WebAssembly UI",
+            "description": "One app for the Architect (full editing) and the Viewer (read-only, opened from a snapshot link)",
+            "kind": "real",
+            "sources": [
+              "c5a10a02",
+              "c5a10a08"
+            ]
+          },
+          {
+            "id": "d6b20d11",
+            "name": "Specs",
+            "technology": "xUnit",
+            "description": "Checks that drive the application through the User port, using the fake driven adapters",
+            "kind": "checks",
+            "sources": []
+          }
+        ]
+      },
+      {
+        "id": "d6b20c02",
+        "name": "Projects",
+        "description": "Opens and saves project files",
+        "side": "driven",
+        "isUser": false,
+        "adapters": [
+          {
+            "id": "d6b20d03",
+            "name": "Browser Files",
+            "technology": "File System Access API, download fallback",
+            "description": "Saved projects: one file per system holding the context diagram and, once started, its ports-and-adapters sketch",
+            "kind": "real",
+            "sources": [
+              "c5a10a05"
+            ]
+          },
+          {
+            "id": "d6b20d04",
+            "name": "Fake Projects",
+            "kind": "fake",
+            "sources": []
+          }
+        ]
+      },
+      {
+        "id": "d6b20c03",
+        "name": "Autosave",
+        "description": "Keeps the work in progress and its file handle between visits",
+        "side": "driven",
+        "isUser": false,
+        "adapters": [
+          {
+            "id": "d6b20d05",
+            "name": "IndexedDB",
+            "technology": "Browser storage",
+            "description": "Autosaved work in progress and its file handle, so a refresh or closed tab loses nothing and Save still goes to the same file",
+            "kind": "real",
+            "sources": [
+              "c5a10a06"
+            ]
+          },
+          {
+            "id": "d6b20d06",
+            "name": "Fake Autosave",
+            "kind": "fake",
+            "sources": []
+          }
+        ]
+      },
+      {
+        "id": "d6b20c04",
+        "name": "Diagram Exports",
+        "description": "Writes the context diagram and the sketch as pictures",
+        "side": "driven",
+        "isUser": false,
+        "adapters": [
+          {
+            "id": "d6b20d07",
+            "name": "SVG Files",
+            "technology": "Browser Files (File System Access API, download fallback)",
+            "description": "The context diagram and the ports-and-adapters sketch as pictures",
+            "kind": "real",
+            "sources": [
+              "c5a10a07"
+            ]
+          },
+          {
+            "id": "d6b20d08",
+            "name": "Fake Diagram Exports",
+            "kind": "fake",
+            "sources": []
+          }
+        ]
+      },
+      {
+        "id": "d6b20c05",
+        "name": "Solution Stubs",
+        "description": "Hands the solution stub on to be built; v2 may add a GitHub adapter that inflates it in a repo",
+        "side": "driven",
+        "isUser": false,
+        "adapters": [
+          {
+            "id": "d6b20d09",
+            "name": "Markdown Plan",
+            "technology": "Browser Files (File System Access API, download fallback)",
+            "description": "The solution stub plan a coding agent builds from",
+            "kind": "real",
+            "sources": [
+              "c5a10a09"
+            ]
+          },
+          {
+            "id": "d6b20d10",
+            "name": "Fake Solution Stubs",
+            "kind": "fake",
+            "sources": []
+          }
+        ]
+      },
+      {
+        "id": "d6b20c06",
+        "name": "Clipboard",
+        "description": "Takes the snapshot link when the Architect copies it",
+        "side": "driven",
+        "isUser": false,
+        "adapters": [
+          {
+            "id": "d6b20d12",
+            "name": "Browser",
+            "technology": "Browser Clipboard API (JS interop)",
+            "description": "Where Copy link puts a snapshot link, ready to paste",
+            "kind": "real",
+            "sources": [
+              "c5a10a0a"
+            ]
+          },
+          {
+            "id": "d6b20d13",
+            "name": "Fake Clipboard",
+            "kind": "fake",
+            "sources": []
+          }
+        ]
+      }
+    ]
+  }
+}

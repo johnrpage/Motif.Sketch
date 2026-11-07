@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <RootNamespace>Motif.Sketch.App</RootNamespace>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.13" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Motif.Sketch\Motif.Sketch.UseCases\Motif.Sketch.UseCases.csproj" />
+    <ProjectReference Include="..\Adapters\Motif.Sketch.Projects\Motif.Sketch.Projects.csproj" />
+    <ProjectReference Include="..\Adapters\Motif.Sketch.Autosave\Motif.Sketch.Autosave.csproj" />
+    <ProjectReference Include="..\Adapters\Motif.Sketch.DiagramExports\Motif.Sketch.DiagramExports.csproj" />
+    <ProjectReference Include="..\Adapters\Motif.Sketch.SolutionStubs\Motif.Sketch.SolutionStubs.csproj" />
+    <ProjectReference Include="..\Adapters\Motif.Sketch.Clipboard\Motif.Sketch.Clipboard.csproj" />
+  </ItemGroup>
+
+</Project>

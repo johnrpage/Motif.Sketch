@@ -18,19 +18,49 @@ These pictures are rendered from the two diagram files below, by Context Sketch'
 
 ## Status
 
-**Designed and planned, not built yet.** The context diagram, the ports-and-adapters sketch, the spec, the look-and-feel pass and the build plan are done.
+**Built.** All of [docs/build-plan.md](docs/build-plan.md) is in: both views, files and autosave, exports and the plan, snapshot links and Viewer mode, the example, and the v2 look with its dark twin. The answers to SPEC §10 are decisions 40–49.
 
-### Next steps
+### Still to do
 
-1. ~~**Look-and-feel design pass**~~ (SPEC §9): done. See decisions 26–39 and the mockups in [docs/mockups](docs/mockups).
-2. ~~**Plan the build**~~: done. See [docs/build-plan.md](docs/build-plan.md), which resolves SPEC §10 and builds on HexaSketch's exported plan, [docs/Motif Sketch - plan.md](<docs/Motif Sketch - plan.md>).
-3. **Build** in the plan's phases, deploying to GitHub Pages from phase 0. The bundled example is made in phase 1 from this folder's two diagram files.
+1. **Turn on GitHub Pages** for the repository (Settings → Pages → Source: GitHub Actions). Until then the workflow's deploy job fails; its test and publish jobs still run.
+2. **Run [docs/manual-checks.md](docs/manual-checks.md)** in Chrome or Edge and in Firefox, then tick off SPEC §8's acceptance checklist. The build was checked in an embedded Chromium only. These haven't been tried yet:
+   - the File System Access save and open dialogs, save-in-place after a reload, and real SVG and plan files on disk
+   - Firefox's upload and download fallback
+   - touch: dragging, pinch-to-zoom and tap-and-hold
+   - phone widths (read-only)
+   - copying to the clipboard (the embedded browser refused it; the manual-copy fallback worked)
+3. **Answer the open questions** at the end of [decisions.md](decisions.md#still-open).
+
+Later ideas (not v1) are listed at the end of [decisions.md](decisions.md#later-not-v1).
+
+## Build and run
+
+You need the .NET 10 SDK.
+
+```
+dotnet run --project Motif.Sketch.App      # http://localhost:5173
+dotnet test                                 # the specs: the core through the User port, with fakes
+dotnet publish Motif.Sketch.App -c Release  # static files in bin/Release/net10.0/publish/wwwroot
+```
+
+Pushing to `main` runs `.github/workflows/pages.yml`: it runs the specs, publishes, sets `<base href>` for the `/Motif.Sketch/` sub-path, adds `.nojekyll`, and deploys to GitHub Pages.
+
+The layout is the one Motif Sketch exports for itself (the golden file `Checks/Motif.Sketch.Specs/Golden/Motif.Sketch.plan.md`):
+
+| Folder | What's there |
+|---|---|
+| `Motif.Sketch.App/` | The Web App: the Blazor UI and the composition root |
+| `Motif.Sketch/Motif.Sketch.Domain/` | The project and its rules, including how the sketch follows the context diagram |
+| `Motif.Sketch/Motif.Sketch.UseCases/` | The ports, `MotifSketchApplication`, both layouts, the scenes and SVG writer, the plan, the file format, snapshot links and the example |
+| `Adapters/` | One project per driven port, each with its small JS module |
+| `Checks/` | `Motif.Sketch.Fakes` and `Motif.Sketch.Specs` |
 
 ## Files
 
 | File | What it is |
 |---|---|
 | [SPEC.md](SPEC.md) | The requirements: architecture, file format, behaviour, quality bar, acceptance criteria |
+| [docs/manual-checks.md](docs/manual-checks.md) | The browser checks to run before a release |
 | [decisions.md](decisions.md) | Every design decision so far and why, plus ideas for later |
 | [Motif Sketch - Context Diagram.contextsketch.json](<Motif Sketch - Context Diagram.contextsketch.json>) | Motif Sketch's context diagram (open it in Context Sketch) |
 | [Motif Sketch.hexasketch.json](<Motif Sketch.hexasketch.json>) | Motif Sketch's ports-and-adapters sketch (open it in HexaSketch) |

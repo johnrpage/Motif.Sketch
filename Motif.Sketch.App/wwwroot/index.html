@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Motif Sketch</title>
+    <meta name="description" content="Sketch a system context diagram, turn it into a ports-and-adapters sketch, and export both, plus a solution plan." />
+    <base href="/" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="preload" href="fonts/IBMPlexSans-Regular-Latin1.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fonts/IBMPlexSans-SemiBold-Latin1.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" id="webassembly" />
+    <link rel="stylesheet" href="css/app.css" />
+    <script>
+        // Apply a remembered theme before the first paint, so dark-mode users don't see a flash.
+        try {
+            const t = localStorage.getItem("motif-theme");
+            if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+        } catch { }
+    </script>
+    <script type="importmap"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div class="splash">
+            <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="13.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="8.5" y="8.5" width="7" height="7" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="14.5" y="3.5" width="7" height="7" rx="1.5" fill="var(--accent)"/></svg>
+            <div class="word"><span class="motif">Motif</span> <b>Sketch</b></div>
+            <div class="loading">Loading…</div>
+            <noscript>Motif Sketch needs JavaScript and WebAssembly.</noscript>
+        </div>
+    </div>
+
+    <div id="blazor-error-ui">
+        Something went wrong. Your work is autosaved in this browser.
+        <a href="." class="reload">Reload</a>
+        <span class="dismiss">✕</span>
+    </div>
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+</body>
+
+</html>

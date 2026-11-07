@@ -1,0 +1,287 @@
+@namespace Motif.Sketch.App
+@implements IDisposable
+@inject Browser Browser
+
+<div class="canvas @(panning ? "panning" : "")" @ref="host"
+     @onpointerdown="Down" @onpointermove="Move" @onpointerup="Up" @onpointercancel="Cancel"
+     @ondblclick="DoubleClick" @oncontextmenu:preventDefault="true">
+    @if (width > 0)
+    {
+        <SceneSvg Scene="Scene" View="ViewBox" Selected="@Selected" DropTarget="@DropTarget" Dragging="@dragHit"
+                  Divider="Divider" Class="@SceneClass" />
+    }
+    @ChildContent
+</div>
+
+@code {
+    /// <summary>What the user is doing with the pointer, in diagram units.</summary>
+    public sealed record Drag(string Hit, Point Start, Point Now, double ClientX, double ClientY, string? Over);
+
+    [Parameter, EditorRequired] public Scene Scene { get; set; } = default!;
+    [Parameter] public string? Selected { get; set; }
+    [Parameter] public string? DropTarget { get; set; }
+    [Parameter] public bool Divider { get; set; }
+    [Parameter] public string? SceneClass { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Which hits can be dragged. Null means nothing can.</summary>
+    [Parameter] public Func<string, bool>? CanDrag { get; set; }
+
+    /// <summary>Changing this fits the diagram to the canvas again (a new project, a new layout).</summary>
+    [Parameter] public int FitKey { get; set; }
+
+    [Parameter] public EventCallback<string?> OnPick { get; set; }
+    [Parameter] public EventCallback<string> OnOpen { get; set; }
+    [Parameter] public EventCallback<Drag> OnDragMove { get; set; }
+    [Parameter] public EventCallback<Drag> OnDrop { get; set; }
+    [Parameter] public EventCallback OnViewChanged { get; set; }
+
+    private const double MinZoom = 0.15, MaxZoom = 3;
+
+    private ElementReference host;
+    private DotNetObjectReference<DiagramCanvas>? self;
+    private double width, height;
+    private Point centre;
+    private double zoom = 1;
+    private int fittedKey = -1;
+    private bool userMoved;
+
+    private readonly Dictionary<long, (double X, double Y)> pointers = [];
+    private (double Distance, double Zoom, Point Anchor)? pinch;
+    private long? primary;
+    private (double X, double Y) downAt;
+    private string? downHit;
+    private string? dragHit;
+    private Point dragStart;
+    private bool moved, panning;
+    private double[] bounds = [0, 0, 0, 0];
+    private CancellationTokenSource? press;
+
+    public Rect ViewBox => new(centre.X - width / 2 / zoom, centre.Y - height / 2 / zoom, width / zoom, height / zoom);
+
+    public (double Width, double Height) Size => (width, height);
+
+    /// <summary>A diagram rectangle in canvas pixels, for placing floating cards.</summary>
+    public Rect ToCanvas(Rect r)
+    {
+        var v = ViewBox;
+        return new Rect((r.X - v.X) * zoom, (r.Y - v.Y) * zoom, r.Width * zoom, r.Height * zoom);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender) return;
+        self = DotNetObjectReference.Create(this);
+        Browser.ListenForWheel(host, self);
+        var r = Browser.Rect(host);
+        OnResize(r[2], r[3]);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (FitKey != fittedKey && width > 0) Fit();
+    }
+
+    public void Fit()
+    {
+        fittedKey = FitKey;
+        userMoved = false;
+        if (width <= 0) return;
+        var b = Scene.Bounds;
+        centre = b.Centre;
+        zoom = Math.Clamp(Math.Min(width / b.Width, height / b.Height) * 0.94, MinZoom, 1.25);
+        StateHasChanged();
+        _ = OnViewChanged.InvokeAsync();
+    }
+
+    [JSInvokable]
+    public void OnResize(double w, double h)
+    {
+        var first = width <= 0;
+        (width, height) = (w, h);
+        if (first || FitKey != fittedKey || !userMoved) Fit();
+        else StateHasChanged();
+        _ = OnViewChanged.InvokeAsync();
+    }
+
+    [JSInvokable]
+    public void OnWheel(double x, double y, double deltaY, int mode)
+    {
+        var step = mode == 1 ? deltaY * 16 : mode == 2 ? deltaY * 400 : deltaY;
+        ZoomAt(x, y, zoom * Math.Exp(-step * 0.0015));
+    }
+
+    private void ZoomAt(double x, double y, double newZoom)
+    {
+        newZoom = Math.Clamp(newZoom, MinZoom, MaxZoom);
+        userMoved = true;
+        var anchor = ToDiagram(x, y);
+        zoom = newZoom;
+        var after = ToDiagram(x, y);
+        centre = new Point(centre.X + anchor.X - after.X, centre.Y + anchor.Y - after.Y);
+        StateHasChanged();
+        _ = OnViewChanged.InvokeAsync();
+    }
+
+    private Point ToDiagram(double x, double y)
+    {
+        var v = ViewBox;
+        return new Point(v.X + x / zoom, v.Y + y / zoom);
+    }
+
+    private Point ClientToDiagram(double clientX, double clientY) => ToDiagram(clientX - bounds[0], clientY - bounds[1]);
+
+    /// <summary>Where a client point falls in the diagram, for drops from outside the canvas.</summary>
+    public Point DiagramPointAt(double clientX, double clientY)
+    {
+        bounds = Browser.Rect(host);
+        return ClientToDiagram(clientX, clientY);
+    }
+
+    private void Down(PointerEventArgs e)
+    {
+        if (e.PointerType == "mouse" && e.Button != 0) return;
+        bounds = Browser.Rect(host);
+        Browser.Capture(host, e.PointerId);
+        pointers[e.PointerId] = (e.ClientX, e.ClientY);
+
+        if (pointers.Count == 2)
+        {
+            // Two fingers: pinch to zoom, and whatever the first finger was doing stops.
+            CancelPress();
+            dragHit = null;
+            panning = false;
+            var (a, b) = (pointers.Values.First(), pointers.Values.Last());
+            var mid = ((a.X + b.X) / 2 - bounds[0], (a.Y + b.Y) / 2 - bounds[1]);
+            pinch = (Distance(a, b), zoom, ToDiagram(mid.Item1, mid.Item2));
+            return;
+        }
+        if (pointers.Count > 2) return;
+
+        primary = e.PointerId;
+        downAt = (e.ClientX, e.ClientY);
+        moved = false;
+        downHit = Browser.HitAt(e.ClientX, e.ClientY);
+        dragStart = ClientToDiagram(e.ClientX, e.ClientY);
+        dragHit = downHit is not null && CanDrag?.Invoke(downHit) == true ? downHit : null;
+        panning = dragHit is null;
+        if (downHit is not null) _ = OnPick.InvokeAsync(downHit);
+
+        // Tap and hold on a touch screen opens the item for renaming.
+        if (e.PointerType != "mouse" && downHit is not null)
+        {
+            press = new CancellationTokenSource();
+            var token = press.Token;
+            var hit = downHit;
+            _ = Task.Delay(550, token).ContinueWith(t =>
+            {
+                if (t.IsCanceled || moved) return;
+                dragHit = null;
+                panning = false;
+                InvokeAsync(() => OnOpen.InvokeAsync(hit));
+            }, TaskScheduler.Default);
+        }
+    }
+
+    private async Task Move(PointerEventArgs e)
+    {
+        if (!pointers.ContainsKey(e.PointerId)) return;
+        pointers[e.PointerId] = (e.ClientX, e.ClientY);
+
+        if (pinch is { } p && pointers.Count == 2)
+        {
+            var (a, b) = (pointers.Values.First(), pointers.Values.Last());
+            var newZoom = Math.Clamp(p.Zoom * Distance(a, b) / Math.Max(1, p.Distance), MinZoom, MaxZoom);
+            var mid = ((a.X + b.X) / 2 - bounds[0], (a.Y + b.Y) / 2 - bounds[1]);
+            zoom = newZoom;
+            userMoved = true;
+            var under = ToDiagram(mid.Item1, mid.Item2);
+            centre = new Point(centre.X + p.Anchor.X - under.X, centre.Y + p.Anchor.Y - under.Y);
+            StateHasChanged();
+            await OnViewChanged.InvokeAsync();
+            return;
+        }
+        if (e.PointerId != primary) return;
+
+        var dx = e.ClientX - downAt.X;
+        var dy = e.ClientY - downAt.Y;
+        if (!moved && dx * dx + dy * dy < 16) return;
+        if (!moved) CancelPress();
+        moved = true;
+
+        if (dragHit is not null)
+        {
+            await OnDragMove.InvokeAsync(DragOf(e));
+        }
+        else if (panning)
+        {
+            userMoved = true;
+            centre = new Point(centre.X - (e.ClientX - downAt.X) / zoom, centre.Y - (e.ClientY - downAt.Y) / zoom);
+            downAt = (e.ClientX, e.ClientY);
+            StateHasChanged();
+            await OnViewChanged.InvokeAsync();
+        }
+    }
+
+    private async Task Up(PointerEventArgs e)
+    {
+        if (!pointers.Remove(e.PointerId)) return;
+        if (pinch is not null)
+        {
+            if (pointers.Count == 0) pinch = null;
+            primary = null;
+            return;
+        }
+        if (e.PointerId != primary) return;
+        primary = null;
+        CancelPress();
+
+        if (dragHit is not null && moved)
+        {
+            var drag = DragOf(e);
+            dragHit = null;
+            await OnDrop.InvokeAsync(drag);
+        }
+        else if (!moved && downHit is null)
+        {
+            await OnPick.InvokeAsync(null);
+        }
+        dragHit = null;
+        panning = false;
+    }
+
+    private void Cancel(PointerEventArgs e)
+    {
+        pointers.Remove(e.PointerId);
+        if (pointers.Count == 0) { pinch = null; primary = null; dragHit = null; panning = false; }
+        CancelPress();
+    }
+
+    private async Task DoubleClick(MouseEventArgs e)
+    {
+        var hit = Browser.HitAt(e.ClientX, e.ClientY);
+        if (hit is not null) await OnOpen.InvokeAsync(hit);
+    }
+
+    private Drag DragOf(PointerEventArgs e)
+    {
+        var over = Browser.HitAt(e.ClientX, e.ClientY);
+        return new Drag(dragHit!, dragStart, ClientToDiagram(e.ClientX, e.ClientY), e.ClientX, e.ClientY, over);
+    }
+
+    private void CancelPress()
+    {
+        press?.Cancel();
+        press = null;
+    }
+
+    private static double Distance((double X, double Y) a, (double X, double Y) b) =>
+        Math.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y));
+
+    public void Dispose()
+    {
+        CancelPress();
+        try { Browser.StopListening(host); } catch (Exception) { /* the page may be going away */ }
+        self?.Dispose();
+    }
+}

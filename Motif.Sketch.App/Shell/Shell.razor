@@ -1,0 +1,245 @@
+@namespace Motif.Sketch.App
+@implements IDisposable
+@inject MotifSketchApplication App
+@inject Ui Ui
+@inject Browser Browser
+
+<PageTitle>@PageTitle</PageTitle>
+@((MarkupString)$"<style>{DiagramStyle.Css()}</style>")
+
+@if (started)
+{
+<div class="app @ModeClass" @onclick="CloseMenus">
+    <header class="appbar">
+        <div class="brand">@Icons.Mark<span class="motif">Motif</span> <span class="tool">Sketch</span></div>
+
+        @if (Editable)
+        {
+            @if (renamingTitle)
+            {
+                <input class="title-edit" id="title-edit" value="@App.Title" @onchange="RenameTitle" @onblur="() => renamingTitle = false"
+                       @onclick:stopPropagation="true" />
+            }
+            else
+            {
+                <button class="title" title="Rename project" @onclick="StartTitleRename" @onclick:stopPropagation="true">
+                    <span class="text">@App.Title</span>
+                    @if (App.HasUnsavedChanges) { <span class="dirty" title="Unsaved changes"></span> }
+                </button>
+            }
+            <div class="vsep"></div>
+            <div class="menu left @(menu == "file" ? "open" : "")">
+                <button class="cmd" @onclick="@(() => Toggle("file"))" @onclick:stopPropagation="true">File @Icons.Chevron</button>
+                <div class="menu-list">
+                    <button @onclick="New">New</button>
+                    <button @onclick="Open">Open…</button>
+                    <button @onclick="Save">Save<span class="code">Ctrl+S</span></button>
+                    <button @onclick="SaveAs">Save as…<span class="code">Ctrl+Shift+S</span></button>
+                    <button @onclick="OpenExample">Open example</button>
+                    @if (!App.CanSaveInPlace)
+                    {
+                        <div class="note">This browser can't save in place, so Save downloads a copy. Edge and Chrome save back to the same file.</div>
+                    }
+                </div>
+            </div>
+            <button class="cmd icon" title="Save (Ctrl+S)" @onclick="Save">@Icons.Save</button>
+            <div class="vsep"></div>
+            <button class="cmd icon" title="Undo (Ctrl+Z)" disabled="@(!App.CanUndo)" @onclick="() => App.Undo()">@Icons.Undo</button>
+            <button class="cmd icon" title="Redo (Ctrl+Y)" disabled="@(!App.CanRedo)" @onclick="() => App.Redo()">@Icons.Redo</button>
+        }
+        else
+        {
+            <span class="title static"><span class="text">@App.Title</span></span>
+            @if (App.Mode == AppMode.Viewer)
+            {
+                <span class="pill">@Icons.Eye<span class="long">Shared snapshot · </span>read-only</span>
+            }
+            else if (App.Mode == AppMode.OtherTab)
+            {
+                <span class="pill">@Icons.Eye<span class="long">Open in another tab · </span>read-only</span>
+            }
+            else if (phone)
+            {
+                <span class="pill">@Icons.Eye read-only</span>
+            }
+        }
+
+        <div class="spacer"></div>
+
+        <div class="switch" role="group" aria-label="Layout">
+            <button aria-pressed="@(EffectiveLayout == "context" ? "true" : "false")" title="Context diagram (Alt+1)" @onclick="@(() => SetLayout("context"))">
+                <svg viewBox="0 0 22 14"><rect x=".5" y=".5" width="16" height="13" rx="2" fill="currentColor"/><rect x="18" y="1" width="3.5" height="12" rx="1" fill="none" stroke="currentColor"/></svg>
+            </button>
+            <button class="wide" aria-pressed="@(EffectiveLayout == "split" ? "true" : "false")" title="Side by side (Alt+2)" @onclick="@(() => SetLayout("split"))">
+                <svg viewBox="0 0 22 14"><rect x=".5" y=".5" width="10" height="13" rx="2" fill="currentColor"/><rect x="11.5" y=".5" width="10" height="13" rx="2" fill="currentColor"/></svg>
+            </button>
+            <button aria-pressed="@(EffectiveLayout == "sketch" ? "true" : "false")" title="Ports and adapters (Alt+3)" @onclick="@(() => SetLayout("sketch"))">
+                <svg viewBox="0 0 22 14"><rect x=".5" y="1" width="3.5" height="12" rx="1" fill="none" stroke="currentColor"/><rect x="5.5" y=".5" width="16" height="13" rx="2" fill="currentColor"/></svg>
+            </button>
+        </div>
+
+        <div class="menu @(menu == "export" ? "open" : "")">
+            <button class="cmd" title="Export" @onclick="OpenExportMenu" @onclick:stopPropagation="true">
+                @Icons.Export<span class="wide">Export</span>
+                @if (Editable && exportCheck is { } c && (c.Unplaced.Count > 0 || c.Warnings.Count > 0 || c.PlanProblems.Count > 0))
+                {
+                    <span class="dot" title="Something to look at before exporting"></span>
+                }
+            </button>
+            <div class="menu-list">
+                <button @onclick="ExportContext">Context diagram <span class="code">SVG</span></button>
+                @if (App.HasSketch)
+                {
+                    <button @onclick="ExportSketch">Ports and adapters <span class="code">SVG</span></button>
+                    <button @onclick="ExportPlan" disabled="@(exportCheck?.PlanProblems.Count > 0)">Solution plan <span class="code">MD</span></button>
+                }
+                @if (exportCheck is { } check)
+                {
+                    @if (check.Unplaced.Count > 0)
+                    {
+                        <div class="note"><b>@check.Unplaced.Count item@(check.Unplaced.Count == 1 ? "" : "s") not placed.</b> The plan lists @(check.Unplaced.Count == 1 ? "it" : "them") under "Not placed".</div>
+                    }
+                    @foreach (var warning in check.Warnings.Where(w => w.Contains("deleted")))
+                    {
+                        <div class="note"><b>Source deleted:</b> @warning</div>
+                    }
+                    @if (check.PlanProblems.Count > 0)
+                    {
+                        <div class="note problem"><b>The plan can't be exported yet:</b>
+                            <ul>@foreach (var p in check.PlanProblems) { <li>@p</li> }</ul></div>
+                    }
+                }
+                <div class="note">Exports always use the light palette.</div>
+            </div>
+        </div>
+
+        @if (Editable)
+        {
+            <button class="cmd" title="Copy a read-only link" @onclick="CopyLink">@Icons.Link<span class="wide">Copy link</span></button>
+        }
+        @if (App.Mode == AppMode.Viewer)
+        {
+            <button class="primary" @onclick="MakeCopy">@Icons.Copy Make a copy<span class="long">&nbsp;to edit</span></button>
+        }
+        else if (App.Mode == AppMode.OtherTab)
+        {
+            <button class="primary" @onclick="UseThisTab">Use this tab instead</button>
+        }
+
+        <div class="menu @(menu == "theme" ? "open" : "")">
+            <button class="cmd icon" title="Theme" @onclick="@(() => Toggle("theme"))" @onclick:stopPropagation="true">
+                @(theme == "dark" ? Icons.Moon : theme == "light" ? Icons.Sun : Icons.Monitor)
+            </button>
+            <div class="menu-list narrow">
+                @foreach (var t in new[] { "system", "light", "dark" })
+                {
+                    <button role="menuitemradio" aria-checked="@(theme == t ? "true" : "false")" @onclick="() => SetTheme(t)">@(char.ToUpperInvariant(t[0]) + t[1..])</button>
+                }
+                <div class="note">Remembered in this browser only.</div>
+            </div>
+        </div>
+        <button class="cmd icon" title="Help" @onclick="() => helpOpen = !helpOpen" @onclick:stopPropagation="true">@Icons.Help</button>
+    </header>
+
+    @if (App.Mode == AppMode.OtherTab)
+    {
+        <div class="banner">Motif Sketch is open in another tab, so this one is read-only and doesn't autosave. <button class="link" @onclick="UseThisTab">Use this tab instead</button></div>
+    }
+    else if (phone && App.Mode == AppMode.Architect)
+    {
+        <div class="banner">Editing needs a bigger screen. You can look around, export, and open this on a tablet or computer to edit.</div>
+    }
+
+    <main class="work s-@EffectiveLayout" style="--left: @Format.N(split)%" @ref="work">
+        <ContextPane @ref="contextPane" ReadOnly="ReadOnlyUi" Collapsed="@(EffectiveLayout == "sketch")" FitKey="fitKey"
+                     ShowWelcome="showWelcome" ExpandHint="@(narrow ? "Click to show" : "Click to show side by side")"
+                     OnExpand="@(() => SetLayout(narrow ? "context" : "split"))" OnMaximise="@(() => SetLayout(EffectiveLayout == "context" ? (narrow ? "context" : "split") : "context"))"
+                     OnDismissWelcome="DismissWelcome" OnOpenExample="OpenExample" OnOpenFile="Open"
+                     OnActivate="@(() => active = "context")" OnElementAdded="ElementAdded" />
+        <div class="divider" title="Drag to resize" @onpointerdown="StartResize" @onpointermove="Resize" @onpointerup="EndResize" @ref="divider"></div>
+        <SketchPane @ref="sketchPane" ReadOnly="ReadOnlyUi" Collapsed="@(EffectiveLayout == "context")" FitKey="fitKey"
+                    ExpandHint="@(narrow ? "Click to show" : "Click to show side by side")"
+                    OnExpand="@(() => SetLayout(narrow ? "sketch" : "split"))" OnMaximise="@(() => SetLayout(EffectiveLayout == "sketch" ? (narrow ? "sketch" : "split") : "sketch"))"
+                    OnStarted="SketchStarted" OnActivate="@(() => active = "sketch")" />
+    </main>
+
+    @if (helpOpen)
+    {
+        <div class="scrim" @onclick="() => helpOpen = false">
+            <div class="card dialog help-card" @onclick:stopPropagation="true">
+                <header><div class="t"><b>Motif Sketch</b><span>Sketch a context diagram, then its ports and adapters</span></div>
+                    <button class="x" title="Close" @onclick="() => helpOpen = false">@Icons.Close</button></header>
+                <div class="body">
+                    <h4>Context diagram</h4>
+                    <ul>
+                        <li>Add people and systems with the tool strip. Each one is linked to the system and placed for you.</li>
+                        <li><b>An arrow points from whoever starts the interaction.</b> Two-way is for the rare case where both sides start one, such as a webhook.</li>
+                        <li>Drag an element to pin it. Auto-layout moves only unpinned elements; All releases every pin first.</li>
+                    </ul>
+                    <h4>Ports and adapters</h4>
+                    <ul>
+                        <li>Start sketch makes the User port, with an adapter for each primary actor and Specs to check it.</li>
+                        <li>Drag items from Not placed onto a port (a new adapter), an adapter (merge it in) or the hexagon (a new port on that side).</li>
+                        <li>Name real adapters after their technology, so class names stay clean: Browser Files on Projects is <span class="code">BrowserFilesProjects</span>.</li>
+                        <li>Drag adapters between ports, or back onto Not placed. Drag ports to reorder them.</li>
+                    </ul>
+                    <h4>Keys</h4>
+                    <div class="keys">
+                        <span class="code">Ctrl+S</span><span>Save</span>
+                        <span class="code">Ctrl+Z / Ctrl+Y</span><span>Undo / redo</span>
+                        <span class="code">Delete</span><span>Delete the selection</span>
+                        <span class="code">F2</span><span>Rename (or double-click; tap and hold on touch)</span>
+                        <span class="code">Esc</span><span>Clear the selection</span>
+                        <span class="code">Alt+1 / 2 / 3</span><span>Context, side by side, sketch</span>
+                    </div>
+                    <p class="help">Your work autosaves in this browser, but that's a safety net: save to a file to keep it. Copy link shares a read-only snapshot; everything after the # stays in the browser.</p>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (manualLink is { } link)
+    {
+        <div class="scrim" @onclick="() => manualLink = null">
+            <div class="card dialog" @onclick:stopPropagation="true">
+                <header><div class="t"><b>Copy this read-only link</b><span>The browser didn't let Motif Sketch copy it for you.</span></div>
+                    <button class="x" title="Close" @onclick="() => manualLink = null">@Icons.Close</button></header>
+                <div class="body">
+                    <div class="field"><textarea id="manual-link" class="link-box" readonly @onfocus="@(() => Browser.Focus("#manual-link"))">@link</textarea></div>
+                    <p class="help">It's a snapshot: later edits need a new link. Everything after the # stays in the browser.</p>
+                    <div class="row end"><button class="ghost" @onclick="() => manualLink = null">Done</button></div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Ui.Pending is { } confirm)
+    {
+        <div class="scrim" @onclick="() => Ui.Answer(false)">
+            <div class="card dialog" role="alertdialog" @onclick:stopPropagation="true">
+                <header><div class="t"><b>@confirm.Title</b></div></header>
+                <div class="body">
+                    <p>@confirm.Message</p>
+                    <div class="row end">
+                        <button class="ghost" @onclick="() => Ui.Answer(false)">@confirm.Cancel</button>
+                        <button class="@(confirm.Danger ? "primary" : "ghost strong")" @onclick="() => Ui.Answer(true)">@confirm.Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="toasts" aria-live="polite">
+        @foreach (var toast in Ui.Toasts)
+        {
+            <div class="toast @toast.Kind.ToString().ToLowerInvariant()" @key="toast.Id">
+                <div class="t"><b>@toast.Title</b>
+                    @if (toast.Lines.Count == 1) { <span>@toast.Lines[0]</span> }
+                    else if (toast.Lines.Count > 1) { <ul>@foreach (var line in toast.Lines.Take(8)) { <li>@line</li> }</ul> }
+                </div>
+                <button class="x" title="Dismiss" @onclick="() => Ui.Dismiss(toast.Id)">@Icons.Close</button>
+            </div>
+        }
+    </div>
+</div>
+}

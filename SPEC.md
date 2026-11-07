@@ -47,7 +47,8 @@ Motif Sketch is built as ports and adapters, exactly as `Motif Sketch.hexasketch
 | Solution Stubs | driven | **Markdown Plan** (File System Access API, download fallback) | Fake Solution Stubs |
 | Clipboard | driven | **Browser** (Clipboard API) | Fake Clipboard |
 
-- The project layout and naming follow the plan Motif Sketch itself would export: roles as folders (`Motif.Sketch/`, `Adapters/`, `Checks/`), one project per driven port, and port interfaces named plainly with no `I` prefix. The root namespace is **`Motif.Sketch`**, keeping the dot (`Motif.Sketch.Domain`, `Motif.Sketch.UseCases`, `Motif.Sketch.Adapters`, ...).
+- The project layout and naming follow the plan Motif Sketch itself would export: roles as folders (`Motif.Sketch/`, `Adapters/`, `Checks/`), one project per driven port, and port interfaces named plainly with no `I` prefix. The root namespace is **`Motif.Sketch`**, keeping the dot (`Motif.Sketch.Domain`, `Motif.Sketch.UseCases`, `Motif.Sketch.Adapters`, ...). Domain and UseCases share the plain `Motif.Sketch` namespace, so the ports are `Motif.Sketch.UserTasks` and so on.
+- The adapter projects use the Razor SDK (`razorclasslib` with its samples removed), so each ships its JS module as a static web asset (`_content/<project>/x.js`), and they reference `Microsoft.JSInterop`: the one extra package, needed for `IJSRuntime`.
 - Domain references nothing. UseCases references Domain only. Every adapter references UseCases only, and adapters never reference each other.
 - The composition root is in the Web App and is the only place that knows which adapters are used. It picks the save-in-place or the download behaviour inside the file adapters by feature detection.
 - **Pure core logic**: validation, both layouts, SVG rendering, plan generation, snapshot-link encoding and the bundled example all live in Domain or UseCases and need no adapter. SVG text and plan Markdown are generated there; the export adapters only write them.
