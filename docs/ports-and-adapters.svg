@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="1003.8" height="866.8" viewBox="-471.6 -453.4 1003.8 866.8" font-family="Segoe UI, Arial, sans-serif" xmlns="http://www.w3.org/2000/svg">
+  <rect x="-471.6" y="-453.4" width="1003.8" height="866.8" fill="#ffffff" />
+  <line x1="0" y1="-453.4" x2="0" y2="413.4" stroke="#94A3B8" stroke-width="1" stroke-linecap="round" stroke-dasharray="6 6" />
+  <polygon points="0,-170 -147.2,-85 -147.2,85 -0,170 147.2,85 147.2,-85" fill="#F8FAFC" stroke="#0F172A" stroke-width="1.5" stroke-linejoin="round" />
+  <polygon points="-96.1,-114.5 -147.2,-85 -147.2,-0 -72,-0 -71.7,-6.3 -70.9,-12.5 -69.5,-18.6 -67.7,-24.6 -65.3,-30.4 -62.4,-36 -59,-41.3 -55.2,-46.3 -50.9,-50.9 -46.3,-55.2" fill="#fdecea" stroke="#b03a2e" stroke-width="1" stroke-linejoin="round" />
+  <polygon points="-147.2,-0 -147.2,85 -96.1,114.5 -46.3,55.2 -50.9,50.9 -55.2,46.3 -59,41.3 -62.4,36 -65.3,30.4 -67.7,24.6 -69.5,18.6 -70.9,12.5 -71.7,6.3 -72,-0" fill="#fdecea" stroke="#b03a2e" stroke-width="1" stroke-linejoin="round" />
+  <line x1="-72" y1="-0" x2="-147.2" y2="-0" stroke="#b03a2e" stroke-width="1" stroke-linecap="round" stroke-dasharray="4 3" />
+  <text x="-101.6" y="-41.1" font-size="13" fill="#b03a2e" text-anchor="middle" dominant-baseline="central">Tasks</text>
+  <text x="-101.6" y="41.1" font-size="13" fill="#b03a2e" text-anchor="middle" dominant-baseline="central">Queries</text>
+  <circle cx="0" cy="0" r="72" fill="#ffffff" stroke="#0F172A" stroke-width="1.5" />
+  <text x="0" y="0" font-size="16" fill="#0F172A" text-anchor="middle" dominant-baseline="central" font-weight="600">Domain</text>
+  <line x1="-147.2" y1="-0" x2="-202.2" y2="-0" stroke="#0F172A" stroke-width="4" stroke-linecap="round" />
+  <line x1="-248" y1="-10.2" x2="-290.2" y2="-30" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="-451.6" y="-55" width="161.4" height="50" rx="4" fill="#64748B" stroke="#475569" stroke-width="1.2" />
+  <text x="-370.9" y="-38" font-size="13" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-weight="600">Web App</text>
+  <text x="-370.9" y="-21" font-size="11" fill="#E2E8F0" text-anchor="middle" dominant-baseline="central">Blazor WebAssembly UI</text>
+  <line x1="-248" y1="10.2" x2="-290.2" y2="30" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="-396.1" y="5" width="105.9" height="50" rx="4" fill="#ffffff" stroke="#64748B" stroke-width="1.2" stroke-dasharray="5 3" />
+  <text x="-343.2" y="22" font-size="13" fill="#0F172A" text-anchor="middle" dominant-baseline="central" font-weight="600">Specs</text>
+  <text x="-343.2" y="39" font-size="11" fill="#64748B" text-anchor="middle" dominant-baseline="central">Fake · xUnit</text>
+  <circle cx="-226.2" cy="-0" r="24" fill="#ffffff" stroke="#334155" stroke-width="4" />
+  <text x="-226.2" y="-40" font-size="14" fill="#334155" text-anchor="middle" dominant-baseline="central" font-weight="600">User</text>
+  <line x1="39.4" y1="-147.2" x2="53.7" y2="-200.4" stroke="#0F172A" stroke-width="2" stroke-linecap="round" />
+  <line x1="61.9" y1="-239.4" x2="81.8" y2="-368.4" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="81.8" y="-393.4" width="230" height="50" rx="4" fill="#64748B" stroke="#475569" stroke-width="1.2" />
+  <text x="196.8" y="-376.4" font-size="13" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-weight="600">Browser Files</text>
+  <text x="196.8" y="-359.4" font-size="11" fill="#E2E8F0" text-anchor="middle" dominant-baseline="central">File System Access API, download f…</text>
+  <line x1="63.9" y1="-239" x2="81.8" y2="-308.4" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="81.8" y="-333.4" width="126.6" height="50" rx="4" fill="#ffffff" stroke="#64748B" stroke-width="1.2" stroke-dasharray="5 3" />
+  <text x="145.1" y="-316.4" font-size="13" fill="#0F172A" text-anchor="middle" dominant-baseline="central" font-weight="600">Fake Projects</text>
+  <text x="145.1" y="-299.4" font-size="11" fill="#64748B" text-anchor="middle" dominant-baseline="central">Fake</text>
+  <circle cx="58.9" cy="-219.7" r="20" fill="#ffffff" stroke="#334155" stroke-width="2" />
+  <text x="58.9" y="-255.7" font-size="14" fill="#334155" text-anchor="end" dominant-baseline="central" font-weight="600">Projects</text>
+  <line x1="126.4" y1="-97" x2="170.1" y2="-130.5" stroke="#0F172A" stroke-width="2" stroke-linecap="round" />
+  <line x1="198.6" y1="-158.1" x2="235.6" y2="-203.1" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="235.6" y="-228.1" width="124.4" height="50" rx="4" fill="#64748B" stroke="#475569" stroke-width="1.2" />
+  <text x="297.8" y="-211.1" font-size="13" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-weight="600">IndexedDB</text>
+  <text x="297.8" y="-194.1" font-size="11" fill="#E2E8F0" text-anchor="middle" dominant-baseline="central">Browser storage</text>
+  <line x1="205.9" y1="-142.8" x2="235.6" y2="-143.1" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="235.6" y="-168.1" width="126.6" height="50" rx="4" fill="#ffffff" stroke="#64748B" stroke-width="1.2" stroke-dasharray="5 3" />
+  <text x="298.9" y="-151.1" font-size="13" fill="#0F172A" text-anchor="middle" dominant-baseline="central" font-weight="600">Fake Autosave</text>
+  <text x="298.9" y="-134.1" font-size="11" fill="#64748B" text-anchor="middle" dominant-baseline="central">Fake</text>
+  <circle cx="185.9" cy="-142.7" r="20" fill="#ffffff" stroke="#334155" stroke-width="2" />
+  <text x="185.9" y="-178.7" font-size="14" fill="#334155" text-anchor="end" dominant-baseline="central" font-weight="600">Autosave</text>
+  <line x1="147.2" y1="-0" x2="202.2" y2="-0" stroke="#0F172A" stroke-width="2" stroke-linecap="round" />
+  <line x1="240.1" y1="-8.9" x2="282.2" y2="-30" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="282.2" y="-55" width="230" height="50" rx="4" fill="#64748B" stroke="#475569" stroke-width="1.2" />
+  <text x="397.2" y="-38" font-size="13" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-weight="600">SVG Files</text>
+  <text x="397.2" y="-21" font-size="11" fill="#E2E8F0" text-anchor="middle" dominant-baseline="central">Browser Files (File System Access …</text>
+  <line x1="240.1" y1="8.9" x2="282.2" y2="30" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="282.2" y="5" width="177.6" height="50" rx="4" fill="#ffffff" stroke="#64748B" stroke-width="1.2" stroke-dasharray="5 3" />
+  <text x="371" y="22" font-size="13" fill="#0F172A" text-anchor="middle" dominant-baseline="central" font-weight="600">Fake Diagram Exports</text>
+  <text x="371" y="39" font-size="11" fill="#64748B" text-anchor="middle" dominant-baseline="central">Fake</text>
+  <circle cx="222.2" cy="-0" r="20" fill="#ffffff" stroke="#334155" stroke-width="2" />
+  <text x="222.2" y="-36" font-size="14" fill="#334155" text-anchor="middle" dominant-baseline="central" font-weight="600">Diagram Exports</text>
+  <line x1="126.4" y1="97" x2="170.1" y2="130.5" stroke="#0F172A" stroke-width="2" stroke-linecap="round" />
+  <line x1="205.9" y1="142.8" x2="235.6" y2="143.1" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="235.6" y="118.1" width="230" height="50" rx="4" fill="#64748B" stroke="#475569" stroke-width="1.2" />
+  <text x="350.6" y="135.1" font-size="13" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-weight="600">Markdown Plan</text>
+  <text x="350.6" y="152.1" font-size="11" fill="#E2E8F0" text-anchor="middle" dominant-baseline="central">Browser Files (File System Access …</text>
+  <line x1="198.6" y1="158.1" x2="235.6" y2="203.1" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="235.6" y="178.1" width="170.3" height="50" rx="4" fill="#ffffff" stroke="#64748B" stroke-width="1.2" stroke-dasharray="5 3" />
+  <text x="320.8" y="195.1" font-size="13" fill="#0F172A" text-anchor="middle" dominant-baseline="central" font-weight="600">Fake Solution Stubs</text>
+  <text x="320.8" y="212.1" font-size="11" fill="#64748B" text-anchor="middle" dominant-baseline="central">Fake</text>
+  <circle cx="185.9" cy="142.7" r="20" fill="#ffffff" stroke="#334155" stroke-width="2" />
+  <text x="185.9" y="178.7" font-size="14" fill="#334155" text-anchor="end" dominant-baseline="central" font-weight="600">Solution Stubs</text>
+  <line x1="39.4" y1="147.2" x2="53.7" y2="200.4" stroke="#0F172A" stroke-width="2" stroke-linecap="round" />
+  <line x1="63.9" y1="239" x2="81.8" y2="308.4" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="81.8" y="283.4" width="230" height="50" rx="4" fill="#64748B" stroke="#475569" stroke-width="1.2" />
+  <text x="196.8" y="300.4" font-size="13" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-weight="600">Browser</text>
+  <text x="196.8" y="317.4" font-size="11" fill="#E2E8F0" text-anchor="middle" dominant-baseline="central">Browser Clipboard API (JS interop)</text>
+  <line x1="61.9" y1="239.4" x2="81.8" y2="368.4" stroke="#0F172A" stroke-width="1" stroke-linecap="round" />
+  <rect x="81.8" y="343.4" width="133.9" height="50" rx="4" fill="#ffffff" stroke="#64748B" stroke-width="1.2" stroke-dasharray="5 3" />
+  <text x="148.8" y="360.4" font-size="13" fill="#0F172A" text-anchor="middle" dominant-baseline="central" font-weight="600">Fake Clipboard</text>
+  <text x="148.8" y="377.4" font-size="11" fill="#64748B" text-anchor="middle" dominant-baseline="central">Fake</text>
+  <circle cx="58.9" cy="219.7" r="20" fill="#ffffff" stroke="#334155" stroke-width="2" />
+  <text x="58.9" y="255.7" font-size="14" fill="#334155" text-anchor="end" dominant-baseline="central" font-weight="600">Clipboard</text>
+  <text x="-451.6" y="-423.4" font-size="18" fill="#0F172A" text-anchor="start" dominant-baseline="central" font-weight="600">Motif Sketch</text>
+</svg>

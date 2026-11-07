@@ -4,6 +4,18 @@ The first tool in the **Motif** suite. You sketch a system context diagram, turn
 
 It combines and replaces two desktop tools: [Context Sketch](https://github.com/johnrpage/context-tool) and [HexaSketch](https://github.com/johnrpage/HexaSketch).
 
+## Design
+
+### Context diagram
+
+![Motif Sketch context diagram](docs/context-diagram.svg)
+
+### Ports and adapters
+
+![Motif Sketch ports-and-adapters sketch](docs/ports-and-adapters.svg)
+
+These pictures are rendered from the two diagram files below, by Context Sketch's and HexaSketch's own SVG exporters.
+
 ## Status
 
 **Designing, not built yet.** The context diagram, the ports-and-adapters sketch and the spec are done.
