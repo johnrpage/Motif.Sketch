@@ -39,7 +39,7 @@
       "description": "Where Copy link puts a snapshot link, ready to paste",
       "technology": "Browser Clipboard API",
       "x": 345,
-      "y": -260,
+      "y": -285,
       "pinned": false
     },
     {
@@ -49,7 +49,7 @@
       "description": "Saved projects: one file per system holding the context diagram and, once started, its ports-and-adapters sketch",
       "technology": "Local files (.motifsketch.json, saved in place or downloaded)",
       "x": 345,
-      "y": -130,
+      "y": -105,
       "pinned": false
     },
     {
@@ -59,7 +59,7 @@
       "description": "Autosaved work in progress and its file handle, so a refresh or closed tab loses nothing and Save still goes to the same file",
       "technology": "IndexedDB",
       "x": 345,
-      "y": 0,
+      "y": 25,
       "pinned": false
     },
     {
@@ -69,7 +69,7 @@
       "description": "The context diagram and the ports-and-adapters sketch as pictures",
       "technology": "Local files (SVG, saved or downloaded)",
       "x": 345,
-      "y": 130,
+      "y": 155,
       "pinned": false
     },
     {
@@ -79,7 +79,7 @@
       "description": "The solution stub plan a coding agent builds from",
       "technology": "Local files (Markdown, saved or downloaded)",
       "x": 345,
-      "y": 260,
+      "y": 285,
       "pinned": false
     }
   ],
