@@ -8,11 +8,15 @@ public static class Icons
     private static MarkupString I(string paths, string extra = "") =>
         new($"<svg class=\"i\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"{extra}>{paths}</svg>");
 
+    /// <summary>
+    /// The Motif mark, drawn in the theme's colours. Its geometry is the suite's brand/mark.svg
+    /// (github.com/motif-dotnet/.github); the splash in index.html has the same copy.
+    /// </summary>
     public static readonly MarkupString Mark = new(
         "<svg class=\"mark\" viewBox=\"0 0 24 24\" aria-hidden=\"true\">" +
-        "<rect x=\"2.5\" y=\"13.5\" width=\"7\" height=\"7\" rx=\"1.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"/>" +
-        "<rect x=\"8.5\" y=\"8.5\" width=\"7\" height=\"7\" rx=\"1.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"/>" +
-        "<rect x=\"14.5\" y=\"3.5\" width=\"7\" height=\"7\" rx=\"1.5\" fill=\"var(--accent)\"/></svg>");
+        "<rect x=\"2.9\" y=\"15.74\" width=\"5.36\" height=\"5.36\" rx=\"0.96\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\"/>" +
+        "<rect x=\"8.42\" y=\"8.42\" width=\"7.16\" height=\"7.16\" rx=\"1.86\" fill=\"currentColor\"/>" +
+        "<rect x=\"14.84\" y=\"2\" width=\"7.16\" height=\"7.16\" rx=\"1.86\" fill=\"var(--accent)\"/></svg>");
 
     public static readonly MarkupString Chevron = I("<path d=\"M6 9l6 6 6-6\"/>", " style=\"width:12px\"");
     public static readonly MarkupString Save = I("<path d=\"M5 3h11l3 3v15H5z\"/><path d=\"M8 3v5h7V3M8 21v-7h8v7\"/>");
