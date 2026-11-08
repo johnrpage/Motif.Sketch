@@ -32,7 +32,9 @@ async function write(handle, text) {
 // This map is the one browser contract shared between adapters.
 const handles = (globalThis.motifFileHandles ??= new Map());
 let counter = 0;
-const types = [{ description: "Motif Sketch project", accept: { "application/json": [".motifsketch.json", ".json"] } }];
+// Chrome refuses picker extensions over 16 characters, and ".motifsketch.json" is 17. ".json" covers it:
+// the suggested name still ends in ".motifsketch.json", and the open picker still lists those files.
+const types = [{ description: "Motif Sketch project", accept: { "application/json": [".json"] } }];
 
 function keep(handle) {
   const id = `file-${Date.now().toString(36)}-${counter++}`;
