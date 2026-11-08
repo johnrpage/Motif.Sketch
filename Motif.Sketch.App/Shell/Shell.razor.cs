@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Motif.Sketch.Adapters;
+using Motif.Suite;
 
 namespace Motif.Sketch.App;
 
@@ -173,6 +174,12 @@ public partial class Shell
     {
         menu = menu == name ? null : name;
         helpOpen = false;
+    }
+
+    private void ToggleHelp()
+    {
+        helpOpen = !helpOpen;
+        menu = null;
     }
 
     private void OpenExportMenu()

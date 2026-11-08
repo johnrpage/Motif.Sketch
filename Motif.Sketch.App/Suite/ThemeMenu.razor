@@ -1,0 +1,36 @@
+@* Motif.NET shared web kit: copied from github.com/motif-dotnet/.github/tree/main/brand/web. Don't edit an app's copy. *@
+@namespace Motif.Suite
+@using Microsoft.AspNetCore.Components.Web
+
+@* System, Light or Dark. The app keeps the choice in localStorage under "motif-theme", which the Motif tools share. *@
+<div class="menu @(Open ? "open" : "")">
+    <button class="cmd icon" title="Theme" aria-haspopup="menu" aria-expanded="@(Open ? "true" : "false")"
+            @onclick="OnToggle" @onclick:stopPropagation="true">@IconFor(Theme)</button>
+    <div class="menu-list narrow" role="menu">
+        @foreach (var (value, label) in Choices)
+        {
+            <button role="menuitemradio" aria-checked="@(Theme == value ? "true" : "false")" @onclick="() => ThemeChanged.InvokeAsync(value)">@IconFor(value) @label</button>
+        }
+        <div class="note">Remembered in this browser only.</div>
+    </div>
+</div>
+
+@code {
+    private static readonly (string Value, string Label)[] Choices = [("system", "System"), ("light", "Light"), ("dark", "Dark")];
+
+    /// <summary>"system", "light" or "dark".</summary>
+    [Parameter] public string Theme { get; set; } = "system";
+
+    [Parameter] public EventCallback<string> ThemeChanged { get; set; }
+
+    [Parameter] public bool Open { get; set; }
+
+    [Parameter] public EventCallback OnToggle { get; set; }
+
+    private static MarkupString IconFor(string theme) => theme switch
+    {
+        "light" => SuiteIcons.Sun,
+        "dark" => SuiteIcons.Moon,
+        _ => SuiteIcons.Monitor,
+    };
+}

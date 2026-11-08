@@ -48,7 +48,7 @@
                     {
                         <button class="x" title="Delete (Delete)" @onclick="Delete">@Icons.Trash</button>
                     }
-                    <button class="x" title="Close (Esc)" @onclick="Clear">@Icons.Close</button>
+                    <button class="x" title="Close (Esc)" @onclick="Clear">@SuiteIcons.Close</button>
                 </header>
                 <div class="body">
                     @if (sel.Kind == "element")
@@ -102,7 +102,7 @@
         @if (ShowWelcome && !ReadOnly)
         {
             <div class="card welcome" @onpointerdown:stopPropagation="true" @ondblclick:stopPropagation="true">
-                <header><div class="t"><b>Sketch your system's context</b></div><button class="x" title="Dismiss" @onclick="OnDismissWelcome">@Icons.Close</button></header>
+                <header><div class="t"><b>Sketch your system's context</b></div><button class="x" title="Dismiss" @onclick="OnDismissWelcome">@SuiteIcons.Close</button></header>
                 <div class="body">
                     <p>Name your system, then add the people and systems around it. When it looks right, start the ports-and-adapters sketch.</p>
                     <div class="tip">@Icons.Arrow<span>An arrow points from whoever starts the interaction.</span></div>

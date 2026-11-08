@@ -1,0 +1,182 @@
+/* Motif.NET: the look every Motif tool shares. Slate chrome, orange only for "look here".
+   Copied into each app from github.com/motif-dotnet/.github/tree/main/brand/web by the app's sync script.
+   Don't edit an app's copy: change this file, then sync. The app's own app.css comes after this one. */
+
+@font-face { font-family: "IBM Plex Sans"; font-weight: 400; font-style: normal; font-display: swap; src: url("../fonts/IBMPlexSans-Regular-Latin1.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 500; font-style: normal; font-display: swap; src: url("../fonts/IBMPlexSans-Medium-Latin1.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-weight: 600; font-style: normal; font-display: swap; src: url("../fonts/IBMPlexSans-SemiBold-Latin1.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-weight: 400; font-style: normal; font-display: swap; src: url("../fonts/IBMPlexMono-Regular-Latin1.woff2") format("woff2"); }
+
+/* The palette, with its dark twin */
+:root {
+  color-scheme: light;
+  --chrome: #F1F5F9;  --bar: #FFFFFF;    --strip: #F8FAFC;  --canvas: #FFFFFF;
+  --ink: #0F172A;     --text: #334155;   --muted: #64748B;  --line: #E2E8F0;  --line-strong: #CBD5E1;
+  --hover: #EEF2F6;   --pressed: #E2E8F0;
+  --accent: #EA580C;  --accent-ink: #FFFFFF; --accent-soft: #FFF1E6;
+  --card: #FFFFFF;    --shadow: 0 8px 24px rgba(15,23,42,.10), 0 1px 2px rgba(15,23,42,.06);
+  --banner: #FEF3C7;  --banner-ink: #78350F;
+  --problem: #B91C1C; --problem-soft: #FEF2F2;
+}
+/* A chosen Light theme is light only: without "only", Chrome on Android's "dark theme for sites"
+   darkens the page itself when the phone is in dark mode. */
+:root[data-theme="light"] { color-scheme: only light; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --chrome: #0B1120;  --bar: #111827;    --strip: #0F172A;  --canvas: #141C2B;
+    --ink: #F1F5F9;     --text: #CBD5E1;   --muted: #94A3B8;  --line: #1F2A3C;  --line-strong: #334155;
+    --hover: #1C2638;   --pressed: #263248;
+    --accent: #FB923C;  --accent-ink: #1A0E05; --accent-soft: #2A1A10;
+    --card: #182235;    --shadow: 0 8px 24px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4);
+    --banner: #2A2110;  --banner-ink: #FCD34D;
+    --problem: #FCA5A5; --problem-soft: #2A1215;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --chrome: #0B1120;  --bar: #111827;    --strip: #0F172A;  --canvas: #141C2B;
+  --ink: #F1F5F9;     --text: #CBD5E1;   --muted: #94A3B8;  --line: #1F2A3C;  --line-strong: #334155;
+  --hover: #1C2638;   --pressed: #263248;
+  --accent: #FB923C;  --accent-ink: #1A0E05; --accent-soft: #2A1A10;
+  --card: #182235;    --shadow: 0 8px 24px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.4);
+  --banner: #2A2110;  --banner-ink: #FCD34D;
+  --problem: #FCA5A5; --problem-soft: #2A1215;
+}
+
+/* Basics */
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; overflow: hidden; }
+body { font: 13px/1.45 "IBM Plex Sans", "Segoe UI", Arial, sans-serif; color: var(--text); background: var(--chrome); }
+#app { height: 100%; }
+a { color: var(--ink); text-decoration-color: var(--line-strong); text-underline-offset: 2px; }
+a:hover { text-decoration-color: var(--accent); }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; white-space: nowrap; }
+button:disabled { opacity: .4; cursor: default; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+svg.i { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+/* Code in prose (file, class and member names) reads as text in monospace; .code is for keys and formats, muted. */
+code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .92em; color: inherit; }
+.code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 12px; color: var(--muted); }
+.muted { color: var(--muted); }
+
+/* Splash, shown until Blazor starts */
+.splash { height: 100%; display: grid; place-content: center; justify-items: center; gap: 10px; color: var(--ink); }
+.splash .mark { width: 48px; height: 48px; }
+.splash .word { font-size: 22px; letter-spacing: -.01em; }
+.splash .word .motif { color: var(--muted); }
+.splash .word b { font-weight: 600; }
+.splash .loading { color: var(--muted); }
+
+.app { height: 100%; display: flex; flex-direction: column; position: relative; }
+
+/* App bar */
+.appbar { height: 48px; flex: none; display: flex; align-items: center; gap: 2px; padding: 0 10px; background: var(--bar); border-bottom: 1px solid var(--line); }
+.cmd { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 10px; border-radius: 6px; color: var(--text); }
+.cmd:hover:not(:disabled) { background: var(--hover); color: var(--ink); }
+.cmd:active:not(:disabled) { background: var(--pressed); }
+.cmd.icon { padding: 0 8px; }
+.vsep { width: 1px; height: 20px; background: var(--line); margin: 0 6px; flex: none; }
+.spacer { flex: 1; }
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 13px; background: var(--hover); color: var(--text); font-size: 12px; white-space: nowrap; min-width: 0; max-width: 420px; }
+
+/* The brand: the mark and the tool's name, which open the tool switcher */
+.brand { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 8px 0 4px; margin-right: 6px; border-radius: 6px; color: var(--ink); font-size: 15px; letter-spacing: -.01em; }
+.brand:hover, .switcher.open .brand { background: var(--hover); }
+.brand .mark { width: 24px; height: 24px; flex: none; }
+.brand .motif { font-weight: 400; color: var(--muted); }
+.brand b { font-weight: 600; }
+.brand svg.i { color: var(--muted); margin-left: -2px; }
+.switcher .menu-list { min-width: 300px; }
+.menu-list a.tool-link { flex-direction: column; align-items: flex-start; gap: 0; padding: 8px 10px; white-space: normal; }
+.tool-link b { color: var(--ink); font-weight: 600; }
+.tool-link span { color: var(--muted); font-size: 12px; }
+.tool-link[aria-current="page"] { background: var(--accent-soft); }
+.tool-link[aria-current="page"] b::after { content: " · this tool"; color: var(--accent); font-weight: 500; font-size: 12px; }
+
+/* Buttons */
+.primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding: 0 14px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.primary:hover:not(:disabled) { filter: brightness(1.06); }
+.ghost { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 12px; border-radius: 6px; border: 1px solid var(--line-strong); color: var(--ink); font-weight: 500; }
+.ghost.small { height: 26px; padding: 0 10px; font-size: 12px; gap: 4px; }
+.ghost.small svg.i { width: 13px; height: 13px; }
+.ghost.strong { border-color: var(--ink); }
+.ghost:hover { background: var(--hover); }
+.x { width: 26px; height: 26px; border-radius: 6px; display: grid; place-items: center; color: var(--muted); flex: none; }
+.x:hover { background: var(--hover); color: var(--ink); }
+.x.small { width: 20px; height: 20px; font-size: 11px; }
+
+/* Menus */
+.menu { position: relative; }
+.menu-list { display: none; position: absolute; top: calc(100% + 4px); right: 0; z-index: 30; min-width: 240px; background: var(--card); border: 1px solid var(--line-strong); border-radius: 8px; box-shadow: var(--shadow); padding: 4px; }
+.menu-list.narrow { min-width: 170px; }
+.menu.left .menu-list { left: 0; right: auto; }
+.menu.open .menu-list { display: block; }
+.menu-list button, .menu-list a { display: flex; width: 100%; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 5px; text-align: left; color: var(--text); text-decoration: none; }
+.menu-list button .code { margin-left: auto; }
+.menu-list button:hover:not(:disabled), .menu-list a:hover { background: var(--hover); color: var(--ink); }
+.menu-list button[aria-checked="true"]::after { content: "✓"; margin-left: auto; color: var(--accent); }
+.menu-list .note { padding: 6px 10px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); margin-top: 4px; white-space: normal; max-width: 320px; }
+.menu-list .note b { color: var(--accent); font-weight: 500; }
+.menu-list .note.problem b { color: var(--problem); }
+.menu-list .note ul { margin: 4px 0 0; padding-left: 16px; }
+.menu-list .note a { display: inline; padding: 0; color: var(--muted); text-decoration: underline; text-decoration-color: var(--line-strong); }
+.menu-list .note a:hover { background: none; color: var(--ink); }
+
+/* Banners: the state of what's on screen, for as long as it lasts. Outcomes of a command are toasts. */
+.banner { flex: none; background: var(--banner); color: var(--banner-ink); padding: 7px 14px; font-size: 12.5px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.banner .link { text-decoration: underline; font-weight: 600; color: inherit; padding: 0; }
+
+/* Cards and dialogs */
+.card { background: var(--card); border: 1px solid var(--line-strong); border-radius: 10px; box-shadow: var(--shadow); }
+.card header { display: flex; align-items: center; gap: 4px; padding: 10px 6px 10px 14px; }
+.card header .t { flex: 1; min-width: 0; }
+.card header b { display: block; color: var(--ink); font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card header span { color: var(--muted); font-size: 12px; }
+.card .body { padding: 2px 14px 14px; }
+.scrim { position: fixed; inset: 0; z-index: 40; background: rgba(15,23,42,.28); display: grid; place-items: center; padding: 16px; }
+.dialog { position: relative; width: min(440px, 100%); max-height: calc(100% - 32px); overflow: auto; }
+.dialog .body p { margin: 0 0 14px; }
+.help-card { width: min(560px, 100%); }
+.help-card h4 { margin: 12px 0 4px; color: var(--ink); font-weight: 600; font-size: 13px; }
+.help-card ul { margin: 0 0 6px; padding-left: 18px; }
+.help-card li { margin-bottom: 3px; }
+.keys { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; margin-bottom: 12px; }
+
+/* Fields */
+.field { margin-bottom: 10px; }
+.field label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); margin-bottom: 3px; }
+.field input, .field textarea, .field select { width: 100%; font: inherit; color: var(--ink); background: var(--canvas); border: 1px solid var(--line-strong); border-radius: 6px; padding: 5px 8px; }
+.field input:focus, .field textarea:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+.field textarea { resize: vertical; min-height: 52px; }
+.help { font-size: 12px; color: var(--muted); margin: 0 0 8px; white-space: normal; }
+.row { display: flex; gap: 8px; }
+.row.wrap { flex-wrap: wrap; gap: 6px; }
+.row.end { justify-content: flex-end; }
+
+/* Toasts: the outcome of a command, at the bottom right */
+.toasts { position: fixed; right: 16px; bottom: 16px; z-index: 45; display: flex; flex-direction: column; gap: 8px; width: min(380px, calc(100% - 32px)); }
+.toast { display: flex; gap: 8px; align-items: flex-start; background: var(--card); border: 1px solid var(--line-strong); border-left: 4px solid var(--muted); border-radius: 8px; box-shadow: var(--shadow); padding: 10px 6px 10px 12px; }
+.toast.warning { border-left-color: var(--accent); }
+.toast.problem { border-left-color: var(--problem); }
+.toast .t { flex: 1; min-width: 0; }
+.toast b { display: block; color: var(--ink); font-weight: 600; }
+.toast span, .toast li { color: var(--text); font-size: 12.5px; }
+.toast ul { margin: 2px 0 0; padding-left: 16px; }
+
+/* Blazor's error bar */
+#blazor-error-ui { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 60; padding: 10px 40px 10px 16px; background: var(--banner); color: var(--banner-ink); }
+#blazor-error-ui .reload { color: inherit; font-weight: 600; }
+#blazor-error-ui .dismiss { cursor: pointer; position: absolute; right: 12px; top: 8px; }
+
+/* Narrow screens: commands lose their labels (put a label in a .wide span) */
+@media (max-width: 899px) {
+  .wide { display: none !important; }
+  .cmd { padding: 0 8px; }
+}
+/* Phones: the bar must fit */
+@media (max-width: 599px) {
+  .brand .motif, .pill .long, .primary .long { display: none !important; }
+  .appbar { gap: 0; padding: 0 6px; }
+  .brand { margin-right: 2px; }
+}

@@ -1,0 +1,22 @@
+# Reports when this app's copy of the Motif web kit (motif-dotnet/.github brand/web) has drifted.
+# It never blocks a deploy: a red run means "run scripts/sync-suite.sh and commit".
+name: Motif web kit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the kit is up to date
+        run: bash scripts/sync-suite.sh --check

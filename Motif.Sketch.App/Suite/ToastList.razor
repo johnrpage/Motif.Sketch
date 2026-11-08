@@ -1,0 +1,21 @@
+@* Motif.NET shared web kit: copied from github.com/motif-dotnet/.github/tree/main/brand/web. Don't edit an app's copy. *@
+@namespace Motif.Suite
+@using Microsoft.AspNetCore.Components.Web
+
+<div class="toasts" aria-live="polite">
+    @foreach (var toast in Toaster.Toasts)
+    {
+        <div class="toast @toast.Kind.ToString().ToLowerInvariant()" @key="toast.Id">
+            <div class="t"><b>@toast.Title</b>
+                @if (toast.Lines.Count == 1) { <span>@toast.Lines[0]</span> }
+                else if (toast.Lines.Count > 1) { <ul>@foreach (var line in toast.Lines.Take(8)) { <li>@line</li> }</ul> }
+            </div>
+            <button class="x" title="Dismiss" @onclick="() => Toaster.Dismiss(toast.Id)">@SuiteIcons.Close</button>
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>The toasts to show. The page re-renders this when the toaster changes.</summary>
+    [Parameter, EditorRequired] public Toaster Toaster { get; set; } = null!;
+}

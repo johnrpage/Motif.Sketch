@@ -1,0 +1,21 @@
+@* Motif.NET shared web kit: copied from github.com/motif-dotnet/.github/tree/main/brand/web. Don't edit an app's copy. *@
+@namespace Motif.Suite
+@using Microsoft.AspNetCore.Components.Web
+
+@* The Help dialog's frame. The app writes the content: short h4 sections with lists, a .keys grid, and a closing .help line. *@
+<div class="scrim" @onclick="OnClose">
+    <div class="card dialog help-card" role="dialog" aria-label="Help: Motif @Tools.Get(Current).Name" @onclick:stopPropagation="true">
+        <header><div class="t"><b>Motif @Tools.Get(Current).Name</b><span>@Tools.Get(Current).Line</span></div>
+            <button class="x" title="Close" @onclick="OnClose">@SuiteIcons.Close</button></header>
+        <div class="body">@ChildContent</div>
+    </div>
+</div>
+
+@code {
+    /// <summary>This tool's id in <see cref="Tools.All"/>.</summary>
+    [Parameter, EditorRequired] public string Current { get; set; } = "";
+
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

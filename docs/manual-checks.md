@@ -49,5 +49,6 @@ published site after the workflow deploys it.
 - [ ] Phone width with no autosaved work (or only the system): opens the example read-only, with the example banner.
 - [ ] `#example` on a computer: the example read-only, "Example · read-only", Make a copy to edit works.
 - [ ] Empty work on a computer (fresh, or after New): the welcome card shows until dismissed; once dismissed it never returns.
-- [ ] Theme menu: System / Light / Dark, remembered after a reload.
+- [ ] Theme menu: System / Light / Dark, remembered after a reload, and shared with Motif Glossary on the same site.
+- [ ] The mark and name open the tool switcher: Motif Sketch is marked as this tool, and Motif Glossary opens the Glossary.
 - [ ] Open example shows Motif Sketch's own design.

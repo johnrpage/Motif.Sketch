@@ -1,0 +1,29 @@
+@* Motif.NET shared web kit: copied from github.com/motif-dotnet/.github/tree/main/brand/web. Don't edit an app's copy. *@
+@namespace Motif.Suite
+@using Microsoft.AspNetCore.Components.Web
+
+@* The brand at the left of the app bar: the mark and "Motif <tool>", opening a menu of the Motif tools. *@
+<div class="menu left switcher @(Open ? "open" : "")">
+    <button class="brand" title="Motif tools" aria-haspopup="menu" aria-expanded="@(Open ? "true" : "false")"
+            @onclick="OnToggle" @onclick:stopPropagation="true">
+        @SuiteIcons.Mark<span class="word"><span class="motif">Motif</span> <b>@Tools.Get(Current).Name</b></span>@SuiteIcons.Chevron
+    </button>
+    <div class="menu-list" role="menu">
+        @foreach (var tool in Tools.All)
+        {
+            <a class="tool-link" role="menuitem" href="@tool.Url" aria-current="@(tool.Id == Current ? "page" : null)">
+                <b>Motif @tool.Name</b><span>@tool.Line</span>
+            </a>
+        }
+        <div class="note">Part of <a href="@Tools.Home" target="_blank" rel="noopener">Motif.NET</a>: tools for building .NET apps with a coding agent.</div>
+    </div>
+</div>
+
+@code {
+    /// <summary>This tool's id in <see cref="Tools.All"/>.</summary>
+    [Parameter, EditorRequired] public string Current { get; set; } = "";
+
+    [Parameter] public bool Open { get; set; }
+
+    [Parameter] public EventCallback OnToggle { get; set; }
+}

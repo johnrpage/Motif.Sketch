@@ -11,7 +11,7 @@
 {
 <div class="app @ModeClass" @onclick="CloseMenus">
     <header class="appbar">
-        <div class="brand">@Icons.Mark<span class="motif">Motif</span> <span class="tool">Sketch</span></div>
+        <ToolSwitcher Current="sketch" Open="@(menu == "tools")" OnToggle="@(() => Toggle("tools"))" />
 
         @if (Editable)
         {
@@ -29,7 +29,7 @@
             }
             <div class="vsep"></div>
             <div class="menu left @(menu == "file" ? "open" : "")">
-                <button class="cmd" @onclick="@(() => Toggle("file"))" @onclick:stopPropagation="true">File @Icons.Chevron</button>
+                <button class="cmd" @onclick="@(() => Toggle("file"))" @onclick:stopPropagation="true">File @SuiteIcons.Chevron</button>
                 <div class="menu-list">
                     <button @onclick="New">New</button>
                     <button @onclick="Open">Open…</button>
@@ -115,30 +115,19 @@
 
         @if (Editable)
         {
-            <button class="cmd" title="Copy a read-only link" @onclick="CopyLink">@Icons.Link<span class="wide">Copy link</span></button>
+            <button class="cmd" title="Copy a read-only link" @onclick="CopyLink">@SuiteIcons.Link<span class="wide">Copy link</span></button>
         }
         @if (App.Mode == AppMode.Viewer)
         {
-            <button class="primary" @onclick="MakeCopy">@Icons.Copy Make a copy<span class="long">&nbsp;to edit</span></button>
+            <button class="primary" @onclick="MakeCopy">@SuiteIcons.Copy Make a copy<span class="long">&nbsp;to edit</span></button>
         }
         else if (App.Mode == AppMode.OtherTab)
         {
             <button class="primary" @onclick="UseThisTab">Use this tab instead</button>
         }
 
-        <div class="menu @(menu == "theme" ? "open" : "")">
-            <button class="cmd icon" title="Theme" @onclick="@(() => Toggle("theme"))" @onclick:stopPropagation="true">
-                @(theme == "dark" ? Icons.Moon : theme == "light" ? Icons.Sun : Icons.Monitor)
-            </button>
-            <div class="menu-list narrow">
-                @foreach (var t in new[] { "system", "light", "dark" })
-                {
-                    <button role="menuitemradio" aria-checked="@(theme == t ? "true" : "false")" @onclick="() => SetTheme(t)">@(char.ToUpperInvariant(t[0]) + t[1..])</button>
-                }
-                <div class="note">Remembered in this browser only.</div>
-            </div>
-        </div>
-        <button class="cmd icon" title="Help" @onclick="() => helpOpen = !helpOpen" @onclick:stopPropagation="true">@Icons.Help</button>
+        <ThemeMenu Theme="@theme" ThemeChanged="SetTheme" Open="@(menu == "theme")" OnToggle="@(() => Toggle("theme"))" />
+        <button class="cmd icon" title="Help" @onclick="ToggleHelp" @onclick:stopPropagation="true">@SuiteIcons.Help</button>
     </header>
 
     @if (App.Mode == AppMode.OtherTab)
@@ -171,11 +160,7 @@
 
     @if (helpOpen)
     {
-        <div class="scrim" @onclick="() => helpOpen = false">
-            <div class="card dialog help-card" @onclick:stopPropagation="true">
-                <header><div class="t"><b>Motif Sketch</b><span>Sketch a context diagram, then its ports and adapters</span></div>
-                    <button class="x" title="Close" @onclick="() => helpOpen = false">@Icons.Close</button></header>
-                <div class="body">
+        <HelpDialog Current="sketch" OnClose="@(() => helpOpen = false)">
                     <h4>Context diagram</h4>
                     <ul>
                         <li>Add people and systems with the tool strip. Each one is linked to the system and placed for you.</li>
@@ -186,7 +171,7 @@
                     <ul>
                         <li>Start sketch makes the User port, with an adapter for each primary actor and Specs to check it.</li>
                         <li>Drag items from Not placed onto a port (a new adapter), an adapter (merge it in) or the hexagon (a new port on that side).</li>
-                        <li>Name real adapters after their technology, so class names stay clean: Browser Files on Projects is <span class="code">BrowserFilesProjects</span>.</li>
+                        <li>Name real adapters after their technology, so class names stay clean: Browser Files on Projects is <code>BrowserFilesProjects</code>.</li>
                         <li>Drag adapters between ports, or back onto Not placed. Drag ports to reorder them.</li>
                     </ul>
                     <h4>Keys</h4>
@@ -199,9 +184,7 @@
                         <span class="code">Alt+1 / 2 / 3</span><span>Context, side by side, sketch</span>
                     </div>
                     <p class="help">Your work autosaves in this browser, but that's a safety net: save to a file to keep it. Copy link shares a read-only snapshot; everything after the # stays in the browser.</p>
-                </div>
-            </div>
-        </div>
+        </HelpDialog>
     }
 
     @if (manualLink is { } link)
@@ -209,7 +192,7 @@
         <div class="scrim" @onclick="() => manualLink = null">
             <div class="card dialog" @onclick:stopPropagation="true">
                 <header><div class="t"><b>Copy this read-only link</b><span>The browser didn't let Motif Sketch copy it for you.</span></div>
-                    <button class="x" title="Close" @onclick="() => manualLink = null">@Icons.Close</button></header>
+                    <button class="x" title="Close" @onclick="() => manualLink = null">@SuiteIcons.Close</button></header>
                 <div class="body">
                     <div class="field"><textarea id="manual-link" class="link-box" readonly @onfocus="@(() => Browser.Focus("#manual-link"))">@link</textarea></div>
                     <p class="help">It's a snapshot: later edits need a new link. Everything after the # stays in the browser.</p>
@@ -235,17 +218,6 @@
         </div>
     }
 
-    <div class="toasts" aria-live="polite">
-        @foreach (var toast in Ui.Toasts)
-        {
-            <div class="toast @toast.Kind.ToString().ToLowerInvariant()" @key="toast.Id">
-                <div class="t"><b>@toast.Title</b>
-                    @if (toast.Lines.Count == 1) { <span>@toast.Lines[0]</span> }
-                    else if (toast.Lines.Count > 1) { <ul>@foreach (var line in toast.Lines.Take(8)) { <li>@line</li> }</ul> }
-                </div>
-                <button class="x" title="Dismiss" @onclick="() => Ui.Dismiss(toast.Id)">@Icons.Close</button>
-            </div>
-        }
-    </div>
+    <ToastList Toaster="Ui" />
 </div>
 }

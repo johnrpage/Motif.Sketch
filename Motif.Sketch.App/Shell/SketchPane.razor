@@ -187,7 +187,7 @@
         {
             var system = App.Context.Elements.Single(e => e.Type == ElementType.System);
             <header><div class="t"><b>@system.Name</b><span>The system · its core is Domain, Tasks and Queries</span></div>
-                <button class="x" title="Close (Esc)" @onclick="Clear">@Icons.Close</button></header>
+                <button class="x" title="Close (Esc)" @onclick="Clear">@SuiteIcons.Close</button></header>
             <div class="body">
                 <div class="field"><label for="sk-name">System name</label>
                     <input id="sk-name" value="@system.Name" readonly="@ReadOnly" @onchange="v => Ui.Run(() => App.RenameElement(system.Id, Text(v)))" /></div>
@@ -201,7 +201,7 @@
         {
             <header><div class="t"><b>@port.Name</b><span>@(port.IsUser ? "The User port" : port.Side == Side.Driving ? "Driving port" : "Driven port") · @port.Adapters.Count adapter@(port.Adapters.Count == 1 ? "" : "s")</span></div>
                 @if (!ReadOnly && !port.IsUser) { <button class="x" title="Delete (Delete)" @onclick="DeleteSelection">@Icons.Trash</button> }
-                <button class="x" title="Close (Esc)" @onclick="Clear">@Icons.Close</button></header>
+                <button class="x" title="Close (Esc)" @onclick="Clear">@SuiteIcons.Close</button></header>
             <div class="body">
                 <div class="field"><label for="sk-name">Name</label>
                     <input id="sk-name" value="@port.Name" readonly="@(ReadOnly || port.IsUser)" @onchange="v => Ui.Run(() => App.RenamePort(port.Id, Text(v)))" /></div>
@@ -225,7 +225,7 @@
             var portOf = view.Port(a.PortId)!;
             <header><div class="t"><b>@a.Name</b><span>@a.Kind adapter on @portOf.Name</span></div>
                 @if (!ReadOnly) { <button class="x" title="Delete (Delete)" @onclick="DeleteSelection">@Icons.Trash</button> }
-                <button class="x" title="Close (Esc)" @onclick="Clear">@Icons.Close</button></header>
+                <button class="x" title="Close (Esc)" @onclick="Clear">@SuiteIcons.Close</button></header>
             <div class="body">
                 @if (a.SourceDeleted)
                 {
@@ -253,7 +253,7 @@
                     @foreach (var s in a.Sources)
                     {
                         <div class="source">@Icons.Glyph(s.Type)<span>@s.Name</span>
-                            @if (!ReadOnly) { <button class="x small" title="Return @s.Name to Not placed" @onclick="() => Ui.Run(() => App.RemoveSource(a.Id, s.ElementId))">@Icons.Close</button> }
+                            @if (!ReadOnly) { <button class="x small" title="Return @s.Name to Not placed" @onclick="() => Ui.Run(() => App.RemoveSource(a.Id, s.ElementId))">@SuiteIcons.Close</button> }
                         </div>
                     }
                     @if (!ReadOnly) { <p class="help">Drop another item on this adapter to merge it in. Naming a real adapter after its technology keeps class names clean.</p> }
