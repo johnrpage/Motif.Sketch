@@ -15,6 +15,9 @@
   --banner: #FEF3C7;  --banner-ink: #78350F;
   --problem: #B91C1C; --problem-soft: #FEF2F2;
 }
+/* A chosen Light theme is light only: without "only", Chrome on Android's "dark theme for sites"
+   darkens the page itself when the phone is in dark mode, turning the chrome black but not the diagrams. */
+:root[data-theme="light"] { color-scheme: only light; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
