@@ -2,7 +2,7 @@
 
 Motif Sketch is the first tool in the **Motif** suite. It combines Context Sketch and HexaSketch into one browser app. You sketch a **system context diagram**, turn it into a **ports-and-adapters sketch**, and export both as pictures, plus a **solution plan** that a coding agent can build stubs from. It is a Blazor WebAssembly app hosted on GitHub Pages: no server, no accounts, and your work stays in your own files and browser.
 
-The two desktop tools are the reference implementations. Their DESIGN.md files describe their diagram scheme, layout rules and plan opinions. Unless this spec says otherwise, Motif Sketch keeps their behaviour. `decisions.md` records why each choice below was made. `Motif Sketch - Context Diagram.contextsketch.json` and `Motif Sketch.hexasketch.json` are Motif Sketch's own design, drawn in the old tools.
+The two desktop tools are the reference implementations. Their DESIGN.md files describe their diagram scheme, layout rules and plan opinions. Unless this spec says otherwise, Motif Sketch keeps their behaviour. `decisions.md` records why each choice below was made. `motif/sketch.motifsketch.json` is Motif Sketch's own design (first drawn in the old tools, then converted).
 
 **Workflow request:** use plan mode. Propose the architecture and a phased plan, resolve section 10, and confirm before writing code. Section 9 (look and feel) has been designed separately; follow it and don't invent your own.
 
@@ -36,7 +36,7 @@ The two desktop tools are the reference implementations. Their DESIGN.md files d
 
 ## 3. Architecture
 
-Motif Sketch is built as ports and adapters, exactly as `Motif Sketch.hexasketch.json` shows:
+Motif Sketch is built as ports and adapters, exactly as `motif/sketch.motifsketch.json` shows:
 
 | Port | Side | Real adapter | Fake / checks |
 |---|---|---|---|
@@ -196,7 +196,7 @@ Every edit in either view is one undo step: Ctrl+Z / Ctrl+Y. There is one histor
 ### 5.9 Example
 
 - **Open example** loads the bundled project, which is Motif Sketch's own design (both views), as an ordinary unsaved project, after asking if there's unsaved work.
-- Until the real `.motifsketch.json` exists, the example is built from the two old files in this folder.
+- The example is `motif/sketch.motifsketch.json`, embedded in the core (decision 53).
 
 ## 6. Diagram visuals
 

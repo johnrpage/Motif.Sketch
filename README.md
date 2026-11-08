@@ -10,13 +10,13 @@ It combines and replaces two desktop tools: [Context Sketch](https://github.com/
 
 ### Context diagram
 
-![Motif Sketch context diagram](docs/context-diagram.svg)
+![Motif Sketch context diagram](motif/diagrams/context-diagram.svg)
 
 ### Ports and adapters
 
-![Motif Sketch ports-and-adapters sketch](docs/ports-and-adapters.svg)
+![Motif Sketch ports-and-adapters sketch](motif/diagrams/ports-and-adapters.svg)
 
-These pictures are rendered from the two diagram files below, by Context Sketch's and HexaSketch's own SVG exporters.
+These pictures are Motif Sketch's own exports of its design, [motif/sketch.motifsketch.json](motif/sketch.motifsketch.json), which is also the bundled example. The [motif/](motif/) folder holds the design, the [solution plan](motif/plan.md) and the [glossary](motif/glossary.md).
 
 ## Status
 
@@ -46,7 +46,7 @@ dotnet publish Motif.Sketch.App -c Release  # static files in bin/Release/net10.
 
 Pushing to `main` runs `.github/workflows/pages.yml`: it runs the specs, publishes, sets `<base href>` for the `/Motif.Sketch/` sub-path, adds `.nojekyll`, and deploys to GitHub Pages.
 
-The layout is the one Motif Sketch exports for itself (the golden file `Checks/Motif.Sketch.Specs/Golden/Motif.Sketch.plan.md`):
+The layout is the one Motif Sketch exports for itself ([motif/plan.md](motif/plan.md), which the specs check against the sketch):
 
 | Folder | What's there |
 |---|---|
@@ -63,14 +63,8 @@ The layout is the one Motif Sketch exports for itself (the golden file `Checks/M
 | [SPEC.md](SPEC.md) | The requirements: architecture, file format, behaviour, quality bar, acceptance criteria |
 | [docs/manual-checks.md](docs/manual-checks.md) | The browser checks to run before a release |
 | [decisions.md](decisions.md) | Every design decision so far and why, plus ideas for later |
-| [Motif Sketch - Context Diagram.contextsketch.json](<Motif Sketch - Context Diagram.contextsketch.json>) | Motif Sketch's context diagram (open it in Context Sketch) |
-| [Motif Sketch.hexasketch.json](<Motif Sketch.hexasketch.json>) | Motif Sketch's ports-and-adapters sketch (open it in HexaSketch) |
-
-The sketch is drawn with HexaSketch, which can't yet express two of Motif Sketch's ideas:
-- **Merged sources:** the Viewer shows as "Not placed" even though the Web App serves it.
-- **The Checks kind:** Specs shows as a Fake.
-
-The adapter descriptions say so.
+| [motif/](motif/README.md) | Motif Sketch's own design, solution plan, diagrams and glossary |
+| [AGENTS.md](AGENTS.md) | Where coding agents start |
 
 ## License
 

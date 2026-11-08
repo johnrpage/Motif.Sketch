@@ -2,7 +2,7 @@
 
 The words this project uses, and what they mean. People and agents use these terms in code, docs, issues and discussion, and avoid the words listed under **Avoid**. A new concept gets an entry, marked *proposed*, in the same change that introduces it. An entry with no status is agreed.
 
-The format is described in the [Motif Glossary design note](https://github.com/motif-dotnet/.github/blob/main/design/glossary.md). **Sketch** gives the id of the element or port in Motif Sketch's own design (`Motif.Sketch/Motif.Sketch.UseCases/Example/example.motifsketch.json`) that the term comes from.
+The format is described in the [Motif Glossary design note](https://github.com/motif-dotnet/.github/blob/main/design/glossary.md). **Sketch** gives the id of the element or port in Motif Sketch's own design ([sketch.motifsketch.json](sketch.motifsketch.json)) that the term comes from.
 
 ## Adapter
 

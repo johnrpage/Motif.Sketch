@@ -168,9 +168,12 @@ public sealed class Exporting
         md.Should().Contain("| User | Specs | Checks | xUnit | `Motif.Sketch.Specs` | - | Added by the plan");
     }
 
-    /// <summary>The golden file: the plan Motif Sketch exports from its own design.</summary>
+    // Golden files: the repo's motif/ folder holds what Motif Sketch exports from its own design
+    // (motif/sketch.motifsketch.json, which is also the bundled example). If the sketch or an exporter
+    // changes, these fail until the exports are refreshed: run the specs with UPDATE_GOLDEN=1.
+
     [Fact]
-    public async Task The_plan_exported_from_the_example_matches_the_golden_file()
+    public async Task The_plan_exported_from_the_example_matches_motif_plan_md()
     {
         var h = await Harness.WithExample();
 
@@ -178,12 +181,43 @@ public sealed class Exporting
 
         var (name, markdown) = h.SolutionStubs.Written.Single();
         name.Should().Be("Motif Sketch - plan.md");
-        var golden = Path.Combine(AppContext.BaseDirectory, "Golden", "Motif.Sketch.plan.md");
-        if (Environment.GetEnvironmentVariable("UPDATE_GOLDEN") == "1")
-            File.WriteAllText(Path.Combine(SourceDirectory(), "Golden", "Motif.Sketch.plan.md"), markdown);
-        markdown.Should().Be(File.ReadAllText(golden).ReplaceLineEndings("\n"));
+        MatchesGolden("plan.md", markdown);
     }
 
-    private static string SourceDirectory([System.Runtime.CompilerServices.CallerFilePath] string path = "") =>
-        Path.GetDirectoryName(path)!;
+    [Fact]
+    public async Task The_context_diagram_exported_from_the_example_matches_motif_diagrams()
+    {
+        var h = await Harness.WithExample();
+
+        (await h.Tasks.ExportContextDiagram()).Succeeded.Should().BeTrue();
+
+        MatchesGolden(Path.Combine("diagrams", "context-diagram.svg"), h.DiagramExports.Written.Single().Svg);
+    }
+
+    [Fact]
+    public async Task The_sketch_exported_from_the_example_matches_motif_diagrams()
+    {
+        var h = await Harness.WithExample();
+
+        (await h.Tasks.ExportSketch()).Succeeded.Should().BeTrue();
+
+        MatchesGolden(Path.Combine("diagrams", "ports-and-adapters.svg"), h.DiagramExports.Written.Single().Svg);
+    }
+
+    /// <param name="path">Relative to the repo's motif/ folder.</param>
+    private static void MatchesGolden(string path, string exported)
+    {
+        exported = exported.ReplaceLineEndings("\n"); // the SVG writer uses the platform's line endings
+        if (Environment.GetEnvironmentVariable("UPDATE_GOLDEN") == "1")
+        {
+            var target = Path.Combine(MotifFolder(), path);
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            File.WriteAllText(target, exported);
+        }
+        var golden = Path.Combine(AppContext.BaseDirectory, "Golden", Path.GetFileName(path));
+        exported.Should().Be(File.ReadAllText(golden).ReplaceLineEndings("\n"));
+    }
+
+    private static string MotifFolder([System.Runtime.CompilerServices.CallerFilePath] string path = "") =>
+        Path.GetFullPath(Path.Combine(Path.GetDirectoryName(path)!, "..", "..", "motif"));
 }

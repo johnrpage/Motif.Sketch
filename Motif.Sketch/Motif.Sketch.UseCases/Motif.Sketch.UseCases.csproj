@@ -9,7 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Example\example.motifsketch.json" LogicalName="Motif.Sketch.example.motifsketch.json" />
+    <!-- The example is Motif Sketch's own design, kept in the repo's motif/ folder. -->
+    <EmbeddedResource Include="..\..\motif\sketch.motifsketch.json" Link="Example\sketch.motifsketch.json" LogicalName="Motif.Sketch.example.motifsketch.json" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="970" height="740" viewBox="-500 -370 970 740" font-family="'IBM Plex Sans', 'Segoe UI', Arial, sans-serif" xmlns="http://www.w3.org/2000/svg">
+  <title>Motif Sketch</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 12 10" markerWidth="12" markerHeight="10" refX="12" refY="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L12,5 L0,10 Z" fill="#52606D" />
+    </marker>
+  </defs>
+  <rect x="-500" y="-370" width="970" height="740" fill="#FFFFFF" />
+  <g class="relationship" data-id="c5a10b01">
+    <line x1="-290" y1="-50.27" x2="-120" y2="-20.8" stroke="#52606D" stroke-width="1.5" stroke-linecap="round" class="outline" marker-end="url(#arrow)" />
+    <rect x="-257.14" y="-58.03" width="104.29" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="-205" y="-50.53" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">Sketches, exports</text>
+    <rect x="-238.46" y="-43.03" width="66.92" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="-205" y="-35.53" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">and shares</text>
+    <rect x="-233.92" y="-28.03" width="57.84" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="-205" y="-20.53" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">diagrams</text>
+  </g>
+  <g class="relationship" data-id="c5a10b07">
+    <line x1="-290" y1="50.27" x2="-120" y2="20.8" stroke="#52606D" stroke-width="1.5" stroke-linecap="round" class="outline" marker-end="url(#arrow)" />
+    <rect x="-244.9" y="20.53" width="79.81" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="-205" y="28.03" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">Views shared</text>
+    <rect x="-233.92" y="35.53" width="57.84" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="-205" y="43.03" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">diagrams</text>
+  </g>
+  <g class="relationship" data-id="c5a10b04">
+    <line x1="120" y1="-36.52" x2="260" y2="-79.13" stroke="#52606D" stroke-width="1.5" stroke-linecap="round" class="outline" marker-end="url(#arrow)" />
+    <rect x="157.14" y="-72.83" width="65.72" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="190" y="-65.33" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">Opens and</text>
+    <rect x="147.41" y="-57.83" width="85.18" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="190" y="-50.33" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">saves projects</text>
+  </g>
+  <g class="relationship" data-id="c5a10b05">
+    <line x1="120" y1="8.7" x2="260" y2="18.84" stroke="#52606D" stroke-width="1.5" stroke-linecap="round" class="outline" marker-end="url(#arrow)" />
+    <rect x="146.48" y="-1.23" width="87.04" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="190" y="6.27" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">Autosaves and</text>
+    <rect x="148.95" y="13.77" width="82.1" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="190" y="21.27" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">restores work</text>
+  </g>
+  <g class="relationship" data-id="c5a10b06">
+    <line x1="120" y1="53.91" x2="260" y2="116.81" stroke="#52606D" stroke-width="1.5" stroke-linecap="round" class="outline" marker-end="url(#arrow)" />
+    <rect x="168.63" y="62.86" width="42.74" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="190" y="70.36" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">Writes</text>
+    <rect x="164" y="77.86" width="51.99" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="190" y="85.36" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">diagram</text>
+    <rect x="164.07" y="92.86" width="51.86" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="190" y="100.36" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">pictures</text>
+  </g>
+  <g class="relationship" data-id="c5a10b08">
+    <line x1="78.68" y1="65" x2="290.53" y2="240" stroke="#52606D" stroke-width="1.5" stroke-linecap="round" class="outline" marker-end="url(#arrow)" />
+    <rect x="126.98" y="145" width="115.24" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="184.61" y="152.5" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">Writes solution plan</text>
+  </g>
+  <g class="relationship" data-id="c5a10b09">
+    <line x1="78.68" y1="-65" x2="290.53" y2="-240" stroke="#52606D" stroke-width="1.5" stroke-linecap="round" class="outline" marker-end="url(#arrow)" />
+    <rect x="131.84" y="-160" width="105.54" height="15" fill="#FFFFFF" stroke="none" stroke-width="0" />
+    <text x="184.61" y="-152.5" font-size="12" fill="#0F172A" text-anchor="middle" dominant-baseline="central">Copies share links</text>
+  </g>
+  <g class="element" data-id="c5a10a01" data-type="system">
+    <rect x="-120" y="-65" width="240" height="130" rx="6" ry="6" fill="#FFFFFF" stroke="#0F172A" stroke-width="3" class="outline" />
+    <text x="0" y="-22.62" font-size="16" fill="#0F172A" text-anchor="middle" dominant-baseline="central" font-weight="600">Motif.Sketch</text>
+    <text x="0" y="-1.75" font-size="11" fill="#0F172A" text-anchor="middle" dominant-baseline="central">Sketch a context diagram, turn it into a</text>
+    <text x="0" y="12" font-size="11" fill="#0F172A" text-anchor="middle" dominant-baseline="central">ports-and-adapters sketch, then export the</text>
+    <text x="0" y="25.75" font-size="11" fill="#0F172A" text-anchor="middle" dominant-baseline="central">diagrams and a solution plan</text>
+  </g>
+  <g class="element" data-id="c5a10a02" data-type="primaryActor">
+    <rect x="-460" y="-110" width="170" height="90" rx="10" ry="10" fill="#64748B" stroke="#475569" stroke-width="2" class="outline" />
+    <circle cx="-375" cy="-88.12" r="5.5" fill="#FFFFFF" />
+    <path d="M-388,-67.62 A13,13 0 0 1 -362,-67.62 Z" fill="#FFFFFF" />
+    <text x="-375" y="-58.88" font-size="14" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-weight="600">Architect</text>
+    <text x="-375" y="-43.25" font-size="11" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" fill-opacity="0.8">Web browser</text>
+  </g>
+  <g class="element" data-id="c5a10a08" data-type="primaryActor">
+    <rect x="-460" y="20" width="170" height="90" rx="10" ry="10" fill="#64748B" stroke="#475569" stroke-width="2" class="outline" />
+    <circle cx="-375" cy="41.88" r="5.5" fill="#FFFFFF" />
+    <path d="M-388,62.38 A13,13 0 0 1 -362,62.38 Z" fill="#FFFFFF" />
+    <text x="-375" y="71.12" font-size="14" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" font-weight="600">Viewer</text>
+    <text x="-375" y="86.75" font-size="11" fill="#FFFFFF" text-anchor="middle" dominant-baseline="central" fill-opacity="0.8">Web browser (snapshot link)</text>
+  </g>
+  <g class="element" data-id="c5a10a0a" data-type="externalSystem">
+    <rect x="260" y="-330" width="170" height="90" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2" class="outline" />
+    <text x="345" y="-291.88" font-size="14" fill="#1E293B" text-anchor="middle" dominant-baseline="central" font-weight="600">Clipboard</text>
+    <text x="345" y="-276.25" font-size="11" fill="#1E293B" text-anchor="middle" dominant-baseline="central" fill-opacity="0.8">Browser Clipboard API</text>
+  </g>
+  <g class="element" data-id="c5a10a05" data-type="storage">
+    <g>
+      <path d="M260,-138 A85,12 0 0 1 430,-138 L430,-72 A85,12 0 0 1 260,-72 Z" fill="#CBD5E1" stroke="#475569" stroke-width="2" class="outline" />
+      <path d="M260,-138 A85,12 0 0 0 430,-138" fill="none" stroke="#475569" stroke-width="2" />
+    </g>
+    <text x="345" y="-112.75" font-size="14" fill="#1E293B" text-anchor="middle" dominant-baseline="central" font-weight="600">Project Files</text>
+    <text x="345" y="-97.12" font-size="11" fill="#1E293B" text-anchor="middle" dominant-baseline="central" fill-opacity="0.8">Local files (.motifsketch.json,</text>
+    <text x="345" y="-83.38" font-size="11" fill="#1E293B" text-anchor="middle" dominant-baseline="central" fill-opacity="0.8">saved in place or…</text>
+  </g>
+  <g class="element" data-id="c5a10a06" data-type="storage">
+    <g>
+      <path d="M260,-8 A85,12 0 0 1 430,-8 L430,58 A85,12 0 0 1 260,58 Z" fill="#CBD5E1" stroke="#475569" stroke-width="2" class="outline" />
+      <path d="M260,-8 A85,12 0 0 0 430,-8" fill="none" stroke="#475569" stroke-width="2" />
+    </g>
+    <text x="345" y="24.12" font-size="14" fill="#1E293B" text-anchor="middle" dominant-baseline="central" font-weight="600">Browser Storage</text>
+    <text x="345" y="39.75" font-size="11" fill="#1E293B" text-anchor="middle" dominant-baseline="central" fill-opacity="0.8">IndexedDB</text>
+  </g>
+  <g class="element" data-id="c5a10a07" data-type="storage">
+    <g>
+      <path d="M260,122 A85,12 0 0 1 430,122 L430,188 A85,12 0 0 1 260,188 Z" fill="#CBD5E1" stroke="#475569" stroke-width="2" class="outline" />
+      <path d="M260,122 A85,12 0 0 0 430,122" fill="none" stroke="#475569" stroke-width="2" />
+    </g>
+    <text x="345" y="147.25" font-size="14" fill="#1E293B" text-anchor="middle" dominant-baseline="central" font-weight="600">Diagram Exports</text>
+    <text x="345" y="162.88" font-size="11" fill="#1E293B" text-anchor="middle" dominant-baseline="central" fill-opacity="0.8">Local files (SVG, saved or</text>
+    <text x="345" y="176.62" font-size="11" fill="#1E293B" text-anchor="middle" dominant-baseline="central" fill-opacity="0.8">downloaded)</text>
+  </g>
+  <g class="element" data-id="c5a10a09" data-type="storage">
+    <g>
+      <path d="M260,252 A85,12 0 0 1 430,252 L430,318 A85,12 0 0 1 260,318 Z" fill="#CBD5E1" stroke="#475569" stroke-width="2" class="outline" />
+      <path d="M260,252 A85,12 0 0 0 430,252" fill="none" stroke="#475569" stroke-width="2" />
+    </g>
+    <text x="345" y="277.25" font-size="14" fill="#1E293B" text-anchor="middle" dominant-baseline="central" font-weight="600">Solution Plans</text>
+    <text x="345" y="292.88" font-size="11" fill="#1E293B" text-anchor="middle" dominant-baseline="central" fill-opacity="0.8">Local files (Markdown, saved</text>
+    <text x="345" y="306.62" font-size="11" fill="#1E293B" text-anchor="middle" dominant-baseline="central" fill-opacity="0.8">or downloaded)</text>
+  </g>
+</svg>
