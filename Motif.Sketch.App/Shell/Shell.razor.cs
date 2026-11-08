@@ -22,7 +22,8 @@ public partial class Shell
     private string layout = "context";
     private double split = 50;
     private int fitKey;
-    private bool showWelcome;
+    private bool welcomeDismissed;
+    private bool viewingExample;
     private string active = "context";
     private ExportCheck? exportCheck;
     private bool selectSystem;
@@ -38,6 +39,9 @@ public partial class Shell
     private string EffectiveLayout => narrow && layout == "split" ? (active == "sketch" ? "sketch" : "context") : layout;
 
     private string ModeClass => (ReadOnlyUi ? "mode-viewer" : "mode-edit") + (narrow ? " narrow" : "") + (phone ? " phone" : "");
+
+    /// <summary>The welcome card shows whenever editable work is empty, until it's dismissed for good.</summary>
+    private bool ShowWelcome => started && Editable && App.IsEmpty && !welcomeDismissed;
 
     private string PageTitle =>
         (App.HasUnsavedChanges && App.Mode == AppMode.Architect ? "• " : "") + App.Title + " · Motif Sketch";
@@ -56,14 +60,13 @@ public partial class Shell
             Ui.Changed += Refresh;
             App.Changed += OnAppChanged;
 
-            var result = await App.Start(Browser.Fragment());
+            welcomeDismissed = Browser.Preference(WelcomeDismissed) == "1";
+            // A phone can't edit, so empty work there would show nothing useful: it gets the example instead.
+            var result = await App.Start(Browser.Fragment(), exampleIfEmpty: phone);
             started = true;
+            viewingExample = result.StartedAs == StartedAs.Example;
             if (result.Problem is { } problem) Ui.Problem("That link can't be opened", [problem, "Here is your own work instead."]);
-            if (result.StartedAs == StartedAs.Fresh)
-            {
-                showWelcome = Browser.Preference(WelcomeDismissed) != "1";
-                selectSystem = !phone;
-            }
+            if (result.StartedAs == StartedAs.Fresh) selectSystem = !phone;
             if (result.StartedAs == StartedAs.OtherTab)
                 Ui.Say("Motif Sketch is open in another tab", "This tab is read-only. Use this tab instead to edit here.");
             layout = App.HasSketch && !narrow ? "split" : "context";
@@ -202,11 +205,9 @@ public partial class Shell
 
     private void DismissWelcome()
     {
-        showWelcome = false;
+        welcomeDismissed = true;
         Browser.SetPreference(WelcomeDismissed, "1");
     }
-
-    private void ElementAdded() => showWelcome = false;
 
     private void SketchStarted()
     {
@@ -240,7 +241,6 @@ public partial class Shell
         var outcome = await App.Open();
         if (outcome.Cancelled) return;
         if (!outcome.Succeeded) { Ui.Problem("That file can't be opened", outcome.Problems); return; }
-        showWelcome = false;
         layout = App.HasSketch && !narrow ? "split" : "context";
         fitKey++;
     }
@@ -249,7 +249,6 @@ public partial class Shell
     {
         if (!await MayDiscard("The example")) return;
         await App.OpenExample();
-        showWelcome = false;
         layout = narrow ? "context" : "split";
         fitKey++;
         Ui.Say("This is Motif Sketch's own design", "It's ordinary unsaved work: change it, or save it as a file of your own.");
@@ -275,6 +274,7 @@ public partial class Shell
                 "The copy replaces the work autosaved in this browser. Save that to a file first if you want to keep it.",
                 "Make a copy")) return;
         await App.MakeCopyToEdit();
+        viewingExample = false;
         Browser.ClearFragment();
         Ui.Say("This is now your own work", "It autosaves in this browser. Save it to a file to keep it.");
     }

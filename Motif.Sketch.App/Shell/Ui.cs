@@ -78,7 +78,8 @@ public sealed class Ui
 
     private async Task Expire(Toast toast)
     {
-        await Task.Delay(toast.Kind == ToastKind.Info ? 3500 : 9000);
+        // A one-line "done" note can go quickly; anything with a sentence to read stays long enough to read it.
+        await Task.Delay(toast.Kind == ToastKind.Info && toast.Lines.Count == 0 ? 3500 : 10000);
         Dismiss(toast.Id);
     }
 }

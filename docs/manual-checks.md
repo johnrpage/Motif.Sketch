@@ -46,5 +46,8 @@ published site after the workflow deploys it.
 
 - [ ] Tablet (or touch emulation): drag, pinch to zoom, tap and hold to rename.
 - [ ] Phone width (under 600px): read-only with a note; snapshot links read well.
+- [ ] Phone width with no autosaved work (or only the system): opens the example read-only, with the example banner.
+- [ ] `#example` on a computer: the example read-only, "Example · read-only", Make a copy to edit works.
+- [ ] Empty work on a computer (fresh, or after New): the welcome card shows until dismissed; once dismissed it never returns.
 - [ ] Theme menu: System / Light / Dark, remembered after a reload.
 - [ ] Open example shows Motif Sketch's own design.

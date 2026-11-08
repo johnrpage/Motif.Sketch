@@ -20,6 +20,8 @@ public enum StartedAs
     Snapshot,
     /// <summary>The app is open in another tab, which owns autosave; this tab is read-only.</summary>
     OtherTab,
+    /// <summary>The bundled example, read-only like a snapshot: from an <c>#example</c> link, or instead of empty work.</summary>
+    Example,
 }
 
 /// <param name="Problem">Why a link couldn't be opened, if one was given and was bad.</param>
@@ -34,8 +36,12 @@ public sealed record LinkOutcome(bool Succeeded, string? Link, bool IsLong, stri
 /// </remarks>
 public interface UserTasks
 {
-    /// <summary>Starts the app: a snapshot link if the fragment holds one, else the autosaved work, else a blank project.</summary>
-    Task<StartResult> Start(string? fragment);
+    /// <summary>
+    /// Starts the app: the example for an <c>#example</c> link, a snapshot link if the fragment holds one,
+    /// else the autosaved work, else a blank project. With <paramref name="exampleIfEmpty"/> (a phone, which
+    /// can't edit), the example is shown read-only instead of a blank or empty project.
+    /// </summary>
+    Task<StartResult> Start(string? fragment, bool exampleIfEmpty = false);
 
     Task NewProject();
     Task<Outcome> Open();

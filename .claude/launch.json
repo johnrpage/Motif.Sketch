@@ -6,6 +6,13 @@
       "runtimeExecutable": "dotnet",
       "runtimeArgs": ["run", "--project", "Motif.Sketch.App", "--launch-profile", "http"],
       "port": 5173
+    },
+    {
+      "name": "motif-sketch-alt",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "Motif.Sketch.App", "--no-launch-profile", "--urls", "http://localhost:5180"],
+      "port": 5180,
+      "autoPort": false
     }
   ]
 }

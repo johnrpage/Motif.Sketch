@@ -23,6 +23,8 @@ public interface UserQueries
     bool IsReadOnly { get; }
 
     string Title { get; }
+    /// <summary>Nothing but the system: no other elements and no sketch.</summary>
+    bool IsEmpty { get; }
     /// <summary>The file the project was last opened from or saved to; null if never saved.</summary>
     string? FileName { get; }
     bool HasUnsavedChanges { get; }

@@ -52,7 +52,7 @@
             <span class="title static"><span class="text">@App.Title</span></span>
             @if (App.Mode == AppMode.Viewer)
             {
-                <span class="pill">@Icons.Eye<span class="long">Shared snapshot · </span>read-only</span>
+                <span class="pill">@Icons.Eye<span class="long">@(viewingExample ? "Example" : "Shared snapshot") · </span>read-only</span>
             }
             else if (App.Mode == AppMode.OtherTab)
             {
@@ -145,6 +145,12 @@
     {
         <div class="banner">Motif Sketch is open in another tab, so this one is read-only and doesn't autosave. <button class="link" @onclick="UseThisTab">Use this tab instead</button></div>
     }
+    else if (viewingExample && App.Mode == AppMode.Viewer)
+    {
+        <div class="banner">@(phone
+            ? "This is the example: Motif Sketch's own design. Look around and export; editing needs a tablet or computer."
+            : "This is the example: Motif Sketch's own design, read-only. Make a copy to edit it.")</div>
+    }
     else if (phone && App.Mode == AppMode.Architect)
     {
         <div class="banner">Editing needs a bigger screen. You can look around, export, and open this on a tablet or computer to edit.</div>
@@ -152,10 +158,10 @@
 
     <main class="work s-@EffectiveLayout" style="--left: @Format.N(split)%" @ref="work">
         <ContextPane @ref="contextPane" ReadOnly="ReadOnlyUi" Collapsed="@(EffectiveLayout == "sketch")" FitKey="fitKey"
-                     ShowWelcome="showWelcome" ExpandHint="@(narrow ? "Click to show" : "Click to show side by side")"
+                     ShowWelcome="ShowWelcome" ExpandHint="@(narrow ? "Click to show" : "Click to show side by side")"
                      OnExpand="@(() => SetLayout(narrow ? "context" : "split"))" OnMaximise="@(() => SetLayout(EffectiveLayout == "context" ? (narrow ? "context" : "split") : "context"))"
                      OnDismissWelcome="DismissWelcome" OnOpenExample="OpenExample" OnOpenFile="Open"
-                     OnActivate="@(() => active = "context")" OnElementAdded="ElementAdded" />
+                     OnActivate="@(() => active = "context")" />
         <div class="divider" title="Drag to resize" @onpointerdown="StartResize" @onpointermove="Resize" @onpointerup="EndResize" @ref="divider"></div>
         <SketchPane @ref="sketchPane" ReadOnly="ReadOnlyUi" Collapsed="@(EffectiveLayout == "context")" FitKey="fitKey"
                     ExpandHint="@(narrow ? "Click to show" : "Click to show side by side")"

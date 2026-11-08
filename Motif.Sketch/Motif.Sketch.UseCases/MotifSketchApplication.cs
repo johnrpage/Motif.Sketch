@@ -44,6 +44,7 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
     public AppMode Mode { get; private set; } = AppMode.Architect;
     public bool IsReadOnly => Mode != AppMode.Architect;
     public string Title => project.Title;
+    public bool IsEmpty => IsEmptyProject(project);
     public string? FileName { get; private set; }
     public bool HasUnsavedChanges => version != savedVersion;
     public bool CanSaveInPlace => projects.CanSaveInPlace;
@@ -75,8 +76,11 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
 
     // ---- Starting, files and autosave --------------------------------------------------------
 
-    public async Task<StartResult> Start(string? fragment)
+    public async Task<StartResult> Start(string? fragment, bool exampleIfEmpty = false)
     {
+        // Like a snapshot, the example opened this way never touches autosave.
+        if (Example.IsLink(fragment)) return StartExample();
+
         string? linkProblem = null;
         if (SnapshotLink.IsSnapshot(fragment))
         {
@@ -91,6 +95,8 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
             linkProblem = snapshot.Problem;
         }
 
+        if (exampleIfEmpty && linkProblem is null && await AutosaveIsEmpty()) return StartExample();
+
         ownsAutosave = await autosave.Claim();
         var restored = await RestoreAutosave();
         Mode = ownsAutosave ? AppMode.Architect : AppMode.OtherTab;
@@ -100,6 +106,29 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
             !ownsAutosave ? StartedAs.OtherTab : restored ? StartedAs.Restored : StartedAs.Fresh,
             linkProblem);
     }
+
+    private StartResult StartExample()
+    {
+        Mode = AppMode.Viewer;
+        Begin(Example.Project(), fileName: null, handle: null, saved: true);
+        return new StartResult(StartedAs.Example);
+    }
+
+    /// <summary>True if there's no autosaved work, or it's unreadable, or it's only the system.</summary>
+    private async Task<bool> AutosaveIsEmpty()
+    {
+        try
+        {
+            var work = await autosave.Restore();
+            return work is null || ProjectJson.Load(work.Json).Project is not { } restored || IsEmptyProject(restored);
+        }
+        catch (Exception)
+        {
+            return true;
+        }
+    }
+
+    private static bool IsEmptyProject(Project p) => p.ContextDiagram.Elements.Count == 1 && p.Sketch is null;
 
     public Task NewProject()
     {
