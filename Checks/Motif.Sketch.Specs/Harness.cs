@@ -10,12 +10,14 @@ public sealed class Harness
     public FakeDiagramExports DiagramExports { get; } = new();
     public FakeSolutionStubs SolutionStubs { get; } = new();
     public FakeClipboard Clipboard { get; } = new();
+    public FakeRepos Repos { get; } = new();
+    public FakeGlossaries Glossaries { get; } = new();
 
     public MotifSketchApplication App { get; }
     public UserTasks Tasks => App;
     public UserQueries Queries => App;
 
-    public Harness() => App = new MotifSketchApplication(Projects, Autosave, DiagramExports, SolutionStubs, Clipboard);
+    public Harness() => App = new MotifSketchApplication(Projects, Autosave, DiagramExports, SolutionStubs, Clipboard, Repos, Glossaries);
 
     /// <summary>A started app with a blank project.</summary>
     public static async Task<Harness> Started(string? fragment = null)

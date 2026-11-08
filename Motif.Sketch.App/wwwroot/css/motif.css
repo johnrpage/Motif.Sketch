@@ -119,6 +119,8 @@ code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .92em; colo
 .menu-list .note { padding: 6px 10px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); margin-top: 4px; white-space: normal; max-width: 320px; }
 .menu-list .note b { color: var(--accent); font-weight: 500; }
 .menu-list .note.problem b { color: var(--problem); }
+.menu-list .note.project { border-top: 0; border-bottom: 1px solid var(--line); margin: 0 0 4px; }
+.menu-list .note.project b { color: var(--ink); font-weight: 600; }
 .menu-list .note ul { margin: 4px 0 0; padding-left: 16px; }
 .menu-list .note a { display: inline; padding: 0; color: var(--muted); text-decoration: underline; text-decoration-color: var(--line-strong); }
 .menu-list .note a:hover { background: none; color: var(--ink); }

@@ -22,7 +22,7 @@ public sealed class Exporting
         doc.Root!.Name.Should().Be(Svg + "svg");
         doc.Descendants(Svg + "g").Where(g => (string?)g.Attribute("class") == "element").Select(g => (string?)g.Attribute("data-id"))
             .Should().BeEquivalentTo(h.Queries.Context.Elements.Select(e => e.Id));
-        doc.Descendants(Svg + "g").Count(g => (string?)g.Attribute("class") == "relationship").Should().Be(7);
+        doc.Descendants(Svg + "g").Count(g => (string?)g.Attribute("class") == "relationship").Should().Be(9);
         doc.Descendants(Svg + "text").Select(t => t.Value).Should().Contain(["Architect", "Browser Storage"]);
     }
 
@@ -54,9 +54,9 @@ public sealed class Exporting
         await h.Tasks.ExportSketch();
 
         var doc = Parse(h.DiagramExports.Written.Single().Svg);
-        doc.Descendants(Svg + "g").Where(g => (string?)g.Attribute("class") == "port").Should().HaveCount(6);
+        doc.Descendants(Svg + "g").Where(g => (string?)g.Attribute("class") == "port").Should().HaveCount(8);
         var adapters = doc.Descendants(Svg + "g").Where(g => (string?)g.Attribute("class") == "adapter").ToList();
-        adapters.Should().HaveCount(12);
+        adapters.Should().HaveCount(16);
         var specs = adapters.Single(a => (string?)a.Attribute("data-kind") == "checks").Element(Svg + "rect")!;
         ((string?)specs.Attribute("fill")).Should().Be("#E2E8F0");
         specs.Attribute("stroke-dasharray").Should().BeNull();
@@ -103,7 +103,7 @@ public sealed class Exporting
 
         outcome.Succeeded.Should().BeTrue();
         outcome.Warnings.Should().ContainSingle();
-        h.SolutionStubs.Written.Single().Markdown.Should().Contain("- Viewer (primary actor, Web browser (snapshot link))");
+        h.SolutionStubs.Written.Single().Markdown.Should().Contain("- Viewer (primary actor, Web browser (snapshot or repo link))");
     }
 
     [Theory]

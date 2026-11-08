@@ -181,6 +181,10 @@ Every edit in either view is one undo step: Ctrl+Z / Ctrl+Y. There is one histor
   - A fake class is `Fake<Port>`. A real adapter's class is `<AdapterName><Port>`, unless the adapter name only repeats the port name, in which case the technology is used instead.
 - Both exports warn, but still allow it, when items are unplaced. The plan lists them under "Not placed". Plan problems block the plan export: name clashes, unusable names, or reserved names.
 - Exports use the same File System Access / download behaviour as projects.
+- **Export glossary** writes entries for the project's glossary (`motif/glossary.md`, in the [Motif Glossary format](https://github.com/motif-dotnet/.github/blob/main/design/glossary.md)) through the Glossaries port: one per actor, external system, storage and port, marked *proposed*, with its kind, its description as the definition and its **Sketch** id. An element and a port with the same name share one entry with two kinds and two ids. The system itself, adapters and domain concepts aren't written: people add those.
+  - **Into an existing glossary** (the usual case): the user picks the file, and only terms it doesn't have yet are added. A term is already there when a term's **Sketch** field has one of its ids, or a term has its name. New terms go before the first heading that sorts after them, so an alphabetical glossary stays alphabetical, and every other line, its line endings included, is left exactly as it was. Renames are left to people: a renamed element whose id is still in the glossary counts as already there. If nothing is new, the file isn't written. Edge and Chrome write back to the same file; other browsers download the merged copy.
+  - **A new glossary**: `glossary.md` with a title, a short introduction and every entry.
+  - It works in Viewer mode too, like the other exports.
 
 ### 5.8 Sharing (snapshot links)
 
@@ -194,6 +198,7 @@ Every edit in either view is one undo step: Ctrl+Z / Ctrl+Y. There is one histor
   - Viewer mode **never touches autosave**, so it can't overwrite the visitor's own work.
   - The viewer can **Make a copy to edit**, which turns it into ordinary work and replaces their autosave after asking.
 - Opening a malformed or old-version link shows a friendly error.
+- **Opening a repo link**, `…/Motif.Sketch/#repo=owner/name`, reads that public GitHub repo's `motif/sketch.motifsketch.json` from its default branch through the Repos port, and shows it in Viewer mode, labelled with the repo. Make a copy to edit works as for a snapshot, and the copy is no longer tied to the repo. A repo with no sketch file, a private one (GitHub can't tell them apart without sign-in), one GitHub can't be reached for, or a file that isn't a sketch shows a friendly error, then the visitor's own work. Every Motif tool accepts the same link, and the tool switcher carries it across, so moving to Motif Glossary opens the same repo's glossary.
 
 ### 5.9 Example
 

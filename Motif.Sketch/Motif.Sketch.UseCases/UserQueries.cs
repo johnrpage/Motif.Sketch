@@ -22,6 +22,9 @@ public interface UserQueries
     AppMode Mode { get; }
     bool IsReadOnly { get; }
 
+    /// <summary>The public GitHub repo whose sketch is on screen, when it was opened from a <c>#repo=</c> link.</summary>
+    RepoName? Repo { get; }
+
     string Title { get; }
     /// <summary>Nothing but the system: no other elements and no sketch.</summary>
     bool IsEmpty { get; }

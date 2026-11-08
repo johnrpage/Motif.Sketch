@@ -19,6 +19,8 @@
     <ProjectReference Include="..\Adapters\Motif.Sketch.DiagramExports\Motif.Sketch.DiagramExports.csproj" />
     <ProjectReference Include="..\Adapters\Motif.Sketch.SolutionStubs\Motif.Sketch.SolutionStubs.csproj" />
     <ProjectReference Include="..\Adapters\Motif.Sketch.Clipboard\Motif.Sketch.Clipboard.csproj" />
+    <ProjectReference Include="..\Adapters\Motif.Sketch.Repos\Motif.Sketch.Repos.csproj" />
+    <ProjectReference Include="..\Adapters\Motif.Sketch.Glossaries\Motif.Sketch.Glossaries.csproj" />
   </ItemGroup>
 
 </Project>

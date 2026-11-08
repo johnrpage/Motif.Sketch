@@ -28,8 +28,8 @@
         "id": "c5a10a08",
         "type": "primaryActor",
         "name": "Viewer",
-        "description": "Opens a diagram someone shared, read-only",
-        "technology": "Web browser (snapshot link)",
+        "description": "Opens a diagram someone shared, or a repo's sketch, read-only",
+        "technology": "Web browser (snapshot or repo link)",
         "x": -375,
         "y": 65,
         "pinned": false
@@ -41,7 +41,7 @@
         "description": "Where Copy link puts a snapshot link, ready to paste",
         "technology": "Browser Clipboard API",
         "x": 345,
-        "y": -285,
+        "y": -415,
         "pinned": false
       },
       {
@@ -82,6 +82,26 @@
         "technology": "Local files (Markdown, saved or downloaded)",
         "x": 345,
         "y": 285,
+        "pinned": false
+      },
+      {
+        "id": "c5a10a0b",
+        "type": "storage",
+        "name": "Glossary Files",
+        "description": "The project's glossary, motif/glossary.md, which Export glossary adds the sketch's terms to",
+        "technology": "Local files (Markdown, saved in place or downloaded)",
+        "x": 345,
+        "y": 415,
+        "pinned": false
+      },
+      {
+        "id": "c5a10a0c",
+        "type": "externalSystem",
+        "name": "GitHub",
+        "description": "Public repos, whose motif/ folder holds a project's sketch",
+        "technology": "raw.githubusercontent.com",
+        "x": 345,
+        "y": -285,
         "pinned": false
       }
     ],
@@ -134,6 +154,20 @@
         "to": "c5a10a0a",
         "label": "Copies share links",
         "direction": "oneWay"
+      },
+      {
+        "id": "c5a10b0a",
+        "from": "c5a10a01",
+        "to": "c5a10a0b",
+        "label": "Adds terms to the glossary",
+        "direction": "oneWay"
+      },
+      {
+        "id": "c5a10b0b",
+        "from": "c5a10a01",
+        "to": "c5a10a0c",
+        "label": "Reads a repo's sketch",
+        "direction": "oneWay"
       }
     ]
   },
@@ -149,7 +183,7 @@
             "id": "d6b20d01",
             "name": "Web App",
             "technology": "Blazor WebAssembly UI",
-            "description": "One app for the Architect (full editing) and the Viewer (read-only, opened from a snapshot link)",
+            "description": "One app for the Architect (full editing) and the Viewer (read-only, opened from a snapshot link or a repo link)",
             "kind": "real",
             "sources": [
               "c5a10a02",
@@ -286,6 +320,56 @@
           {
             "id": "d6b20d13",
             "name": "Fake Clipboard",
+            "kind": "fake",
+            "sources": []
+          }
+        ]
+      },
+      {
+        "id": "d6b20c07",
+        "name": "Repos",
+        "description": "Reads a public GitHub repo's sketch from its default branch",
+        "side": "driven",
+        "isUser": false,
+        "adapters": [
+          {
+            "id": "d6b20d14",
+            "name": "GitHub",
+            "technology": "raw.githubusercontent.com (HttpClient)",
+            "description": "Public repos, whose motif/ folder holds a project's sketch",
+            "kind": "real",
+            "sources": [
+              "c5a10a0c"
+            ]
+          },
+          {
+            "id": "d6b20d15",
+            "name": "Fake Repos",
+            "kind": "fake",
+            "sources": []
+          }
+        ]
+      },
+      {
+        "id": "d6b20c08",
+        "name": "Glossaries",
+        "description": "Opens the project's glossary and writes it back with the sketch's new terms",
+        "side": "driven",
+        "isUser": false,
+        "adapters": [
+          {
+            "id": "d6b20d16",
+            "name": "Browser Files",
+            "technology": "File System Access API, download fallback",
+            "description": "The project's glossary, motif/glossary.md, which Export glossary adds the sketch's terms to",
+            "kind": "real",
+            "sources": [
+              "c5a10a0b"
+            ]
+          },
+          {
+            "id": "d6b20d17",
+            "name": "Fake Glossaries",
             "kind": "fake",
             "sources": []
           }

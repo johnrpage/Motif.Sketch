@@ -12,6 +12,7 @@ public partial class Shell
     private const string WelcomeDismissed = "motif-welcome-dismissed";
 
     [Inject] private BrowserFilesProjects Files { get; set; } = default!;
+    [Inject] private BrowserFilesGlossaries Glossaries { get; set; } = default!;
 
     private DotNetObjectReference<Shell>? self;
     private bool started;
@@ -33,6 +34,7 @@ public partial class Shell
     private ElementReference work, divider;
     private long? resizing;
     private string? manualLink;
+    private bool glossaryDialog;
 
     private bool ReadOnlyUi => App.IsReadOnly || phone;
     private bool Editable => !ReadOnlyUi;
@@ -58,6 +60,7 @@ public partial class Shell
             (phone, narrow) = (viewport[0], viewport[1]);
             Browser.ListenForKeys(self);
             await Files.Detect();
+            await Glossaries.Detect();
             Ui.Changed += Refresh;
             App.Changed += OnAppChanged;
 
@@ -115,6 +118,7 @@ public partial class Shell
         {
             case "Escape":
                 if (Ui.Pending is not null) Ui.Answer(false);
+                else if (glossaryDialog) glossaryDialog = false;
                 else if (menu is not null || helpOpen) { menu = null; helpOpen = false; }
                 else { contextPane?.Clear(); sketchPane?.Clear(); }
                 break;
@@ -318,6 +322,32 @@ public partial class Shell
     {
         menu = null;
         Ui.Report(await App.ExportPlan(), "Solution plan exported", "The plan can't be exported yet");
+    }
+
+    private void ShowGlossaryExport()
+    {
+        menu = null;
+        glossaryDialog = true;
+    }
+
+    private async Task ExportGlossary(bool intoExisting)
+    {
+        glossaryDialog = false;
+        var outcome = await App.ExportGlossary(intoExisting);
+        if (outcome.Cancelled) return;
+        if (!outcome.Succeeded) { Ui.Problem("The glossary couldn't be exported", [outcome.Problem!]); return; }
+
+        var name = outcome.FileName;
+        var n = outcome.Added.Count;
+        var terms = n == 1 ? "1 term" : $"{n} terms";
+        if (intoExisting && n == 0)
+            Ui.Say($"{name} already has every term", "Nothing in it was changed.");
+        else if (intoExisting)
+            Ui.Say(Glossaries.CanSaveInPlace ? $"Added {terms} to {name}" : $"Downloaded {name} with {terms} added",
+                string.Join(", ", outcome.Added) + ", marked proposed.");
+        else
+            Ui.Say(Glossaries.CanSaveInPlace ? $"Saved {name}" : $"Downloaded {name}",
+                $"{terms} from the sketch, marked proposed. Put it in the repo's motif/ folder.");
     }
 
     public void Dispose()

@@ -11,7 +11,7 @@
 {
 <div class="app @ModeClass" @onclick="CloseMenus">
     <header class="appbar">
-        <ToolSwitcher Current="sketch" Open="@(menu == "tools")" OnToggle="@(() => Toggle("tools"))" />
+        <ToolSwitcher Current="sketch" Repo="@App.Repo?.ToString()" Open="@(menu == "tools")" OnToggle="@(() => Toggle("tools"))" />
 
         @if (Editable)
         {
@@ -52,7 +52,7 @@
             <span class="title static"><span class="text">@App.Title</span></span>
             @if (App.Mode == AppMode.Viewer)
             {
-                <span class="pill">@Icons.Eye<span class="long">@(viewingExample ? "Example" : "Shared snapshot") · </span>read-only</span>
+                <span class="pill">@Icons.Eye<span class="long">@(App.Repo is { } repo ? repo.ToString() : viewingExample ? "Example" : "Shared snapshot") · </span>read-only</span>
             }
             else if (App.Mode == AppMode.OtherTab)
             {
@@ -93,6 +93,7 @@
                     <button @onclick="ExportSketch">Ports and adapters <span class="code">SVG</span></button>
                     <button @onclick="ExportPlan" disabled="@(exportCheck?.PlanProblems.Count > 0)">Solution plan <span class="code">MD</span></button>
                 }
+                <button @onclick="ShowGlossaryExport">Glossary… <span class="code">MD</span></button>
                 @if (exportCheck is { } check)
                 {
                     @if (check.Unplaced.Count > 0)
@@ -133,6 +134,10 @@
     @if (App.Mode == AppMode.OtherTab)
     {
         <div class="banner">Motif Sketch is open in another tab, so this one is read-only and doesn't autosave. <button class="link" @onclick="UseThisTab">Use this tab instead</button></div>
+    }
+    else if (App.Repo is { } shown && App.Mode == AppMode.Viewer)
+    {
+        <div class="banner"><span>This is <b>@shown</b>'s sketch, read from <code>motif/sketch.motifsketch.json</code> on its default branch. It's read-only: make a copy to edit it, then save the file back into the repo.</span></div>
     }
     else if (viewingExample && App.Mode == AppMode.Viewer)
     {
@@ -184,6 +189,7 @@
                         <span class="code">Alt+1 / 2 / 3</span><span>Context, side by side, sketch</span>
                     </div>
                     <p class="help">Your work autosaves in this browser, but that's a safety net: save to a file to keep it. Copy link shares a read-only snapshot; everything after the # stays in the browser.</p>
+                    <p class="help">A link ending <code>#repo=owner/name</code> opens a public GitHub repo's <code>motif/sketch.motifsketch.json</code>, read-only, and the tool switcher keeps that repo when you move to Motif Glossary. Export glossary adds the sketch's terms to the project's <code>motif/glossary.md</code>.</p>
         </HelpDialog>
     }
 
@@ -197,6 +203,28 @@
                     <div class="field"><textarea id="manual-link" class="link-box" readonly @onfocus="@(() => Browser.Focus("#manual-link"))">@link</textarea></div>
                     <p class="help">It's a snapshot: later edits need a new link. Everything after the # stays in the browser.</p>
                     <div class="row end"><button class="ghost" @onclick="() => manualLink = null">Done</button></div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (glossaryDialog)
+    {
+        <div class="scrim" @onclick="() => glossaryDialog = false">
+            <div class="card dialog" role="dialog" aria-label="Export glossary" @onclick:stopPropagation="true">
+                <header><div class="t"><b>Export glossary</b><span>Terms for the sketch's actors, external systems, storage and ports</span></div>
+                    <button class="x" title="Close" @onclick="() => glossaryDialog = false">@SuiteIcons.Close</button></header>
+                <div class="body">
+                    <p>Pick the project's <code>motif/glossary.md</code> to add the terms it doesn't have yet, each marked <i>proposed</i>. Nothing already in it changes: a term counts as there when its <b>Sketch</b> id or its name is.</p>
+                    <p class="help">@(Glossaries.CanSaveInPlace
+                        ? "The glossary is saved back to the same file."
+                        : "This browser can't save in place, so the merged glossary downloads. Edge and Chrome save back to the same file.")
+                        No glossary yet? Start one with every term.</p>
+                    <div class="row end">
+                        <button class="ghost" @onclick="() => glossaryDialog = false">Cancel</button>
+                        <button class="ghost" @onclick="() => ExportGlossary(false)">New glossary.md</button>
+                        <button class="primary" @onclick="() => ExportGlossary(true)">Add to a glossary…</button>
+                    </div>
                 </div>
             </div>
         </div>

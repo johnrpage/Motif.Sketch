@@ -10,7 +10,7 @@ public sealed class TheExample
         h.Queries.Title.Should().Be("Motif Sketch");
         h.Queries.Should().BeEquivalentTo(new { HasUnsavedChanges = true, FileName = (string?)null, HasSketch = true });
         h.Queries.Sketch!.Ports.Select(p => p.Name).Should().Equal(
-            "User", "Projects", "Autosave", "Diagram Exports", "Solution Stubs", "Clipboard");
+            "User", "Projects", "Autosave", "Diagram Exports", "Solution Stubs", "Clipboard", "Repos", "Glossaries");
         h.Adapter("Web App").Sources.Select(s => s.Name).Should().Equal("Architect", "Viewer");
         h.Adapter("Specs").Kind.Should().Be(AdapterKind.Checks);
         h.Queries.Unplaced.Should().BeEmpty();

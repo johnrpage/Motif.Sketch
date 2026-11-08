@@ -9,9 +9,13 @@
         @SuiteIcons.Mark<span class="word"><span class="motif">Motif</span> <b>@Tools.Get(Current).Name</b></span>@SuiteIcons.Chevron
     </button>
     <div class="menu-list" role="menu">
+        @if (!string.IsNullOrEmpty(Repo))
+        {
+            <div class="note project">Each tool opens <b>@Repo</b>: its <code>motif/</code> folder on GitHub.</div>
+        }
         @foreach (var tool in Tools.All)
         {
-            <a class="tool-link" role="menuitem" href="@tool.Url" aria-current="@(tool.Id == Current ? "page" : null)">
+            <a class="tool-link" role="menuitem" href="@Tools.Link(tool, Repo)" aria-current="@(tool.Id == Current ? "page" : null)">
                 <b>Motif @tool.Name</b><span>@tool.Line</span>
             </a>
         }
@@ -22,6 +26,12 @@
 @code {
     /// <summary>This tool's id in <see cref="Tools.All"/>.</summary>
     [Parameter, EditorRequired] public string Current { get; set; } = "";
+
+    /// <summary>
+    /// The GitHub repo on screen ("owner/name"), if there is one. Every tool's link then carries it,
+    /// so switching tools stays on the same project.
+    /// </summary>
+    [Parameter] public string? Repo { get; set; }
 
     [Parameter] public bool Open { get; set; }
 

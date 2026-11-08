@@ -22,10 +22,23 @@ public enum StartedAs
     OtherTab,
     /// <summary>The bundled example, read-only like a snapshot: from an <c>#example</c> link, or instead of empty work.</summary>
     Example,
+    /// <summary>A public GitHub repo's sketch, from a <c>#repo=owner/name</c> link: read-only like a snapshot.</summary>
+    Repo,
 }
 
 /// <param name="Problem">Why a link couldn't be opened, if one was given and was bad.</param>
 public sealed record StartResult(StartedAs StartedAs, string? Problem = null);
+
+/// <summary>What Export glossary did.</summary>
+/// <param name="Added">The terms added, alphabetically. Empty on success means the glossary already had them all and wasn't written.</param>
+/// <param name="AlreadyThere">How many of the sketch's terms the glossary already had.</param>
+/// <param name="FileName">The glossary file read or written.</param>
+public sealed record GlossaryOutcome(
+    bool Succeeded, bool Cancelled, IReadOnlyList<string> Added, int AlreadyThere, string? FileName, string? Problem)
+{
+    public static GlossaryOutcome WasCancelled { get; } = new(false, true, [], 0, null, null);
+    public static GlossaryOutcome Failed(string problem) => new(false, false, [], 0, null, problem);
+}
 
 public sealed record LinkOutcome(bool Succeeded, string? Link, bool IsLong, string? Problem);
 
@@ -37,7 +50,8 @@ public sealed record LinkOutcome(bool Succeeded, string? Link, bool IsLong, stri
 public interface UserTasks
 {
     /// <summary>
-    /// Starts the app: the example for an <c>#example</c> link, a snapshot link if the fragment holds one,
+    /// Starts the app: the example for an <c>#example</c> link, a public repo's sketch for a
+    /// <c>#repo=owner/name</c> link, a snapshot link if the fragment holds one,
     /// else the autosaved work, else a blank project. With <paramref name="exampleIfEmpty"/> (a phone, which
     /// can't edit), the example is shown read-only instead of a blank or empty project.
     /// </summary>
@@ -58,6 +72,14 @@ public interface UserTasks
     Task<Outcome> ExportContextDiagram();
     Task<Outcome> ExportSketch();
     Task<Outcome> ExportPlan();
+
+    /// <summary>
+    /// Writes glossary entries for the sketch's actors, external systems, storage and ports. With
+    /// <paramref name="intoExisting"/> it asks for the project's glossary and adds only the terms it doesn't
+    /// have yet (by Sketch id, or by name), leaving everything people wrote as it was; otherwise it writes a
+    /// new glossary.md. Works read-only too, like the other exports.
+    /// </summary>
+    Task<GlossaryOutcome> ExportGlossary(bool intoExisting);
     Task<LinkOutcome> CopyLink(string pageUrl);
 
     void RenameProject(string title);

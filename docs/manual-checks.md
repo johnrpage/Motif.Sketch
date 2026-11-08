@@ -41,6 +41,8 @@ published site after the workflow deploys it.
 - [ ] Copy link, open it in another browser (or a private window): read-only, both views, Export works, Make a copy turns it into ordinary unsaved work and clears the link from the address bar.
 - [ ] Damage a link (cut its end off): a friendly error, then your own work.
 - [ ] If the browser refuses clipboard access, the link appears in a dialog to copy by hand.
+- [ ] Open `#repo=motif-dotnet/Motif.Sketch`: the repo's sketch, read-only, labelled with the repo and with a banner. The tool switcher says each tool opens that repo, and Motif Glossary opens its glossary. `#repo=someone/nothing-here`: a friendly error, then your own work.
+- [ ] Export → Glossary…, Add to a glossary…: pick a copy of `motif/glossary.md`. With nothing new it says so and the file is unchanged; after adding a storage element, the new term appears in alphabetical place, marked proposed, and `git diff` shows only added lines. New glossary.md writes a whole glossary. In Firefox both download.
 
 ## Devices and look
 

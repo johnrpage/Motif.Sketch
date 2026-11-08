@@ -8,7 +8,7 @@
 - **Purpose**: Sketch a context diagram, turn it into a ports-and-adapters sketch, then export the diagrams and a solution plan
 - **Solution**: `Motif.Sketch.sln`, targeting `net10.0`
 - **Architecture**: ports and adapters. The application core (Domain and UseCases) knows nothing about the outside world; every external concern sits behind a port and is reached through an adapter.
-- **Ports**: 1 driving, 5 driven
+- **Ports**: 1 driving, 7 driven
 
 ## 2. Solution and project layout
 
@@ -26,6 +26,8 @@ Motif.Sketch.sln
     Motif.Sketch.DiagramExports/
     Motif.Sketch.SolutionStubs/
     Motif.Sketch.Clipboard/
+    Motif.Sketch.Repos/
+    Motif.Sketch.Glossaries/
   Checks/
     Motif.Sketch.Fakes/
     Motif.Sketch.Specs/
@@ -41,6 +43,8 @@ Motif.Sketch.sln
 | `Motif.Sketch.DiagramExports` | `Adapters/Motif.Sketch.DiagramExports/` | `razorclasslib` | `Motif.Sketch.Adapters` | Adapters on the Diagram Exports port |
 | `Motif.Sketch.SolutionStubs` | `Adapters/Motif.Sketch.SolutionStubs/` | `razorclasslib` | `Motif.Sketch.Adapters` | Adapters on the Solution Stubs port |
 | `Motif.Sketch.Clipboard` | `Adapters/Motif.Sketch.Clipboard/` | `razorclasslib` | `Motif.Sketch.Adapters` | Adapters on the Clipboard port |
+| `Motif.Sketch.Repos` | `Adapters/Motif.Sketch.Repos/` | `razorclasslib` | `Motif.Sketch.Adapters` | Adapters on the Repos port |
+| `Motif.Sketch.Glossaries` | `Adapters/Motif.Sketch.Glossaries/` | `razorclasslib` | `Motif.Sketch.Adapters` | Adapters on the Glossaries port |
 | `Motif.Sketch.Fakes` | `Checks/Motif.Sketch.Fakes/` | `classlib` | `Motif.Sketch.Fakes` | Fake driven adapters, for specs |
 | `Motif.Sketch.Specs` | `Checks/Motif.Sketch.Specs/` | `xunit` | `Motif.Sketch.Specs` | Specs: the checks on every driving port |
 
@@ -56,6 +60,8 @@ Motif.Sketch.sln
 | `Motif.Sketch.DiagramExports` | `Motif.Sketch.UseCases` |
 | `Motif.Sketch.SolutionStubs` | `Motif.Sketch.UseCases` |
 | `Motif.Sketch.Clipboard` | `Motif.Sketch.UseCases` |
+| `Motif.Sketch.Repos` | `Motif.Sketch.UseCases` |
+| `Motif.Sketch.Glossaries` | `Motif.Sketch.UseCases` |
 | `Motif.Sketch.Fakes` | `Motif.Sketch.UseCases` |
 | `Motif.Sketch.Specs` | `Motif.Sketch.UseCases`, `Motif.Sketch.Fakes` |
 
@@ -90,6 +96,8 @@ Motif.Sketch.UseCases/
     DiagramExports.cs
     SolutionStubs.cs
     Clipboard.cs
+    Repos.cs
+    Glossaries.cs
 ```
 
 ### User (driving)
@@ -186,6 +194,34 @@ public interface Clipboard
 }
 ```
 
+### Repos (driven)
+
+Reads a public GitHub repo's sketch from its default branch
+
+`Ports/Repos.cs`:
+
+```csharp
+namespace Motif.Sketch;
+
+public interface Repos
+{
+}
+```
+
+### Glossaries (driven)
+
+Opens the project's glossary and writes it back with the sketch's new terms
+
+`Ports/Glossaries.cs`:
+
+```csharp
+namespace Motif.Sketch;
+
+public interface Glossaries
+{
+}
+```
+
 Also add one stub class, `MotifSketchApplication` in `Motif.Sketch.UseCases` (namespace `Motif.Sketch`), implementing the driving interfaces (`UserTasks`, `UserQueries`). It is the application itself; its constructor will later take the driven ports.
 
 ## 6. Adapters
@@ -206,6 +242,10 @@ Kinds: **Real** is the production adapter; **Fake** is a simple in-process stand
 | Solution Stubs | Fake Solution Stubs | Fake | - | `Motif.Sketch.Fakes` (`SolutionStubs/`) | `FakeSolutionStubs` | Added in the sketch |
 | Clipboard | Browser | Real | Browser Clipboard API (JS interop) | `Motif.Sketch.Clipboard` | `BrowserClipboard` | Context diagram: Clipboard |
 | Clipboard | Fake Clipboard | Fake | - | `Motif.Sketch.Fakes` (`Clipboard/`) | `FakeClipboard` | Added in the sketch |
+| Repos | GitHub | Real | raw.githubusercontent.com (HttpClient) | `Motif.Sketch.Repos` | `GitHubRepos` | Context diagram: GitHub |
+| Repos | Fake Repos | Fake | - | `Motif.Sketch.Fakes` (`Repos/`) | `FakeRepos` | Added in the sketch |
+| Glossaries | Browser Files | Real | File System Access API, download fallback | `Motif.Sketch.Glossaries` | `BrowserFilesGlossaries` | Context diagram: Glossary Files |
+| Glossaries | Fake Glossaries | Fake | - | `Motif.Sketch.Fakes` (`Glossaries/`) | `FakeGlossaries` | Added in the sketch |
 
 For each driven adapter, add the stub class named above implementing its port's interface, in its project's namespace and in the folder shown. For example:
 
@@ -221,20 +261,22 @@ Driving adapters (the app among them) keep their project template's default file
 
 Adapter notes:
 
-- **Web App** (`Motif.Sketch.App`): One app for the Architect (full editing) and the Viewer (read-only, opened from a snapshot link)
+- **Web App** (`Motif.Sketch.App`): One app for the Architect (full editing) and the Viewer (read-only, opened from a snapshot link or a repo link)
 - **Specs** (`Motif.Sketch.Specs`): Checks that drive the application through the User port, using the fake driven adapters
 - **Browser Files** (`Motif.Sketch.Projects`): Saved projects: one file per system holding the context diagram and, once started, its ports-and-adapters sketch
 - **IndexedDB** (`Motif.Sketch.Autosave`): Autosaved work in progress and its file handle, so a refresh or closed tab loses nothing and Save still goes to the same file
 - **SVG Files** (`Motif.Sketch.DiagramExports`): The context diagram and the ports-and-adapters sketch as pictures
 - **Markdown Plan** (`Motif.Sketch.SolutionStubs`): The solution stub plan a coding agent builds from
 - **Browser** (`Motif.Sketch.Clipboard`): Where Copy link puts a snapshot link, ready to paste
+- **GitHub** (`Motif.Sketch.Repos`): Public repos, whose motif/ folder holds a project's sketch
+- **Browser Files** (`Motif.Sketch.Glossaries`): The project's glossary, motif/glossary.md, which Export glossary adds the sketch's terms to
 
 ## 7. Fakes and specs
 
-- `Motif.Sketch.Fakes` (`Checks/Motif.Sketch.Fakes/`): every fake driven adapter, with a folder per port (`Projects/`, `Autosave/`, `DiagramExports/`, `SolutionStubs/`, `Clipboard/`). The namespace is flat: `Motif.Sketch.Fakes`.
+- `Motif.Sketch.Fakes` (`Checks/Motif.Sketch.Fakes/`): every fake driven adapter, with a folder per port (`Projects/`, `Autosave/`, `DiagramExports/`, `SolutionStubs/`, `Clipboard/`, `Repos/`, `Glossaries/`). The namespace is flat: `Motif.Sketch.Fakes`.
 - `Motif.Sketch.Specs` (`Checks/Motif.Sketch.Specs/`): xUnit. Packages: `Microsoft.NET.Test.Sdk`, `xunit`, `xunit.runner.visualstudio`, `coverlet.collector`, `AwesomeAssertions`. Keep the template's packages and add `AwesomeAssertions`.
   Add one placeholder spec class with a single passing `[Fact]`, so `dotnet test` runs. Specs wire the fake adapters up by hand; there is no composition root yet.
-- The browser adapters (`Motif.Sketch.Projects`, `Motif.Sketch.Autosave`, `Motif.Sketch.DiagramExports`, `Motif.Sketch.SolutionStubs`, `Motif.Sketch.Clipboard`) also take `Microsoft.JSInterop`: each reaches the browser through a small JS module it ships as a static web asset.
+- The browser adapters (`Motif.Sketch.Projects`, `Motif.Sketch.Autosave`, `Motif.Sketch.DiagramExports`, `Motif.Sketch.SolutionStubs`, `Motif.Sketch.Clipboard`, `Motif.Sketch.Repos`, `Motif.Sketch.Glossaries`) also take `Microsoft.JSInterop`: each reaches the browser through a small JS module it ships as a static web asset.
 - Use the latest stable package versions. Use AwesomeAssertions (`.Should()` style) in specs.
 
 ## 8. Not placed

@@ -19,4 +19,11 @@ public static class Tools
     ];
 
     public static Tool Get(string id) => All.First(t => t.Id == id);
+
+    /// <summary>
+    /// A link to the tool. With a repo ("owner/name") it opens that repo's <c>motif/</c> folder:
+    /// <c>#repo=owner/name</c> is how every Motif tool is told which project to show.
+    /// </summary>
+    public static string Link(Tool tool, string? repo) =>
+        string.IsNullOrEmpty(repo) ? tool.Url : $"{tool.Url}#repo={repo}";
 }

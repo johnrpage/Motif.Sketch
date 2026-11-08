@@ -25,7 +25,7 @@
 
   <ItemGroup>
     <!-- Golden files: the plan and diagrams in the repo's motif/ folder must match what the example exports. -->
-    <None Include="..\..\motif\plan.md;..\..\motif\diagrams\*.svg" LinkBase="Golden" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\motif\plan.md;..\..\motif\glossary.md;..\..\motif\diagrams\*.svg" LinkBase="Golden" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

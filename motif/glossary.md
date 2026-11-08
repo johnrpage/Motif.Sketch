@@ -121,6 +121,36 @@ A simple in-process stand-in for a real adapter, for fast specs. Named "Fake ⟨
 - **Avoid:** mock, stub (stub means something else here: see [Solution Stubs](#solution-stubs))
 - **In code:** `AdapterKind.Fake`; `Fake<Port>` classes in `Motif.Sketch.Fakes`
 
+## GitHub
+
+Where a project's repo lives. Motif Sketch reads a public repo's sketch from its default branch, through the Repos port, when it's opened from a repo link.
+
+- **Kind:** external system
+- **In code:** `GitHubRepos` (the adapter)
+- **Status:** proposed
+- **Sketch:** `c5a10a0c`
+- **See also:** [Repo link](#repo-link), [Repos](#repos)
+
+## Glossaries
+
+The port Export glossary goes through: it opens the project's glossary and writes it back with the terms the sketch adds.
+
+- **Kind:** port
+- **In code:** `Glossaries`, `GlossaryExport`
+- **Status:** proposed
+- **Sketch:** `d6b20c08`
+- **See also:** [Glossary Files](#glossary-files)
+
+## Glossary Files
+
+The project's glossary, `motif/glossary.md`. Export glossary adds an entry, marked *proposed*, for each actor, external system, storage and port in the sketch that it has no term for yet, found by **Sketch** id or name, and leaves everything else in the file as it was.
+
+- **Kind:** storage
+- **Avoid:** dictionary, vocabulary
+- **Status:** proposed
+- **Sketch:** `c5a10a0b`
+- **See also:** [Glossaries](#glossaries)
+
 ## Motif Sketch
 
 This app: the first tool in the Motif.NET suite. Also the system on its own context diagram.
@@ -202,6 +232,26 @@ The line joining an element to the system. Every element except the system has e
 - **Kind:** domain concept
 - **Avoid:** link (that's a snapshot link), edge, connection
 - **In code:** `Relationship`, `RelationshipDirection`
+
+## Repo link
+
+A link ending `#repo=owner/name`, naming a public GitHub repo. Every Motif tool opens that repo's `motif/` folder from it, and the tool switcher carries it from one tool to the next, so switching tools stays on the same project. Motif Sketch opens the repo's sketch in Viewer mode.
+
+- **Kind:** domain concept
+- **Avoid:** project link (a project is a file), share link
+- **In code:** `RepoLink`, `RepoName`
+- **Status:** proposed
+- **See also:** [GitHub](#github), [Snapshot link](#snapshot-link)
+
+## Repos
+
+The port that reads a public repo's sketch.
+
+- **Kind:** port
+- **In code:** `Repos`
+- **Status:** proposed
+- **Sketch:** `d6b20c07`
+- **See also:** [GitHub](#github)
 
 ## Secondary actor
 
@@ -300,7 +350,7 @@ The driving port people use. Always present in a sketch, and can't be deleted. I
 
 ## Viewer
 
-Someone who opens a snapshot link to look at a shared project, read-only. Also the read-only mode the app opens in for them, which never touches autosave.
+Someone who opens a snapshot link to look at a shared project, or a repo link to look at a repo's sketch, read-only. Also the read-only mode the app opens in for them, which never touches autosave.
 
 - **Kind:** actor
 - **Avoid:** reader, guest

@@ -14,12 +14,16 @@ builder.Services.AddSingleton<IndexedDBAutosave>();
 builder.Services.AddSingleton<SvgFilesDiagramExports>();
 builder.Services.AddSingleton<MarkdownPlanSolutionStubs>();
 builder.Services.AddSingleton<BrowserClipboard>();
+builder.Services.AddSingleton(_ => new GitHubRepos(new HttpClient()));
+builder.Services.AddSingleton<BrowserFilesGlossaries>();
 builder.Services.AddSingleton(sp => new MotifSketchApplication(
     sp.GetRequiredService<BrowserFilesProjects>(),
     sp.GetRequiredService<IndexedDBAutosave>(),
     sp.GetRequiredService<SvgFilesDiagramExports>(),
     sp.GetRequiredService<MarkdownPlanSolutionStubs>(),
-    sp.GetRequiredService<BrowserClipboard>()));
+    sp.GetRequiredService<BrowserClipboard>(),
+    sp.GetRequiredService<GitHubRepos>(),
+    sp.GetRequiredService<BrowserFilesGlossaries>()));
 builder.Services.AddSingleton<Browser>();
 builder.Services.AddSingleton<Ui>();
 

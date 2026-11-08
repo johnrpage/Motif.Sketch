@@ -14,6 +14,8 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
     private readonly DiagramExports diagramExports;
     private readonly SolutionStubs solutionStubs;
     private readonly Clipboard clipboard;
+    private readonly Repos repos;
+    private readonly Glossaries glossaries;
 
     private readonly LinkedList<(Project Project, int Version)> undo = new();
     private readonly Stack<(Project Project, int Version)> redo = new();
@@ -26,13 +28,16 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
     private Views? views;
 
     public MotifSketchApplication(
-        Projects projects, Autosave autosave, DiagramExports diagramExports, SolutionStubs solutionStubs, Clipboard clipboard)
+        Projects projects, Autosave autosave, DiagramExports diagramExports, SolutionStubs solutionStubs, Clipboard clipboard,
+        Repos repos, Glossaries glossaries)
     {
         this.projects = projects;
         this.autosave = autosave;
         this.diagramExports = diagramExports;
         this.solutionStubs = solutionStubs;
         this.clipboard = clipboard;
+        this.repos = repos;
+        this.glossaries = glossaries;
         project = Blank();
         autosave.Released += OnReleased;
     }
@@ -43,6 +48,7 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
 
     public AppMode Mode { get; private set; } = AppMode.Architect;
     public bool IsReadOnly => Mode != AppMode.Architect;
+    public RepoName? Repo { get; private set; }
     public string Title => project.Title;
     public bool IsEmpty => IsEmptyProject(project);
     public string? FileName { get; private set; }
@@ -82,7 +88,20 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
         if (Example.IsLink(fragment)) return StartExample();
 
         string? linkProblem = null;
-        if (SnapshotLink.IsSnapshot(fragment))
+        if (RepoLink.TryRead(fragment, out var repo))
+        {
+            var opened = await ReadRepo(repo);
+            if (opened.Project is { } fromRepo)
+            {
+                // Like a snapshot: read-only, and never touching autosave.
+                Mode = AppMode.Viewer;
+                Repo = repo;
+                Begin(fromRepo, fileName: null, handle: null, saved: true);
+                return new StartResult(StartedAs.Repo);
+            }
+            linkProblem = opened.Problem;
+        }
+        else if (SnapshotLink.IsSnapshot(fragment))
         {
             var snapshot = SnapshotLink.Read(fragment!);
             if (snapshot.Project is { } shared)
@@ -105,6 +124,26 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
         return new StartResult(
             !ownsAutosave ? StartedAs.OtherTab : restored ? StartedAs.Restored : StartedAs.Fresh,
             linkProblem);
+    }
+
+    private async Task<(Project? Project, string? Problem)> ReadRepo(RepoName repo)
+    {
+        string? text;
+        try
+        {
+            text = await repos.ReadSketch(repo);
+        }
+        catch (Exception e)
+        {
+            return (null, $"GitHub couldn't be reached to read {repo}: {e.Message}");
+        }
+        if (text is null)
+            return (null, $"{repo} has no {RepoLink.SketchPath} on its default branch, or it isn't a public repo.");
+        var loaded = ProjectJson.Load(text);
+        if (loaded.Project is not { } read)
+            return (null, $"{repo}'s {RepoLink.SketchPath} isn't a sketch Motif Sketch can open: {string.Join(" ", loaded.Problems)}");
+        if (loaded.NeedsLayout) ContextLayout.Apply(read.ContextDiagram);
+        return (read, null);
     }
 
     private StartResult StartExample()
@@ -204,6 +243,7 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
             ownsAutosave = true;
         }
         Mode = AppMode.Architect;
+        Repo = null;
         FileName = null;
         fileHandle = null;
         savedVersion = -1;
@@ -279,6 +319,40 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
         if (plan.Problems.Count > 0) return Task.FromResult(Outcome.Failed(plan.Problems));
         var markdown = PlanMarkdown.Write(plan);
         return Export(() => solutionStubs.Write(SuggestedName(" - plan.md"), markdown), plan.Warnings);
+    }
+
+    public async Task<GlossaryOutcome> ExportGlossary(bool intoExisting)
+    {
+        OpenedFile? existing = null;
+        if (intoExisting)
+        {
+            try
+            {
+                existing = await glossaries.Open();
+            }
+            catch (Exception e)
+            {
+                return GlossaryOutcome.Failed($"The glossary couldn't be opened: {e.Message}");
+            }
+            if (existing is null) return GlossaryOutcome.WasCancelled;
+        }
+
+        var merge = GlossaryExport.Merge(project, existing?.Text);
+        // Nothing new: the file is left exactly as it was.
+        if (existing is not null && merge.Added.Count == 0)
+            return new GlossaryOutcome(true, false, [], merge.AlreadyThere, existing.Name, null);
+
+        SavedFile? saved;
+        try
+        {
+            saved = await glossaries.Save(merge.Markdown, existing?.Name ?? GlossaryExport.FileName, existing?.Handle);
+        }
+        catch (Exception e)
+        {
+            return GlossaryOutcome.Failed($"The glossary couldn't be written: {e.Message}");
+        }
+        if (saved is null) return GlossaryOutcome.WasCancelled;
+        return new GlossaryOutcome(true, false, merge.Added, merge.AlreadyThere, saved.Name, null);
     }
 
     public async Task<LinkOutcome> CopyLink(string pageUrl)
