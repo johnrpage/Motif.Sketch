@@ -137,6 +137,7 @@ public sealed class Exporting
     public async Task An_unusable_system_name_blocks_the_plan()
     {
         var h = await Harness.WithExample();
+        h.Tasks.SetCodeRoot(null);
         h.Tasks.RenameElement(h.System.Id, "42");
 
         (await h.Tasks.ExportPlan()).Problems.Should().Contain(p => p.Contains("usable solution name"));

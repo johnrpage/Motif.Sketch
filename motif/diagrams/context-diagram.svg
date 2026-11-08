@@ -58,7 +58,7 @@
   </g>
   <g class="element" data-id="c5a10a01" data-type="system">
     <rect x="-120" y="-65" width="240" height="130" rx="6" ry="6" fill="#FFFFFF" stroke="#0F172A" stroke-width="3" class="outline" />
-    <text x="0" y="-22.62" font-size="16" fill="#0F172A" text-anchor="middle" dominant-baseline="central" font-weight="600">Motif.Sketch</text>
+    <text x="0" y="-22.62" font-size="16" fill="#0F172A" text-anchor="middle" dominant-baseline="central" font-weight="600">Motif Sketch</text>
     <text x="0" y="-1.75" font-size="11" fill="#0F172A" text-anchor="middle" dominant-baseline="central">Sketch a context diagram, turn it into a</text>
     <text x="0" y="12" font-size="11" fill="#0F172A" text-anchor="middle" dominant-baseline="central">ports-and-adapters sketch, then export the</text>
     <text x="0" y="25.75" font-size="11" fill="#0F172A" text-anchor="middle" dominant-baseline="central">diagrams and a solution plan</text>

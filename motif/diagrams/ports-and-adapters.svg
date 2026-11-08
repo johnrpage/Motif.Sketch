@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg width="993.34" height="866.8" viewBox="-461.11 -453.4 993.34 866.8" font-family="'IBM Plex Sans', 'Segoe UI', Arial, sans-serif" xmlns="http://www.w3.org/2000/svg">
-  <title>Motif.Sketch</title>
+  <title>Motif Sketch</title>
   <defs>
     <marker id="arrow" viewBox="0 0 12 10" markerWidth="12" markerHeight="10" refX="12" refY="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
       <path d="M0,0 L12,5 L0,10 Z" fill="#52606D" />
@@ -131,5 +131,5 @@
       <text x="143.42" y="377.4" font-size="11" fill="#64748B" text-anchor="middle" dominant-baseline="central">Fake</text>
     </g>
   </g>
-  <text x="-441.11" y="-423.4" font-size="18" fill="#0F172A" text-anchor="start" dominant-baseline="central" font-weight="600">Motif.Sketch</text>
+  <text x="-441.11" y="-423.4" font-size="18" fill="#0F172A" text-anchor="start" dominant-baseline="central" font-weight="600">Motif Sketch</text>
 </svg>

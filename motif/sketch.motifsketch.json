@@ -6,9 +6,10 @@
       {
         "id": "c5a10a01",
         "type": "system",
-        "name": "Motif.Sketch",
+        "name": "Motif Sketch",
         "description": "Sketch a context diagram, turn it into a ports-and-adapters sketch, then export the diagrams and a solution plan",
         "technology": "Blazor WebAssembly (GitHub Pages)",
+        "codeRoot": "Motif.Sketch",
         "x": 0,
         "y": 0,
         "pinned": false

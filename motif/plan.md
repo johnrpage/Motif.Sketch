@@ -1,10 +1,10 @@
-# Motif.Sketch: solution plan
+# Motif Sketch: solution plan
 
 *Exported by Motif Sketch from the project "Motif Sketch". Stubs only: no functionality.*
 
 ## 1. Overview
 
-- **System**: Motif.Sketch (Blazor WebAssembly (GitHub Pages))
+- **System**: Motif Sketch (Blazor WebAssembly (GitHub Pages))
 - **Purpose**: Sketch a context diagram, turn it into a ports-and-adapters sketch, then export the diagrams and a solution plan
 - **Solution**: `Motif.Sketch.sln`, targeting `net10.0`
 - **Architecture**: ports and adapters. The application core (Domain and UseCases) knows nothing about the outside world; every external concern sits behind a port and is reached through an adapter.
