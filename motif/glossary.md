@@ -8,7 +8,7 @@ The format is described in the [Motif Glossary design note](https://github.com/m
 
 One concrete way of plugging something into a port. Each adapter has a kind: real, fake, simulated or checks.
 
-- **Kind:** sketch concept
+- **Kind:** domain concept
 - **In code:** `Adapter`, `AdapterKind`
 - **See also:** [Port](#port), [Source](#source)
 
@@ -42,7 +42,7 @@ Where autosaved work is kept: the browser's IndexedDB.
 
 An adapter that drives the application through a driving port and checks what it does. Allowed on driving ports only. Every driving port starts with one, named Specs.
 
-- **Kind:** sketch concept
+- **Kind:** domain concept
 - **Avoid:** fake (a fake stands in for something the application calls; a checks adapter calls the application)
 - **In code:** `AdapterKind.Checks`; the `Checks/` folder
 - **See also:** [Specs](#specs)
@@ -59,7 +59,7 @@ Where Copy link puts a snapshot link, ready to paste. The same name is used for 
 
 The first view: the system in the middle, with the actors, external systems and storage around it, each joined to the system by one relationship. Layout is automatic.
 
-- **Kind:** sketch concept
+- **Kind:** domain concept
 - **Avoid:** context map (a different thing in domain-driven design)
 - **In code:** `ContextDiagram`
 - **See also:** [Element](#element), [Relationship](#relationship)
@@ -76,7 +76,7 @@ Writes the context diagram and the sketch as SVG pictures, cropped to the conten
 
 The two sides of the hexagon. A driving port is for things that use the application, and sits on the left. A driven port is for things the application uses, and sits on the right.
 
-- **Kind:** sketch concept
+- **Kind:** domain concept
 - **Avoid:** primary and secondary (those are actor types), inbound and outbound
 - **In code:** `Side.Driving`, `Side.Driven`
 
@@ -84,7 +84,7 @@ The two sides of the hexagon. A driving port is for things that use the applicat
 
 Anything on the context diagram: the system, a primary or secondary actor, an external system, or storage.
 
-- **Kind:** sketch concept
+- **Kind:** domain concept
 - **Avoid:** node, box
 - **In code:** `Element`, `ElementType`
 - **Status:** proposed
@@ -101,14 +101,14 @@ The bundled project: Motif Sketch's own design, with both views. Opened with Fil
 
 Another system the system talks to, drawn on the right of the context diagram.
 
-- **Kind:** element type
+- **Kind:** domain concept
 - **In code:** `ElementType.ExternalSystem`
 
 ## Fake
 
 A simple in-process stand-in for a real adapter, for fast specs. Named "Fake ⟨Port⟩" by default.
 
-- **Kind:** adapter kind
+- **Kind:** domain concept
 - **Avoid:** mock, stub (stub means something else here: see [Solution Stubs](#solution-stubs))
 - **In code:** `AdapterKind.Fake`; `Fake<Port>` classes in `Motif.Sketch.Fakes`
 
@@ -142,7 +142,7 @@ A .NET project in the solution plan, such as `Motif.Sketch.Domain`. Not the same
 
 A named role the application plays or needs, on the driving or driven side. Adapters plug into it. In code, a port is an interface named plainly, with no `I` prefix.
 
-- **Kind:** sketch concept
+- **Kind:** domain concept
 - **Avoid:** interface (that's how a port appears in code, not what it is)
 - **In code:** `Port`
 - **See also:** [Adapter](#adapter), [Driving and driven](#driving-and-driven)
@@ -151,7 +151,7 @@ A named role the application plays or needs, on the driving or driven side. Adap
 
 A person or system that starts interactions with the system. Drawn on the left of the context diagram. Starting the sketch makes each primary actor the source of a real adapter on the User port.
 
-- **Kind:** element type
+- **Kind:** domain concept
 - **In code:** `ElementType.PrimaryActor`
 
 ## Project
@@ -183,14 +183,14 @@ The port that opens and saves project files.
 
 The production adapter.
 
-- **Kind:** adapter kind
+- **Kind:** domain concept
 - **In code:** `AdapterKind.Real`
 
 ## Relationship
 
 The line joining an element to the system. Every element except the system has exactly one. Its arrow points from the side that starts the interaction; two-way is for the rare case where both do.
 
-- **Kind:** sketch concept
+- **Kind:** domain concept
 - **Avoid:** link (that's a snapshot link), edge, connection
 - **In code:** `Relationship`, `RelationshipDirection`
 
@@ -198,21 +198,21 @@ The line joining an element to the system. Every element except the system has e
 
 A person or system the system starts interactions with. Drawn on the right of the context diagram.
 
-- **Kind:** element type
+- **Kind:** domain concept
 - **In code:** `ElementType.SecondaryActor`
 
 ## Simulated
 
 A higher-fidelity stand-in for a real adapter, for people running the whole app locally.
 
-- **Kind:** adapter kind
+- **Kind:** domain concept
 - **In code:** `AdapterKind.Simulated`
 
 ## Sketch
 
 The ports-and-adapters view: the hexagon, with ports around it and adapters on the ports. Absent from a project until the user starts it.
 
-- **Kind:** sketch concept
+- **Kind:** domain concept
 - **Avoid:** hexagon (that's the shape it's drawn with), and "sketch" on its own for the app (say Motif Sketch)
 - **In code:** `Sketch`
 
@@ -247,7 +247,7 @@ The port the solution plan is handed to, to be built. Today it writes a Markdown
 
 A context diagram element that an adapter stands for. An adapter can have several sources or none, and an element can be the source of at most one adapter.
 
-- **Kind:** sketch concept
+- **Kind:** domain concept
 - **In code:** `Adapter.Sources`
 
 ## Specs
@@ -263,21 +263,21 @@ The checks adapter on a driving port, named Specs by default. Motif Sketch's own
 
 Somewhere the system keeps data, drawn on the right of the context diagram, below the external systems.
 
-- **Kind:** element type
+- **Kind:** domain concept
 - **In code:** `ElementType.Storage`
 
 ## System
 
 The one element at the centre of the context diagram: the thing being designed. Created with the project, and can't be deleted.
 
-- **Kind:** element type
+- **Kind:** domain concept
 - **In code:** `ElementType.System`
 
 ## Unplaced list
 
 The elements not yet placed in the sketch. Dragging one onto a port, the hexagon or an adapter places it.
 
-- **Kind:** sketch concept
+- **Kind:** domain concept
 - **In code:** `UnplacedItem`
 
 ## User port
