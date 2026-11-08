@@ -55,6 +55,7 @@ Motif Sketch is the first tool in the Motif suite. It combines Context Sketch an
 | 49 | Plan templates | The plan exporter maps "Blazor" to `blazorwasm`, and in a Blazor solution puts driven adapters on `razorclasslib` with `Microsoft.JSInterop`, as this repo does. The golden spec checks the example's plan against `Checks/Motif.Sketch.Specs/Golden/Motif.Sketch.plan.md`. |
 | 50 | Example link and phones | `#example` opens the bundled example read-only, like a snapshot link (never touching autosave) but always the current example, labelled "Example · read-only" with a banner. A phone can't edit (decision 30), so with no link and empty or no autosaved work it opens the example the same way; real autosaved work still opens as before. The README and repo Website keep the plain page link, since first-time visitors on a computer get the welcome card. |
 | 51 | Toast timing | A title-only info toast ("Saved to …") goes after 3.5 s. Any toast with a sentence to read, and every warning or problem, stays 10 s, and can be closed sooner. |
+| 52 | Cache busting | GitHub Pages lets browsers keep files for 10 minutes. Every JS module (the App's `app.js` and each adapter's) is fingerprinted through `Directory.Build.props` and reached through the import map, so a deploy never runs new code against old adapter scripts. `css/app.css` keeps its plain name: a standalone app's `index.html` only resolves fingerprint placeholders for scripts, so a stale stylesheet can last up to 10 minutes after a deploy. |
 
 ## Later (not v1)
 

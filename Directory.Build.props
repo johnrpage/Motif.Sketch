@@ -5,4 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Every JS module (the App's and each adapter's) gets a content hash in its name and an import-map
+         entry, so a deploy takes effect at once instead of after GitHub Pages' 10-minute cache. -->
+    <StaticWebAssetFingerprintPattern Include="JSModule" Pattern="*.js" Expression="#[.{fingerprint}]!" />
+  </ItemGroup>
 </Project>
