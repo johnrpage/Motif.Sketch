@@ -480,6 +480,3 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
-
-# Claude Code: personal settings stay local
-.claude/settings.local.json

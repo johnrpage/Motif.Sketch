@@ -7,8 +7,8 @@ Motif Sketch is fully specified: SPEC.md, decisions 1–39 and the mockups in `d
 There are two good starting points:
 - **The solution plan HexaSketch exported from Motif Sketch's own sketch** (`docs/Motif Sketch - plan.md`). It gives the project layout. SPEC §3 says the solution follows "the plan Motif Sketch itself would export", so we use that layout, corrected wherever Motif Sketch's own exporter will differ.
 - **The two reference apps' core libraries, which are plain C# with no UI.** They can be ported almost verbatim:
-  - Context Sketch (`C:\_organised\Code\Claude\Context Tool\src\ContextSketch.Core`): the model, `DiagramValidator`, `DiagramJson`, `AutoLayout` with `LayoutOptions`, the geometry types (`Primitives`, `ElementShapes`, `EdgeGeometry`), `TextWrap`, `DiagramStyle` and `SvgExporter`, plus their xUnit tests.
-  - HexaSketch (`C:\_organised\Code\Claude\HexaSketch\src`, the canonical copy with the GitHub remote): from Domain, `Sketch`, `Port` and `Adapter`; from Application, `SketchSession` (snapshot undo), `Diagram/DiagramLayout` with `DiagramView`, `Diagram/SvgDiagram`, and `Plan/SolutionPlanner`, `CodeName` and `PlanMarkdown`; about 55 specs.
+  - Context Sketch (`..\Context Tool\src\ContextSketch.Core`): the model, `DiagramValidator`, `DiagramJson`, `AutoLayout` with `LayoutOptions`, the geometry types (`Primitives`, `ElementShapes`, `EdgeGeometry`), `TextWrap`, `DiagramStyle` and `SvgExporter`, plus their xUnit tests.
+  - HexaSketch (`..\HexaSketch\src`, the canonical copy with the GitHub remote): from Domain, `Sketch`, `Port` and `Adapter`; from Application, `SketchSession` (snapshot undo), `Diagram/DiagramLayout` with `DiagramView`, `Diagram/SvgDiagram`, and `Plan/SolutionPlanner`, `CodeName` and `PlanMarkdown`; about 55 specs.
   - Only the two WPF shells need rewriting, as Blazor.
 
 **Reusing the old code: review, simplify, fit.** Ported code is a starting point, not something to copy unexamined. For every file brought over from Context Sketch or HexaSketch:
