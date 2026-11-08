@@ -70,6 +70,9 @@ public sealed class Project
 
     public void SetElementTechnology(string elementId, string? technology) => FindElement(elementId).Technology = Tidy(technology);
 
+    /// <summary>Sets the root of the plan's project names. Blank goes back to the one made from the system's name.</summary>
+    public void SetCodeRoot(string? codeRoot) => ContextDiagram.System.CodeRoot = Tidy(codeRoot);
+
     /// <summary>Changes what kind of element this is. Its placement in the sketch is kept.</summary>
     public void SetElementType(string elementId, ElementType type)
     {

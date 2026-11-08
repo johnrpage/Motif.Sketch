@@ -191,10 +191,12 @@
             <div class="body">
                 <div class="field"><label for="sk-name">System name</label>
                     <input id="sk-name" value="@system.Name" readonly="@ReadOnly" @onchange="v => Ui.Run(() => App.RenameElement(system.Id, Text(v)))" /></div>
-                <div class="field"><label>Code root</label><div class="code">@CodeOr(CodeName.Root(system.Name))</div></div>
+                <div class="field"><label for="sk-root">Code root</label>
+                    <input id="sk-root" value="@system.CodeRoot" readonly="@ReadOnly" placeholder="@(ReadOnly ? "" : CodeName.Root(system.Name))" @onchange="v => Ui.Run(() => App.SetCodeRoot(Text(v)))" /></div>
                 <div class="field"><label for="sk-desc">Description</label>
                     <textarea id="sk-desc" readonly="@ReadOnly" @onchange="v => Ui.Run(() => App.DescribeElement(system.Id, Text(v)))">@system.Description</textarea></div>
-                <p class="help">A dotted name such as Motif.Sketch keeps its dots as the plan's root.</p>
+                @{ var root = CodeName.Root(system.CodeRoot ?? system.Name); }
+                <p class="help">@if (string.IsNullOrEmpty(root)) { <text>This doesn't make a usable code name, so the plan can't be exported.</text> } else { <text>The plan's projects are named <code>@root.*</code>.</text> }@if (!ReadOnly) { <text> Leave the code root blank to make it from the system name; dots are kept.</text> }</p>
             </div>
         }
         else if (kind == "port" && view.Port(id) is { } port)

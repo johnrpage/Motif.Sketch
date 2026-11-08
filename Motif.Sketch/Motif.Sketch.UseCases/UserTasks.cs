@@ -67,6 +67,7 @@ public interface UserTasks
     void RenameElement(string elementId, string name);
     void DescribeElement(string elementId, string? description);
     void SetElementTechnology(string elementId, string? technology);
+    void SetCodeRoot(string? codeRoot);
     void SetElementType(string elementId, ElementType type);
     void DeleteElement(string elementId);
     void MoveElement(string elementId, double x, double y);

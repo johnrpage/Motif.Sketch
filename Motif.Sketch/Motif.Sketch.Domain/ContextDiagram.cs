@@ -14,6 +14,12 @@ public sealed class Element
     public string? Description { get; set; }
     public string? Technology { get; set; }
 
+    /// <summary>
+    /// The system only: the root of the solution plan's project names, such as "Motif.Sketch". Empty means
+    /// it comes from the name, so a system can be shown as "Motif Sketch" and still plan <c>Motif.Sketch.*</c>.
+    /// </summary>
+    public string? CodeRoot { get; set; }
+
     /// <summary>Centre of the element, in diagram units.</summary>
     public double X { get; set; }
     public double Y { get; set; }

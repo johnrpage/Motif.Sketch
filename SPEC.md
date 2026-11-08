@@ -76,7 +76,7 @@ One project per system, saved as **`.motifsketch.json`**:
 ### 4.2 Context diagram
 
 As in Context Sketch:
-- **Element** fields: `id`, `type` (`system` | `primaryActor` | `secondaryActor` | `externalSystem` | `storage`), `name`, optional `description` and `technology`, plus `x`, `y` and `pinned`.
+- **Element** fields: `id`, `type` (`system` | `primaryActor` | `secondaryActor` | `externalSystem` | `storage`), `name`, optional `description` and `technology`, plus `x`, `y` and `pinned`. The system alone may also have an optional `codeRoot` (§5.7).
 - **Relationship** fields: `id`, `from`, `to`, `label` and `direction`.
 - **Rules:**
   - There is exactly one system, created with the project. It can't be deleted.
@@ -174,6 +174,7 @@ Every edit in either view is one undo step: Ctrl+Z / Ctrl+Y. There is one histor
   - The SVG and the screen are drawn from the same style definitions: the same shapes, layout and text. Exports always use the light palette; on screen, dark mode swaps in the dark twin of that palette.
 - **Export plan** writes the Markdown solution plan to the Solution Stubs port. It follows HexaSketch's plan opinions with these changes:
   - **Dotted names are kept as the root**: `Motif.Sketch.Domain`, not `MotifSketch.Domain`.
+  - The root comes from the system's optional **code root** when it has one, so the diagrams can show "Motif Sketch" while the plan says `Motif.Sketch.*`. Without one, it comes from the system name.
   - **Two-letter acronyms stay in capitals** in code names (`IndexedDB`, `UI`), which overrides the .NET guidelines.
   - The User port's runnable Real adapter is `<Root>.App`, or one project per adapter if there are several. Each adapter lists the context diagram items it stands for.
   - A `checks` adapter on a driving port becomes `<Root>.Specs` (xUnit and AwesomeAssertions).
@@ -187,6 +188,7 @@ Every edit in either view is one undo step: Ctrl+Z / Ctrl+Y. There is one histor
 - Everything after `#` stays in the browser and is never sent to a server.
 - The link is a **snapshot**: later edits need a new link.
 - If the link would be very long, the app says so but still copies it. The threshold is the planner's choice. Most chat and email tools handle links up to several KB.
+- If the browser refuses the clipboard, the link is shown in a dialog to copy by hand. Otherwise it isn't shown.
 - **Opening a snapshot link** starts the app in **Viewer mode**:
   - The project is read-only, and both views are viewable.
   - Viewer mode **never touches autosave**, so it can't overwrite the visitor's own work.

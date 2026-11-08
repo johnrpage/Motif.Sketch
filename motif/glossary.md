@@ -55,6 +55,15 @@ Where Copy link puts a snapshot link, ready to paste. The same name is used for 
 - **In code:** `Clipboard`
 - **Sketch:** `c5a10a0a` (element), `d6b20c06` (port)
 
+## Code root
+
+The root of the solution plan's project names, such as `Motif.Sketch`. Set on the system when its name isn't the one the code should use; blank means it's made from the system name.
+
+- **Kind:** domain concept
+- **In code:** `Element.CodeRoot`, `CodeName.Root`
+- **Status:** proposed
+- **See also:** [System](#system), [Solution plan](#solution-plan)
+
 ## Context diagram
 
 The first view: the system in the middle, with the actors, external systems and storage around it, each joined to the system by one relationship. Layout is automatic.

@@ -25,6 +25,8 @@ public static class ProjectValidator
 
         foreach (var e in diagram.Elements.Where(e => string.IsNullOrWhiteSpace(e.Name)))
             problems.Add($"Element '{e.Id}' has no name.");
+        foreach (var e in diagram.Elements.Where(e => e.Type != ElementType.System && e.CodeRoot is not null))
+            problems.Add($"'{e.Name}' has a code root, but only the system can have one.");
 
         var byId = diagram.Elements.GroupBy(e => e.Id).ToDictionary(g => g.Key, g => g.First());
         var systemId = systems == 1 ? diagram.System.Id : null;

@@ -43,6 +43,7 @@ public static class ProjectJson
                     Name = e.Name,
                     Description = Blank(e.Description),
                     Technology = Blank(e.Technology),
+                    CodeRoot = Blank(e.CodeRoot),
                     X = Math.Round(e.X),
                     Y = Math.Round(e.Y),
                     Pinned = e.Pinned,
@@ -117,6 +118,7 @@ public static class ProjectJson
                 Name = e.Name?.Trim() ?? "",
                 Description = Blank(e.Description),
                 Technology = Blank(e.Technology),
+                CodeRoot = Blank(e.CodeRoot),
                 X = e.X ?? 0,
                 Y = e.Y ?? 0,
                 Pinned = e.Pinned == true && e.X is not null && e.Y is not null,
@@ -207,6 +209,7 @@ internal sealed class ElementFile
     public string? Name { get; set; }
     public string? Description { get; set; }
     public string? Technology { get; set; }
+    public string? CodeRoot { get; set; }
     public double? X { get; set; }
     public double? Y { get; set; }
     public bool? Pinned { get; set; }

@@ -29,6 +29,23 @@ public sealed class Files
     }
 
     [Fact]
+    public async Task The_code_root_is_saved_on_the_system_and_left_out_when_blank()
+    {
+        var h = await Harness.Started();
+        await h.Tasks.SaveAs();
+        h.Projects.Writes[^1].Json.Should().NotContain("codeRoot");
+
+        h.Tasks.SetCodeRoot("Shop.Orders");
+        await h.Tasks.SaveAs();
+        var saved = h.Projects.Writes[^1].Json;
+        saved.Should().Contain("\"codeRoot\": \"Shop.Orders\"");
+
+        h.Projects.NextOpen = h.Projects.FileOf("again.motifsketch.json", saved);
+        (await h.Tasks.Open()).Succeeded.Should().BeTrue();
+        h.System.CodeRoot.Should().Be("Shop.Orders");
+    }
+
+    [Fact]
     public async Task In_save_in_place_browsers_Save_writes_back_to_the_same_file()
     {
         var h = await Harness.Started();
@@ -133,6 +150,7 @@ public sealed class Files
     [InlineData("""{ "schemaVersion": 1, "contextDiagram": { "elements": [ { "id": "s", "type": "system", "name": "A" } ], "relationships": [ { "id": "r", "from": "s", "to": "ghost" } ] } }""", "isn't an element")]
     [InlineData("""{ "schemaVersion": 1, "contextDiagram": { "elements": [ { "id": "s", "type": "system", "name": "A" }, { "id": "b", "type": "storage", "name": "B" } ], "relationships": [] } }""", "exactly one relationship")]
     [InlineData("""{ "schemaVersion": 1, "contextDiagram": { "elements": [ { "id": "s", "type": "system", "name": "A" }, { "id": "b", "type": "storage", "name": "B" }, { "id": "c", "type": "storage", "name": "C" } ], "relationships": [ { "id": "r1", "from": "s", "to": "b" }, { "id": "r2", "from": "b", "to": "c" } ] } }""", "doesn't have the system at one end")]
+    [InlineData("""{ "schemaVersion": 1, "contextDiagram": { "elements": [ { "id": "s", "type": "system", "name": "A" }, { "id": "a", "type": "primaryActor", "name": "Ann", "codeRoot": "Ann" } ], "relationships": [ { "id": "r", "from": "a", "to": "s" } ] } }""", "only the system can have one")]
     [InlineData("""{ "schemaVersion": 1, "contextDiagram": { "elements": [ { "id": "s", "type": "system", "name": "A" } ] }, "sketch": { "ports": [] } }""", "no User port")]
     [InlineData("""{ "schemaVersion": 1, "contextDiagram": { "elements": [ { "id": "s", "type": "system", "name": "A" } ] }, "sketch": { "ports": [ { "id": "u", "name": "User", "side": "driving", "isUser": true }, { "id": "p", "name": "P", "side": "driven", "adapters": [ { "id": "x", "name": "Specs", "kind": "checks" } ] } ] } }""", "driving ports only")]
     [InlineData("""{ "schemaVersion": 1, "contextDiagram": { "elements": [ { "id": "s", "type": "system", "name": "A" } ] }, "sketch": { "ports": [ { "id": "u", "name": "User", "side": "driving", "isUser": true, "adapters": [ { "id": "x", "name": "X", "kind": "real", "sources": ["nope"] } ] } ] } }""", "isn't an element of the context diagram")]

@@ -6,6 +6,7 @@ public sealed record ElementView(
     string Name,
     string? Description,
     string? Technology,
+    string? CodeRoot,
     bool Pinned,
     Rect Box,
     IReadOnlyList<string> NameLines,
@@ -56,7 +57,7 @@ public sealed record ContextView(
         var textWidth = box.Width - 20;
         var nameSize = system ? DiagramStyle.SystemNameFontSize : DiagramStyle.NameFontSize;
         // Technology gets two lines, and the system's description three.
-        return new ElementView(e.Id, e.Type, e.Name, e.Description, e.Technology, e.Pinned, box,
+        return new ElementView(e.Id, e.Type, e.Name, e.Description, e.Technology, e.CodeRoot, e.Pinned, box,
             TextWrap.Wrap(e.Name, textWidth, nameSize, true, 2),
             system ? [] : TextWrap.Wrap(e.Technology, textWidth, DiagramStyle.SmallFontSize, false, 2),
             system ? TextWrap.Wrap(e.Description, textWidth, DiagramStyle.SmallFontSize, false, 3) : []);

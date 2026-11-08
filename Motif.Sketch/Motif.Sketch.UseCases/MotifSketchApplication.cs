@@ -339,6 +339,7 @@ public sealed class MotifSketchApplication : UserTasks, UserQueries
     public void RenameElement(string elementId, string name) => Edit(p => p.RenameElement(elementId, name));
     public void DescribeElement(string elementId, string? description) => Edit(p => p.DescribeElement(elementId, description));
     public void SetElementTechnology(string elementId, string? technology) => Edit(p => p.SetElementTechnology(elementId, technology));
+    public void SetCodeRoot(string? codeRoot) => Edit(p => p.SetCodeRoot(codeRoot));
 
     public void SetElementType(string elementId, ElementType type) => Edit(p =>
     {

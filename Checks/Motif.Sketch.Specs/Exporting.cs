@@ -143,6 +143,42 @@ public sealed class Exporting
     }
 
     [Fact]
+    public async Task A_code_root_names_the_planned_projects_and_the_diagrams_keep_the_system_name()
+    {
+        var h = await Harness.WithExample();
+        h.Tasks.RenameElement(h.System.Id, "Motif Sketch");
+        h.Tasks.SetCodeRoot(" Motif.Sketch ");
+
+        (await h.Tasks.ExportPlan()).Succeeded.Should().BeTrue();
+
+        h.System.CodeRoot.Should().Be("Motif.Sketch");
+        h.SolutionStubs.Written.Single().Markdown.Should().Contain("`Motif.Sketch.Domain`").And.NotContain("MotifSketch.");
+        h.Queries.Sketch!.Title.Should().Be("Motif Sketch");
+    }
+
+    [Fact]
+    public async Task A_blank_code_root_goes_back_to_the_system_name()
+    {
+        var h = await Harness.WithExample();
+        h.Tasks.RenameElement(h.System.Id, "Motif Sketch");
+        h.Tasks.SetCodeRoot("Motif.Sketch");
+        h.Tasks.SetCodeRoot("  ");
+
+        h.System.CodeRoot.Should().BeNull();
+        (await h.Tasks.ExportPlan()).Succeeded.Should().BeTrue();
+        h.SolutionStubs.Written.Single().Markdown.Should().Contain("`MotifSketch.Domain`");
+    }
+
+    [Fact]
+    public async Task An_unusable_code_root_blocks_the_plan()
+    {
+        var h = await Harness.WithExample();
+        h.Tasks.SetCodeRoot("Motif.42");
+
+        (await h.Tasks.ExportPlan()).Problems.Should().Contain(p => p.Contains("code root 'Motif.42'"));
+    }
+
+    [Fact]
     public void Code_names_keep_dots_in_the_root_and_two_letter_acronyms_in_capitals()
     {
         CodeName.Root("Motif.Sketch").Should().Be("Motif.Sketch");

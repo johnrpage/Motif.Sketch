@@ -32,9 +32,11 @@ public static partial class SolutionPlanner
         var warnings = new List<string>();
         var system = project.ContextDiagram.System;
         var sketch = project.Sketch ?? throw new InvalidOperationException("The plan needs a sketch.");
-        var s = CodeName.Root(system.Name);
+        var s = CodeName.Root(system.CodeRoot ?? system.Name);
         if (!CodeName.IsValid(s))
-            problems.Add($"The system name '{system.Name}' doesn't make a usable solution name.");
+            problems.Add(system.CodeRoot is { } root
+                ? $"The code root '{root}' doesn't make a usable solution name."
+                : $"The system name '{system.Name}' doesn't make a usable solution name. Give the system a code root.");
 
         var ports = sketch.Ports.OrderBy(p => p.Side).ToList();
         var userRunnable = sketch.UserPort.Adapters.Where(IsRunnable).ToList();
