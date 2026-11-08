@@ -9,8 +9,8 @@ public sealed record Tool(string Id, string Name, string Line, string Url);
 /// <summary>The Motif tools that run in the browser, in the order the tool switcher lists them.</summary>
 public static class Tools
 {
-    /// <summary>Motif.NET's home. The GitHub org until the suite has a landing page.</summary>
-    public const string Home = "https://github.com/motif-dotnet";
+    /// <summary>Motif.NET's home: the suite's landing page, which lists every tool.</summary>
+    public const string Home = "https://motif-dotnet.github.io/";
 
     public static readonly IReadOnlyList<Tool> All =
     [

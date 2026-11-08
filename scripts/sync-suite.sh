@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Motif.NET shared web kit: copied from github.com/motif-dotnet/.github/tree/main/brand/web. Don't edit an app's copy.
 #
-# Copies the kit into this repo's Blazor app (the one *.App folder at the root), or with --check,
-# reports whether the app's copy has drifted from it.
+# Copies the kit into this repo's Blazor app (the one *.App folder at the root), or into a static
+# site (no *.App folder, an index.html at the root), or with --check, reports whether the copy has
+# drifted from it.
 #
 #   scripts/sync-suite.sh                    copy the kit in from GitHub
 #   scripts/sync-suite.sh --check            report drift; exits 1 if there is any
@@ -13,6 +14,8 @@
 #   brand/web/fonts/     ->  wwwroot/fonts/   (the whole folder)
 #   brand/web/Suite/     ->  Suite/           (the whole folder: C# and Razor in namespace Motif.Suite)
 #   brand/web/sync-suite.sh -> scripts/sync-suite.sh (this script)
+# A static site (the suite's landing page) gets the stylesheet and fonts at its root, and no Suite/:
+#   brand/web/motif.css  ->  css/motif.css,   brand/web/fonts/  ->  fonts/
 set -euo pipefail
 
 check=false
@@ -27,11 +30,16 @@ while [ $# -gt 0 ]; do
 done
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
+shopt -s nullglob
 apps=("$root"/*.App)
-if [ ${#apps[@]} -ne 1 ] || [ ! -d "${apps[0]}" ]; then
-  echo "Expected one *.App folder in $root" >&2; exit 2
+shopt -u nullglob
+if [ ${#apps[@]} -eq 1 ] && [ -d "${apps[0]}" ]; then
+  app="${apps[0]}"
+elif [ ${#apps[@]} -eq 0 ] && [ -f "$root/index.html" ]; then
+  app=""
+else
+  echo "Expected one *.App folder, or a static site's index.html, in $root" >&2; exit 2
 fi
-app="${apps[0]}"
 
 if [ -z "$from" ]; then
   tmp="$(mktemp -d)"
@@ -43,10 +51,16 @@ kit="$from/brand/web"
 [ -f "$kit/motif.css" ] || { echo "No kit at $kit" >&2; exit 2; }
 
 # pairs of kit path and app path
-pairs=(
-  "$kit/motif.css" "$app/wwwroot/css/motif.css"
-  "$kit/fonts" "$app/wwwroot/fonts"
-  "$kit/Suite" "$app/Suite"
+if [ -n "$app" ]; then
+  web="$app/wwwroot"; target="${app#"$root"/}"
+  pairs=("$kit/Suite" "$app/Suite")
+else
+  web="$root"; target="the static site"
+  pairs=()
+fi
+pairs+=(
+  "$kit/motif.css" "$web/css/motif.css"
+  "$kit/fonts" "$web/fonts"
   "$kit/sync-suite.sh" "$root/scripts/sync-suite.sh"
 )
 
@@ -60,10 +74,10 @@ if $check; then
     fi
   done
   if [ $drift -eq 1 ]; then
-    echo "The app's copy of the Motif web kit differs from motif-dotnet/.github brand/web. Run scripts/sync-suite.sh to bring it up to date."
+    echo "This repo's copy of the Motif web kit differs from motif-dotnet/.github brand/web. Run scripts/sync-suite.sh to bring it up to date."
     exit 1
   fi
-  echo "The app's copy of the Motif web kit is up to date."
+  echo "This repo's copy of the Motif web kit is up to date."
   exit 0
 fi
 
@@ -77,6 +91,6 @@ fi
       mkdir -p "$(dirname "$dst")"; cp "$src" "$dst"
     fi
   done
-  echo "Copied the Motif web kit into ${app#"$root"/}."
+  echo "Copied the Motif web kit into $target."
   exit 0
 }
