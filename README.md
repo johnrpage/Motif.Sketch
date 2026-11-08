@@ -1,8 +1,8 @@
 # Motif Sketch
 
-The first tool in the **Motif** suite. You sketch a system context diagram, turn it into a ports-and-adapters sketch, and export both as SVG pictures, plus a Markdown solution plan a coding agent can build stubs from. It's a Blazor WebAssembly app for GitHub Pages: no server and no accounts. Your work stays in your own files and browser.
+The first tool in the **[Motif.NET](https://github.com/motif-dotnet)** suite. You sketch a system context diagram, turn it into a ports-and-adapters sketch, and export both as SVG pictures, plus a Markdown solution plan a coding agent can build stubs from. It's a Blazor WebAssembly app for GitHub Pages: no server and no accounts. Your work stays in your own files and browser.
 
-**Try it: [johnrpage.github.io/Motif.Sketch](https://johnrpage.github.io/Motif.Sketch/)**. File → Open example shows Motif Sketch's own design.
+**Try it: [motif-dotnet.github.io/Motif.Sketch](https://motif-dotnet.github.io/Motif.Sketch/)**. File → Open example shows Motif Sketch's own design.
 
 It combines and replaces two desktop tools: [Context Sketch](https://github.com/johnrpage/context-tool) and [HexaSketch](https://github.com/johnrpage/HexaSketch).
 
