@@ -66,6 +66,10 @@ The layout is the one Motif Sketch exports for itself ([motif/plan.md](motif/pla
 | [motif/](motif/README.md) | Motif Sketch's own design, solution plan, diagrams and glossary |
 | [AGENTS.md](AGENTS.md) | Where coding agents start |
 
+## Contributing
+
+Bug reports, suggestions and pull requests are welcome; [CONTRIBUTING.md](https://github.com/motif-dotnet/.github/blob/main/CONTRIBUTING.md) says how. Issues labelled [good first issue](https://github.com/motif-dotnet/Motif.Sketch/labels/good%20first%20issue) are a gentle way in. For ideas and questions, start a thread in [Discussions](https://github.com/motif-dotnet/.github/discussions).
+
 ## License
 
 MIT, see [LICENSE](LICENSE).
