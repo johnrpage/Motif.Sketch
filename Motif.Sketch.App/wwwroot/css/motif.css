@@ -87,6 +87,8 @@ code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .92em; colo
 .brand .motif { font-weight: 400; color: var(--muted); }
 .brand b { font-weight: 600; }
 .brand svg.i { color: var(--muted); margin-left: -2px; }
+.brand .new-dot { flex: none; width: 7px; height: 7px; margin: 0 -2px 0 -2px; border-radius: 50%; background: var(--accent); }
+.tool-link .new-tag { margin-left: 6px; padding: 1px 6px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); font-size: 11px; font-style: normal; font-weight: 600; vertical-align: 1px; }
 .switcher .menu-list { min-width: 300px; }
 .menu-list a.tool-link { flex-direction: column; align-items: flex-start; gap: 0; padding: 8px 10px; white-space: normal; }
 .tool-link b { color: var(--ink); font-weight: 600; }

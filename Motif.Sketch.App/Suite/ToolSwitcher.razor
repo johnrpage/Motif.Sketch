@@ -1,12 +1,14 @@
 @* Motif.NET shared web kit: copied from github.com/motif-dotnet/.github/tree/main/brand/web. Don't edit an app's copy. *@
 @namespace Motif.Suite
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
 
 @* The brand at the left of the app bar: the mark and "Motif <tool>", opening a menu of the Motif tools. *@
 <div class="menu left switcher @(Open ? "open" : "")">
-    <button class="brand" title="Motif tools" aria-haspopup="menu" aria-expanded="@(Open ? "true" : "false")"
+    <button class="brand" title="@(unseen ? "Motif tools: something new" : "Motif tools")" aria-haspopup="menu" aria-expanded="@(Open ? "true" : "false")"
             @onclick="OnToggle" @onclick:stopPropagation="true">
-        @SuiteIcons.Mark<span class="word"><span class="motif">Motif</span> <b>@Tools.Get(Current).Name</b></span>@SuiteIcons.Chevron
+        @SuiteIcons.Mark<span class="word"><span class="motif">Motif</span> <b>@Tools.Get(Current).Name</b></span>@if (unseen) {<span class="new-dot" aria-hidden="true"></span>}@SuiteIcons.Chevron
     </button>
     <div class="menu-list" role="menu">
         @if (!string.IsNullOrEmpty(Repo))
@@ -18,13 +20,13 @@
             if (tool.Ready)
             {
                 <a class="tool-link" role="menuitem" href="@Tools.Link(tool, Repo)" aria-current="@(tool.Id == Current ? "page" : null)">
-                    <b>Motif @tool.Name</b><span>@tool.Line</span>
+                    <b>Motif @tool.Name@NewTag(tool)</b><span>@tool.Line</span>
                 </a>
             }
             else
             {
                 <div class="tool-link next-up" role="menuitem" aria-disabled="true">
-                    <b>Motif @tool.Name</b><span>@tool.Line</span>
+                    <b>Motif @tool.Name@NewTag(tool)</b><span>@tool.Line</span>
                 </div>
             }
         }
@@ -34,6 +36,12 @@
 </div>
 
 @code {
+    // The ids of the new tools this browser has already seen in the menu, kept like the theme: this browser only.
+    private const string SeenKey = "motif-seen-new";
+
+    private bool unseen;
+    private IReadOnlyList<string> newIds = [];
+
     /// <summary>This tool's id in <see cref="Tools.All"/>.</summary>
     [Parameter, EditorRequired] public string Current { get; set; } = "";
 
@@ -46,4 +54,46 @@
     [Parameter] public bool Open { get; set; }
 
     [Parameter] public EventCallback OnToggle { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var today = DateOnly.FromDateTime(DateTime.Now);
+        newIds = Tools.All.Where(t => t.Id != Current && t.IsNew(today)).Select(t => t.Id).ToList();
+        var seen = (Read() ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries);
+        unseen = newIds.Except(seen).Any();
+    }
+
+    protected override void OnParametersSet()
+    {
+        // Opening the menu shows what's new, so the dot has done its job.
+        if (Open && unseen)
+        {
+            unseen = false;
+            Write(string.Join(',', newIds));
+        }
+    }
+
+    private RenderFragment NewTag(Tool tool) => builder =>
+    {
+        if (newIds.Contains(tool.Id))
+        {
+            builder.OpenElement(0, "em");
+            builder.AddAttribute(1, "class", "new-tag");
+            builder.AddContent(2, "new");
+            builder.CloseElement();
+        }
+    };
+
+    // Storage can be blocked or missing (private windows, prerendering): then there's simply no dot memory.
+    private string? Read()
+    {
+        try { return (JS as IJSInProcessRuntime)?.Invoke<string?>("localStorage.getItem", SeenKey); }
+        catch { return null; }
+    }
+
+    private void Write(string value)
+    {
+        try { (JS as IJSInProcessRuntime)?.InvokeVoid("localStorage.setItem", SeenKey, value); }
+        catch { /* storage may be blocked */ }
+    }
 }
