@@ -15,9 +15,18 @@
         }
         @foreach (var tool in Tools.All)
         {
-            <a class="tool-link" role="menuitem" href="@Tools.Link(tool, Repo)" aria-current="@(tool.Id == Current ? "page" : null)">
-                <b>Motif @tool.Name</b><span>@tool.Line</span>
-            </a>
+            if (tool.Ready)
+            {
+                <a class="tool-link" role="menuitem" href="@Tools.Link(tool, Repo)" aria-current="@(tool.Id == Current ? "page" : null)">
+                    <b>Motif @tool.Name</b><span>@tool.Line</span>
+                </a>
+            }
+            else
+            {
+                <div class="tool-link next-up" role="menuitem" aria-disabled="true">
+                    <b>Motif @tool.Name</b><span>@tool.Line</span>
+                </div>
+            }
         }
         <div class="note">Part of <a href="@Tools.Home" target="_blank" rel="noopener">Motif.NET</a>: tools for building .NET apps with a coding agent.</div>
     </div>

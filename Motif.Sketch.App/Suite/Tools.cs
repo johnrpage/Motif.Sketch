@@ -4,7 +4,8 @@ namespace Motif.Suite;
 /// <param name="Id">Short and stable: what an app passes to the tool switcher as itself.</param>
 /// <param name="Name">The tool's name after "Motif", as in its wordmark.</param>
 /// <param name="Line">One line on what it's for, shown in the tool switcher.</param>
-public sealed record Tool(string Id, string Name, string Line, string Url);
+/// <param name="Ready">False for a tool that's next up but not built yet: the switcher shows it greyed out, with no link.</param>
+public sealed record Tool(string Id, string Name, string Line, string Url, bool Ready = true);
 
 /// <summary>The Motif tools that run in the browser, in the order the tool switcher lists them.</summary>
 public static class Tools
@@ -16,6 +17,7 @@ public static class Tools
     [
         new("sketch", "Sketch", "Sketch a context diagram and its ports and adapters, then export a solution plan.", "https://motif-dotnet.github.io/Motif.Sketch/"),
         new("glossary", "Glossary", "Review a project's glossary at a glance.", "https://motif-dotnet.github.io/Motif.Glossary/"),
+        new("memory", "Memory", "Set up an agent's external memory, with the roles and workflow that suit you.", "https://motif-dotnet.github.io/Motif.Memory/", Ready: false),
     ];
 
     public static Tool Get(string id) => All.First(t => t.Id == id);
