@@ -9,9 +9,16 @@ namespace Motif.Suite;
 /// While set and not past, the tool is news: the switcher tags it "new", and puts a dot on the Motif mark
 /// until the viewer next opens the menu. Leave it unset once the news is old.
 /// </param>
-public sealed record Tool(string Id, string Name, string Line, string Url, bool Ready = true, DateOnly? NewUntil = null)
+/// <param name="Preview">
+/// True while the tool is an early version that may change and have bugs: the brand shows a "preview" tag, and
+/// the switcher says what that means, with a link to the tool's issues.
+/// </param>
+public sealed record Tool(string Id, string Name, string Line, string Url, bool Ready = true, DateOnly? NewUntil = null, bool Preview = false)
 {
     public bool IsNew(DateOnly today) => NewUntil is { } until && today <= until;
+
+    /// <summary>Where to report a bug: the tool's issues on GitHub.</summary>
+    public string Issues => $"https://github.com/motif-dotnet/Motif.{Name}/issues";
 }
 
 /// <summary>The Motif tools that run in the browser, in the order the tool switcher lists them.</summary>
@@ -22,9 +29,9 @@ public static class Tools
 
     public static readonly IReadOnlyList<Tool> All =
     [
-        new("sketch", "Sketch", "Sketch a context diagram and its ports and adapters, then export a solution plan.", "https://motif-dotnet.github.io/Motif.Sketch/"),
-        new("glossary", "Glossary", "Review a project's glossary at a glance.", "https://motif-dotnet.github.io/Motif.Glossary/"),
-        new("memory", "Memory", "Set up an agent's external memory, with the roles and workflow that suit you.", "https://motif-dotnet.github.io/Motif.Memory/", NewUntil: new(2026, 12, 31)),
+        new("sketch", "Sketch", "Sketch a context diagram and its ports and adapters, then export a solution plan.", "https://motif-dotnet.github.io/Motif.Sketch/", Preview: true),
+        new("glossary", "Glossary", "Review a project's glossary at a glance.", "https://motif-dotnet.github.io/Motif.Glossary/", Preview: true),
+        new("memory", "Memory", "Set up an agent's external memory, with the roles and workflow that suit you.", "https://motif-dotnet.github.io/Motif.Memory/", NewUntil: new(2026, 12, 31), Preview: true),
     ];
 
     public static Tool Get(string id) => All.First(t => t.Id == id);

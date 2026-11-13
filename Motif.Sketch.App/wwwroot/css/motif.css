@@ -88,6 +88,9 @@ code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .92em; colo
 .brand b { font-weight: 600; }
 .brand svg.i { color: var(--muted); margin-left: -2px; }
 .brand .new-dot { flex: none; width: 7px; height: 7px; margin: 0 -2px 0 -2px; border-radius: 50%; background: var(--accent); }
+.brand .preview-tag { flex: none; display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border: 1px solid var(--line-strong); border-radius: 9px; color: var(--muted); font-size: 11px; font-weight: 500; letter-spacing: 0; }
+.menu-list .note.preview { border-top: 0; border-bottom: 1px solid var(--line); margin: 0 0 4px; }
+.menu-list .note.preview b { color: var(--ink); font-weight: 600; }
 .tool-link .new-tag { margin-left: 6px; padding: 1px 6px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); font-size: 11px; font-style: normal; font-weight: 600; vertical-align: 1px; }
 .switcher .menu-list { min-width: 300px; }
 .menu-list a.tool-link { flex-direction: column; align-items: flex-start; gap: 0; padding: 8px 10px; white-space: normal; }
@@ -188,7 +191,7 @@ code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .92em; colo
 }
 /* Phones: the bar must fit */
 @media (max-width: 599px) {
-  .brand .motif, .pill .long, .primary .long { display: none !important; }
+  .brand .motif, .brand .preview-tag, .pill .long, .primary .long { display: none !important; }
   .appbar { gap: 0; padding: 0 6px; }
   .brand { margin-right: 2px; }
 }

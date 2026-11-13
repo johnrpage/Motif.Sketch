@@ -8,9 +8,13 @@
 <div class="menu left switcher @(Open ? "open" : "")">
     <button class="brand" title="@(unseen ? "Motif tools: something new" : "Motif tools")" aria-haspopup="menu" aria-expanded="@(Open ? "true" : "false")"
             @onclick="OnToggle" @onclick:stopPropagation="true">
-        @SuiteIcons.Mark<span class="word"><span class="motif">Motif</span> <b>@Tools.Get(Current).Name</b></span>@if (unseen) {<span class="new-dot" aria-hidden="true"></span>}@SuiteIcons.Chevron
+        @SuiteIcons.Mark<span class="word"><span class="motif">Motif</span> <b>@Tools.Get(Current).Name</b></span>@if (Tools.Get(Current).Preview) {<span class="preview-tag">preview</span>}@if (unseen) {<span class="new-dot" aria-hidden="true"></span>}@SuiteIcons.Chevron
     </button>
     <div class="menu-list" role="menu">
+        @if (Tools.Get(Current).Preview)
+        {
+            <div class="note preview"><b>Preview.</b> Expect changes and the odd bug. <a href="@Tools.Get(Current).Issues" target="_blank" rel="noopener">Found one? Tell us</a>.</div>
+        }
         @if (!string.IsNullOrEmpty(Repo))
         {
             <div class="note project">Each tool opens <b>@Repo</b>: its <code>motif/</code> folder on GitHub.</div>
