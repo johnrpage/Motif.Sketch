@@ -24,7 +24,7 @@ public static class Tools
     [
         new("sketch", "Sketch", "Sketch a context diagram and its ports and adapters, then export a solution plan.", "https://motif-dotnet.github.io/Motif.Sketch/"),
         new("glossary", "Glossary", "Review a project's glossary at a glance.", "https://motif-dotnet.github.io/Motif.Glossary/"),
-        new("memory", "Memory", "Set up an agent's external memory, with the roles and workflow that suit you.", "https://motif-dotnet.github.io/Motif.Memory/", Ready: false, NewUntil: new(2026, 12, 31)),
+        new("memory", "Memory", "Set up an agent's external memory, with the roles and workflow that suit you.", "https://motif-dotnet.github.io/Motif.Memory/", NewUntil: new(2026, 12, 31)),
     ];
 
     public static Tool Get(string id) => All.First(t => t.Id == id);

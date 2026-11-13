@@ -173,6 +173,8 @@ code { font-family: "IBM Plex Mono", Consolas, monospace; font-size: .92em; colo
 .toast b { display: block; color: var(--ink); font-weight: 600; }
 .toast span, .toast li { color: var(--text); font-size: 12.5px; }
 .toast ul { margin: 2px 0 0; padding-left: 16px; }
+.toast .copy { display: block; margin-top: 6px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--canvas); color: var(--ink); }
+.toast .ghost { display: flex; width: fit-content; margin-top: 8px; }
 
 /* Blazor's error bar */
 #blazor-error-ui { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 60; padding: 10px 40px 10px 16px; background: var(--banner); color: var(--banner-ink); }

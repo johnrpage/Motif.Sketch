@@ -1,6 +1,8 @@
 @* Motif.NET shared web kit: copied from github.com/motif-dotnet/.github/tree/main/brand/web. Don't edit an app's copy. *@
 @namespace Motif.Suite
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
 
 <div class="toasts" aria-live="polite">
     @foreach (var toast in Toaster.Toasts)
@@ -9,6 +11,7 @@
             <div class="t"><b>@toast.Title</b>
                 @if (toast.Lines.Count == 1) { <span>@toast.Lines[0]</span> }
                 else if (toast.Lines.Count > 1) { <ul>@foreach (var line in toast.Lines.Take(8)) { <li>@line</li> }</ul> }
+                @if (toast.Copy != "") { <span class="copy">@toast.Copy</span> <button class="ghost small" @onclick="() => CopyText(toast)">@SuiteIcons.Copy @(copied == toast.Id ? "Copied" : "Copy")</button> }
             </div>
             <button class="x" title="Dismiss" @onclick="() => Toaster.Dismiss(toast.Id)">@SuiteIcons.Close</button>
         </div>
@@ -18,4 +21,17 @@
 @code {
     /// <summary>The toasts to show. The page re-renders this when the toaster changes.</summary>
     [Parameter, EditorRequired] public Toaster Toaster { get; set; } = null!;
+
+    private int copied;
+
+    private async Task CopyText(Toast toast)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", toast.Copy);
+            copied = toast.Id;
+        }
+        // The browser can refuse the clipboard. The text is in the toast to select by hand, so the button stays as it was.
+        catch (JSException) { }
+    }
 }
