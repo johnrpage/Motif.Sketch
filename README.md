@@ -20,7 +20,7 @@ These pictures are Motif Sketch's own exports of its design, [motif/sketch.motif
 
 ## Status
 
-**Built.** All of [docs/build-plan.md](docs/build-plan.md) is in: both views, files and autosave, exports and the plan, snapshot links and Viewer mode, the example, and the v2 look with its dark twin. The answers to SPEC §10 are decisions 40–49.
+**Trial.** Built and in use on Motif's own repos, still changing. All of [docs/build-plan.md](docs/build-plan.md) is in: both views, files and autosave, exports and the plan, snapshot links and Viewer mode, the example, and the v2 look with its dark twin. The answers to SPEC §10 are decisions 40–49.
 
 ### Still to do
 
